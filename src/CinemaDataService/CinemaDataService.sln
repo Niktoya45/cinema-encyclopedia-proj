@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaDataService.Domain", "CinemaDataService.Domain\CinemaDataService.Domain.csproj", "{BAC7C672-D96D-4418-AA85-72406DEBF522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaDataService.Infrastructure", "CinemaDataService.Infrastructure\CinemaDataService.Infrastructure.csproj", "{7621A504-6503-4050-B98C-8A193F413361}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaDataService.Api", "CinemaDataService.Api\CinemaDataService.Api.csproj", "{0689E4E1-2421-4EA5-A778-C9B0C55B2BEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BAC7C672-D96D-4418-AA85-72406DEBF522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAC7C672-D96D-4418-AA85-72406DEBF522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAC7C672-D96D-4418-AA85-72406DEBF522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAC7C672-D96D-4418-AA85-72406DEBF522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7621A504-6503-4050-B98C-8A193F413361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7621A504-6503-4050-B98C-8A193F413361}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7621A504-6503-4050-B98C-8A193F413361}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7621A504-6503-4050-B98C-8A193F413361}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0689E4E1-2421-4EA5-A778-C9B0C55B2BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0689E4E1-2421-4EA5-A778-C9B0C55B2BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0689E4E1-2421-4EA5-A778-C9B0C55B2BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0689E4E1-2421-4EA5-A778-C9B0C55B2BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

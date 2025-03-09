@@ -1,0 +1,6 @@
+@UserDataService.Api_HostAddress = http://localhost:5139
+
+GET {{UserDataService.Api_HostAddress}}/
+Accept: application/json
+
+###

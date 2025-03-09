@@ -1,0 +1,6 @@
+@CinemaDataService.Api_HostAddress = http://localhost:5126
+
+GET {{CinemaDataService.Api_HostAddress}}/
+Accept: application/json
+
+###
