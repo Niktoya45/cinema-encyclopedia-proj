@@ -1,0 +1,72 @@
+﻿@using EncyclopediaService.Api.Models; 
+@model FilmsViewModel;
+@{
+    ViewData["Title"] = "Cinemas";
+}
+
+<h1>Cinemas</h1>
+
+<body>
+    <div class="container">
+        <div class="row mt-4">
+            <!-- Collection Grid -->
+            <div class="col-md-10">
+                @{
+                    string _css_rows = $"row row-cols-1 row-cols-md-{Model.ColumnsCount} g-{Model.ColumnsCount}";
+                    int col_count = Model.ColumnsCount;
+                    var sub_list = Model.List.Take(Model.ColumnsCount);
+                    int counter = 0;
+                }
+                @while ((sub_list != null && sub_list.Count() != 0))
+                {
+                    <div class=@(_css_rows)>
+                        @foreach (var film in sub_list)
+                        {
+                            <div class="col">
+                                <div class="card">
+                                    <img src="~/img/grid_placeholder.png" class="card-img-top" alt="Cinema @(film.Id)">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Cinema @(film.Id)</h5>
+                                        <p class="card-text"><a asp-area="" asp-controller="Films" asp-action="Cinema">Title of cinema @(film.Id).</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    sub_list = Model.List.Skip(col_count).Take(Model.ColumnsCount);
+                    col_count += 4;
+                    counter++;
+                }
+            </div>
+            <!-- Filter Options -->
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Filter Options</h5>
+                        <form>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option1">
+                                <label class="form-check-label" for="option1">
+                                    Option 1
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option2">
+                                <label class="form-check-label" for="option2">
+                                    Option 2
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option3">
+                                <label class="form-check-label" for="option3">
+                                    Option 3
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+

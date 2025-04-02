@@ -1,5 +1,4 @@
-﻿using CinemaDataService.Domain.Aggregates.Base;
-
+﻿
 namespace CinemaDataService.Domain.Aggregates.Shared
 {
     [Flags]

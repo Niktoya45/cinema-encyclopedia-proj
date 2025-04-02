@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
-using CinemaDataService.Domain.Aggregates.Cinema;
-using CinemaDataService.Domain.Aggregates.Person;
-using CinemaDataService.Domain.Aggregates.Studio;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Domain.Aggregates.PersonAggregate;
+using CinemaDataService.Domain.Aggregates.StudioAggregate;
 
 
-namespace CinemaDataService.Infrastructure
+namespace CinemaDataService.Infrastructure.Context
 {
     public class CinemaDataDb
     {

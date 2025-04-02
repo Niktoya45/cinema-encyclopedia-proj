@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using CinemaDataService.Domain.Aggregates.Base;
 
-namespace CinemaDataService.Domain.Aggregates.Cinema
+namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
 {
     public record ActorRole:Value
     {

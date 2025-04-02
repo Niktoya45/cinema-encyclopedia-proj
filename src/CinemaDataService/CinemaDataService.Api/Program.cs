@@ -1,5 +1,9 @@
 
 using MongoDB.Driver;
+using CinemaDataService.Infrastructure.Context;
+using MongoDB.Bson.Serialization.IdGenerators;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 
 namespace CinemaDataService.Api
 {
@@ -22,8 +26,10 @@ namespace CinemaDataService.Api
 
                 IMongoClient client = new MongoClient(url);
                 IMongoDatabase db = client.GetDatabase(url.DatabaseName);
+
                 return db;
             });
+            builder.Services.AddScoped<CinemaDataDb>();
 
             var app = builder.Build();
 

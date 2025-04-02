@@ -1,9 +1,10 @@
 ﻿using CinemaDataService.Domain.Aggregates.Base;
 
-namespace CinemaDataService.Domain.Aggregates.Cinema
+namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
 {
     public enum Language
     {
+        None,
         Afrikaans,
         Albanian,
         Amharic,

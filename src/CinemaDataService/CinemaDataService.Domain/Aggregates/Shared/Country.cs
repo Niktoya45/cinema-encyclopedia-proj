@@ -1,10 +1,9 @@
-﻿using CinemaDataService.Domain.Aggregates.Base;
-using CinemaDataService.Domain.Aggregates.Shared;
-
-namespace CinemaDataService.Domain.Aggregates.Cinema
+﻿
+namespace CinemaDataService.Domain.Aggregates.Shared
 {
     public enum Country
     {
+        None,
         Afghanistan,
         Albania,
         Algeria,
