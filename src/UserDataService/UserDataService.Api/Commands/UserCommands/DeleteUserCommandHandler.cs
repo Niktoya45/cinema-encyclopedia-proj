@@ -1,21 +1,21 @@
 using MediatR;
 using UserDataService.Domain.Aggregates.UserAggregate;
-using UserDataService.Infrastructure.Repositories.UnitOfWork;
+using UserDataService.Infrastructure.Repositories.Abstractions;
 //using UserDataService.Api.Exceptions;
 
 namespace UserDataService.Api.Commands.UserCommands
 {
     public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Unit>
     {
-        IUnitOfWork _unitOfWork;
+        IUserRepository _repository;
 
-        public DeleteUserCommandHandler(IUnitOfWork unitOfWork)
+        public DeleteUserCommandHandler(IUserRepository repository)
         {
-            _unitOfWork = unitOfWork;
+            _repository = repository;
         }
         public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            User? deleted = await _unitOfWork.Cities.Delete(request.Id, cancellationToken);
+            User? deleted = await _repository.Delete(request.Id, cancellationToken);
 
             if (deleted == null)
             {

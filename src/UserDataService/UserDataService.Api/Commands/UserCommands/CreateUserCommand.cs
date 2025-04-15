@@ -6,11 +6,19 @@ namespace UserDataService.Api.Commands.UserCommands
     public class CreateUserCommand : IRequest<CreateUserResponse>
     {
 
-        public CreateUserCommand(string name, string auserId)
+        public CreateUserCommand(
+            string username, 
+            DateOnly? birthdate, 
+            string? picture
+            )
         {
-            Name = name;
+            Username = username;
+            Birthdate = birthdate;
+            Picture = picture;
         }
 
-        public string Name { get; }
+        public string Username { get; }
+        public DateOnly? Birthdate { get; }
+        public string? Picture { get; }
     }
 }

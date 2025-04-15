@@ -1,0 +1,17 @@
+﻿
+.link-underline-float:hover {
+    text-decoration: underline;
+}
+
+.link-underline-blue-float:hover {
+    text-decoration: underline blue;
+}
+
+.link-underline-offset-2-hover:hover {
+    text-decoration: underline;
+    padding-bottom: 1.25em;
+}
+
+.link-underline-float:hover {
+    text-decoration: underline;
+}

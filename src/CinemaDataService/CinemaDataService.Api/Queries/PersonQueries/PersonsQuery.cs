@@ -13,7 +13,7 @@ namespace CinemaDataService.Api.Queries.PersonQueries
         public PersonsQuery(SortBy? sort = null, Pagination? pagination = null, string? email=null)
         {
             Sort = sort;
-            Pg = pagination ?? new Pagination();
+            Pg = pagination ?? new Pagination(0, Pagination._max);
         }
     }
 }

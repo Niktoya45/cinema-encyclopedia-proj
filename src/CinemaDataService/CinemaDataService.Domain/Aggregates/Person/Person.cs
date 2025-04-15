@@ -12,6 +12,8 @@ namespace CinemaDataService.Domain.Aggregates.PersonAggregate
 
         [BsonRepresentation(BsonType.Int32)]
         public Job Jobs { get; set; }
+
+        [BsonElement("Filmography")]
         public IList<CinemaRecord>? Filmography { get; set; }
     }
 }

@@ -1,9 +1,8 @@
-
+using System.Reflection;
 using MongoDB.Driver;
 using CinemaDataService.Infrastructure.Context;
-using MongoDB.Bson.Serialization.IdGenerators;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Infrastructure.Repositories.Implementations;
 
 namespace CinemaDataService.Api
 {
@@ -11,6 +10,7 @@ namespace CinemaDataService.Api
     {
         public static void Main(string[] args)
         {
+            var assembly = Assembly.GetExecutingAssembly();
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -30,6 +30,13 @@ namespace CinemaDataService.Api
                 return db;
             });
             builder.Services.AddScoped<CinemaDataDb>();
+
+            builder.Services.AddTransient<ICinemaRepository, CinemaRepository>();
+            builder.Services.AddTransient<IPersonRepository, PersonRepository>();
+            builder.Services.AddTransient<IStudioRepository, StudioRepository>();
+
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+            builder.Services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
             var app = builder.Build();
 

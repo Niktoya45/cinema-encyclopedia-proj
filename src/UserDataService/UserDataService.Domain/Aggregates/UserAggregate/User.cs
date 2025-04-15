@@ -11,5 +11,7 @@ namespace UserDataService.Domain.Aggregates.UserAggregate
         public string Username { get; set; }
         public DateOnly Birthdate { get; set; }
         public string Picture { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

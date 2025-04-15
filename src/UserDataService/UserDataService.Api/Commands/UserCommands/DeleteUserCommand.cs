@@ -6,7 +6,7 @@ namespace UserDataService.Api.Commands.UserCommands
     public class DeleteUserCommand : IRequest<Unit>
     {
 
-        public DeleteUserCommand(string id, string auserId)
+        public DeleteUserCommand(string id)
         {
             Id = id;
         }

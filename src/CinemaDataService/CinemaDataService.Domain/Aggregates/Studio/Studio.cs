@@ -10,6 +10,8 @@ namespace CinemaDataService.Domain.Aggregates.StudioAggregate
         public DateOnly FoundDate {  get; set; }
         [BsonRepresentation(BsonType.Int32)]
         public Country Country { get; set; }
+
+        [BsonElement("Filmography")]
         public IList<CinemaRecord>? Filmography { get; set; }
         public string? PresidentName { get; set; }
     }

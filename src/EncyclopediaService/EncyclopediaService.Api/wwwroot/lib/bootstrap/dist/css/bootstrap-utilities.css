@@ -62,6 +62,7 @@
 .link-dark {
   color: #212529;
 }
+
 .link-dark:hover, .link-dark:focus {
   color: #1a1e21;
 }

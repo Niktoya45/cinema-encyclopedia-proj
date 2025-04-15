@@ -1,19 +1,10 @@
 ﻿
 namespace CinemaDataService.Infrastructure.Pagination
 {
-    public record Pagination
+    public record Pagination(int? skip, int? take)
     {
-        const int _max = 49;
-        public int Skip { get; set; } = 0;
-        public int Take { get; set; } = _max;
-        public Pagination()
-        {
-
-        }
-        public Pagination(int? skip, int? take)
-        {
-            Skip = skip ?? 0;
-            Take = take ?? _max;
-        }
+        public const int _max = 49;
+        public int Skip { get; set; } = skip ?? 0;
+        public int Take { get; set; } = take == null ? _max : (take > _max ? _max : take??_max);
     }
 }

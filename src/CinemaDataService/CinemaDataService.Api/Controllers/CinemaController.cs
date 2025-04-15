@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using CinemaDataService.Api.Commands.CinemaCommands;
-using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Infrastructure.Pagination;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Api.Commands.CinemaCommands.CreateCommands;
+using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
+using CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -12,10 +16,6 @@ namespace CinemaDataService.Api.Controllers
     [Route("api/[controller]")]
     public class CinemaController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         private readonly IMediator _mediator;
 
@@ -25,7 +25,7 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Get all cinemas by optional criteria
+        /// Get all cinemas by optional sort and pagination criteria
         /// </summary>
         /// <param name="st">sort parameters</param> 
         /// <param name="pg">pagination parameters</param>
@@ -37,13 +37,112 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetListAsync(
-            [FromQuery] string? name = null,
+        public async Task<IActionResult> GetAsync(
             [FromQuery] SortBy? st = null,
             [FromQuery] Pagination? pg = null
             )
         {
             var response = await _mediator.Send(new CinemasQuery(st, pg));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all cinemas by provided year with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="year">year of cinema release</param> 
+        /// <param name="st">sort parameters</param> 
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All cinema list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No cinema was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("Year/{year:int}")]
+        [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Year(
+            [FromRoute] int year,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(new CinemasYearQuery(year, st, pg));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all cinemas by provided genres with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="genres">genres of cinema to search by</param> 
+        /// <param name="st">sort parameters</param> 
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All cinema list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No cinema was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("Genres/{genres}")]
+        [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Genres(
+            [FromRoute] Genre genres,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(new CinemasGenresQuery(genres, st, pg));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all cinemas by provided language of origin with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="language">language of cinema origin</param> 
+        /// <param name="st">sort parameters</param> 
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All cinema list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No cinema was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("Language/{language}")]
+        [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Language(
+            [FromRoute] Language language,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(new CinemasLanguageQuery(language, st, pg));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all cinemas by provided studio with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="studioId"> id of studio cinema was filmed by</param>
+        /// <param name="st">sort parameters</param> 
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All cinema list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No cinema was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("Studio/{studioId}")]
+        [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Studio(
+            [FromRoute] string studioId,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(new CinemasStudioQuery(studioId, st, pg));
 
             return Ok(response);
         }
@@ -59,7 +158,7 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(CinemaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAsync(
-            [FromQuery] string id)
+            [FromRoute] string id)
         {
             var response = await _mediator.Send(new CinemaQuery(id));
 
@@ -88,6 +187,61 @@ namespace CinemaDataService.Api.Controllers
                         request.ProductionStudios,
                         request.Starrings,
                         request.Description
+                    )
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Add to cinema production studios made of request parameter
+        /// </summary>
+        /// <param name="cinemaId">cinema id</param>
+        /// <param name="request">request body</param>
+        /// <returns>Newly created studio instance</returns>
+        /// <response code="200">Success</response>
+        [HttpPost("{cinemaId}/ProductionStudios")]
+        [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ProductionStudios(
+            [FromRoute] string cinemaId,
+            [FromBody] CreateProductionStudioRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new CreateCinemaProductionStudioCommand(
+                        cinemaId,
+                        request.Id,
+                        request.Name,
+                        request.Picture
+                    )
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Add starring to cinema starring list made of request parameter
+        /// </summary>
+        /// <param name="cinemaId">cinema id</param>
+        /// <param name="request">request body</param>
+        /// <returns>Newly created studio instance</returns>
+        /// <response code="200">Success</response>
+        [HttpPost("{cinemaId}/Starrings")]
+        [ProducesResponseType(typeof(StarringResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Starrings(
+            [FromRoute] string cinemaId,
+            [FromBody] CreateStarringRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new CreateCinemaStarringCommand(
+                        cinemaId,
+                        request.Id,
+                        request.Name,
+                        request.Jobs,
+                        request.RoleName,
+                        request.RolePriority,
+                        request.Picture
                     )
                 );
 
@@ -127,7 +281,63 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Delete single cinema by its name
+        /// Update production studio for all cinemas
+        /// </summary>
+        /// <param name="id">production studio id</param>
+        /// <param name="request">request body</param>
+        /// <returns>Newly created studio instance</returns>
+        /// <response code="200">Success</response>
+        [HttpPut("ProductionStudios/{id}")]
+        [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ProductionStudios(
+            [FromRoute] string id,
+            [FromBody] UpdateProductionStudioRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdateCinemaProductionStudioCommand(
+                        id,
+                        request.Name,
+                        request.Picture
+                    )
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update starring for all cinemas or specific cinema
+        /// </summary>
+        /// <param name="cinemaId">cinema id (optional)</param>
+        /// <param name="request">request body</param>
+        /// <returns>Newly created studio instance</returns>
+        /// <response code="200">Success</response>
+        [HttpPut("Starrings/{id}")]
+        [HttpPut("{cinemaId}/Starrings/{id}")]
+        [ProducesResponseType(typeof(StarringResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Starrings(
+            [FromRoute] string? cinemaId,
+            [FromRoute] string id,
+            [FromBody] UpdateStarringRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdateCinemaStarringCommand(
+                        cinemaId,
+                        id,
+                        request.Name,
+                        request.Jobs,
+                        request.RoleName,
+                        request.RolePriority,
+                        request.Picture
+                    )
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Delete single cinema by its id
         /// </summary>
         /// <param name="id">Id of cinema to be deleted</param>
         /// <returns></returns>
@@ -140,6 +350,50 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] string id)
         {
             await _mediator.Send(new DeleteCinemaCommand(id));
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Delete production studio by optional cinema id
+        /// </summary>
+        /// <param name="cinemaId">Id of cinema which studio is to be deleted</param>
+        /// <param name="id">Id of production studio entrance</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Production studio or cinema is not found</response>
+        [HttpDelete("ProductionStudios/{id}")]
+        [HttpDelete("{cinemaId}/ProductionStudios/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ProductionStudios(
+            [FromRoute] string? cinemaId,
+            [FromRoute] string id
+            )
+        {
+            await _mediator.Send(new DeleteCinemaProductionStudioCommand(cinemaId, id));
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Delete starring by optional cinema id
+        /// </summary>
+        /// <param name="cinemaId">Id of cinema which starring is to be deleted</param>
+        /// <param name="id">Id of starrings entrance</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Starring or cinema is not found</response>
+        [HttpDelete("Starrings/{id}")]
+        [HttpDelete("{cinemaId}/Starrings/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Starrings(
+            [FromRoute] string? cinemaId,
+            [FromRoute] string id
+            )
+        {
+            await _mediator.Send(new DeleteCinemaStarringCommand(cinemaId, id));
 
             return Ok();
         }

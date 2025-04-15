@@ -7,7 +7,7 @@ namespace CinemaDataService.Infrastructure.Models.StudioDTO
     {
         public string Name { get; set; }
         public DateOnly FoundDate { get; set; }
-        public int Country { get; set; }
+        public Country Country { get; set; }
         public string? Picture { get; set; }
         public CinemaRecord[]? Filmography { get; set; }
         public string? PresidentName { get; set; }

@@ -3,6 +3,7 @@ using MediatR;
 using UserDataService.Api.Commands.UserCommands;
 using UserDataService.Api.Queries.UserQueries;
 using UserDataService.Infrastructure.Models.UserDTO;
+using UserDataService.Domain.Aggregates.UserAggregate;
 
 namespace UserDataService.Api.Controllers
 {
@@ -33,11 +34,11 @@ namespace UserDataService.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GetUserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetTaskAsync(
+        public async Task<IActionResult> GetAsync(
             [FromRoute] string userId,
             [FromQuery] string id)
         {
-            var response = await _mediator.Send(new UserQuery( id));
+            var response = await _mediator.Send(new UserQuery(id, userId));
 
             return Ok(response);
         }
@@ -52,11 +53,13 @@ namespace UserDataService.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CreateUserResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> PostAsync(
-            [FromRoute] string userId,
             [FromBody] CreateUserRequest request
             )
         {
-            var response = await _mediator.Send(new CreateUserCommand());
+            var response = await _mediator.Send(new CreateUserCommand(
+                                            request.Username, 
+                                            request.Birthdate,
+                                            request.Picture));
 
             return Ok(response);
         }
@@ -76,7 +79,12 @@ namespace UserDataService.Api.Controllers
             [FromRoute] string userId,
             [FromBody] UpdateUserRequest request)
         {
-            var response = await _mediator.Send(new UpdateUserCommand());
+            var response = await _mediator.Send(new UpdateUserCommand(
+                                        userId,
+                                        request.Username,
+                                        request.Birthdate,
+                                        request.Picture
+                ));
 
             return Ok(response);
         }
@@ -92,8 +100,8 @@ namespace UserDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteAsync(
-            [FromRoute] string userId,
-            [FromQuery] string name)
+            [FromRoute] string userId
+            )
         {
             await _mediator.Send(new DeleteUserCommand(userId));
 

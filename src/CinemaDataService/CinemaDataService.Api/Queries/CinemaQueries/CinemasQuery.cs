@@ -13,7 +13,7 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
             )
         {
             Sort = sort;
-            Pg = pagination ?? new Pagination();
+            Pg = pagination ?? new Pagination(0, Pagination._max);
         }
         public SortBy? Sort { get; }
         public Pagination Pg { get; }

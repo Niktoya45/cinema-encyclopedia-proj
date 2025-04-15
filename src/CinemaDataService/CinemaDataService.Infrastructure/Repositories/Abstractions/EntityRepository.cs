@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using CinemaDataService.Domain.Aggregates.Base;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Domain.Aggregates.PersonAggregate;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Pagination;
 using CinemaDataService.Infrastructure.Sort;
@@ -18,11 +20,40 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 
             return entity;
         }
-        public Task<List<T>?> Find(Pagination.Pagination? pg = default, Expression<Func<T, bool>>? query = null, SortBy? sort=default, CancellationToken ct = default)
+
+        public async Task<E?> AddRecord<E>(Expression<Func<T, bool>> entity, Expression<Func<T, IEnumerable<E>?>> field, E record, Expression<Func<E, bool>>? excludeDuplicate = default, CancellationToken ct=default) where E : Value
         {
-            pg ??= new Pagination.Pagination();
+            UpdateDefinition<T> update = Builders<T>.Update.Push(field, record);
+            FilterDefinition<T> notPresent = excludeDuplicate is null ?
+                                              Builders<T>.Filter.Empty :
+                                              Builders<T>.Filter.Not(
+                                                  Builders<T>.Filter.ElemMatch<E>(field, excludeDuplicate)
+                                                  );
+
+            FilterDefinition<T> findEntity = Builders<T>.Filter.Where(entity);
+
+            var res = await _collection.UpdateOneAsync(findEntity & notPresent, update, cancellationToken: ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return record;
+        }
+
+        public async Task<List<T>?> Find(Expression<Func<T, bool>>? query = null, Pagination.Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default)
+        {
             var condition = Builders<T>.Filter.Where(query ?? (e => true));
-            var notDeleted = Builders<T>.Filter.Where(e => e.IsDeleted);
+
+            return await Find(condition, pg, sort, ct);
+        }
+
+        public async Task<List<T>?> Find(FilterDefinition<T> condition, Pagination.Pagination? pg = default,  SortBy? sort=default, CancellationToken ct = default)
+        {   
+            pg ??= new Pagination.Pagination(0, null);
+
+            var notDeleted = Builders<T>.Filter.Where(e => !e.IsDeleted);
 
             var sortByAdditional = sort is null ? null
                                         : sort.Order == SortBy.Ascending ? 
@@ -34,22 +65,28 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
             SortDefinition<T> sortBy = sortByAdditional is null ? sortByTimeCreated
                                     : Builders<T>.Sort.Combine(sortByAdditional, sortByTimeCreated);
 
-            return _collection.Find(condition & notDeleted).Sort(sortBy).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
+            return await _collection.Find(condition & notDeleted).Sort(sortBy).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
         }
 
-        public Task<T?> FindOne(Expression<Func<T, bool>>? query = null, CancellationToken ct = default)
+        public async Task<T?> FindOne(Expression<Func<T, bool>>? query = null, CancellationToken ct = default)
         {
             var condition = Builders<T>.Filter.Where(query ?? (e => true));
-            var notDeleted = Builders<T>.Filter.Where(e => e.IsDeleted);
+            var notDeleted = Builders<T>.Filter.Where(e => !e.IsDeleted);
 
             var sortByTimeCreated = Builders<T>.Sort.Descending(e => e.CreatedAt);
 
-            return _collection.Find(condition & notDeleted).Sort(sortByTimeCreated).FirstOrDefaultAsync(ct);
+            return await _collection.Find(condition & notDeleted).Sort(sortByTimeCreated).FirstOrDefaultAsync(ct);
         }
         public async Task<T?> FindById(string id, CancellationToken ct = default)
         {
             return await FindOne(e => e.Id == id, ct);
         }
+
+        public async Task<T?> FindByName(string name, CancellationToken ct = default)
+        {
+            return await FindOne(e => e.Name == name, ct);
+        }
+
         public abstract Task<T?> Update(T entity, CancellationToken ct = default);
 
         public async Task<T?> Delete(string id, CancellationToken ct = default)

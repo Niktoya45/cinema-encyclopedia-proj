@@ -2,32 +2,55 @@
 using MediatR;
 using CinemaDataService.Api.Queries;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Api.Exceptions.CinemaExceptions;
-using CinemaDataService.Infrastructure.Repositories.UnitOfWork;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
-    public class CinemasQueryHandler : IRequestHandler<CinemasQuery, IEnumerable<GetCinemasResponse>>
+    public class CinemasQueryHandler : IRequestHandler<CinemasQuery, IEnumerable<CinemasResponse>>
     {
-        IUnitOfWork _unitOfWork;
+        ICinemaRepository _repository;
         IMapper _mapper;
-        public CinemasQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public CinemasQueryHandler(ICinemaRepository repository, IMapper mapper)
         {
-            IUnitOfWork _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GetCinemasResponse>> Handle(CinemasQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<CinemasResponse>> Handle(CinemasQuery request, CancellationToken cancellationToken)
         {
-            IEnumerable<Cinema>? Cinemas;
-            if (request.Email != null)
-                Cinemas = await _unitOfWork.Cinemas.GetByEmail(request.Email, cancellationToken);
-            else Cinemas = await _unitOfWork.Cinemas.GetAll(null, cancellationToken, request.Pg);
+            IEnumerable<Cinema>? cinemas = null;
 
-            if (Cinemas == null)
-                throw new TrialCinemaNotFoundException("No Cinema was found", request.Email);
+            switch (request)
+            {
+                case CinemasYearQuery cyq:
+                    cinemas = await _repository.FindByYear(cyq.Year, cyq.Pg, cyq.Sort, cancellationToken);
+                    break;
 
-            return _mapper.Map<IEnumerable<Cinema>, IEnumerable<GetCinemasResponse>>(Cinemas);
+                case CinemasGenresQuery cgq:
+                    cinemas = await _repository.FindByGenres(cgq.Genres, cgq.Pg, cgq.Sort, cancellationToken);
+                    break;
+
+                case CinemasLanguageQuery clq:
+                    cinemas = await _repository.FindByLanguage(clq.Language, clq.Pg, clq.Sort, cancellationToken);
+                    break;
+
+                case CinemasStudioQuery csq:
+                    cinemas = await _repository.FindByStudioId(csq.StudioId, csq.Pg, csq.Sort, cancellationToken);
+                    break;
+
+                default:
+                    cinemas = await _repository.Find(pg:request.Pg, sort:request.Sort, ct:cancellationToken);
+                    break;
+            }
+
+            if (cinemas == null) {
+                // handle
+                throw new NotFoundException("Cinemas");
+            }
+
+            return _mapper.Map<IEnumerable<Cinema>, IEnumerable<CinemasResponse>>(cinemas);
         }
     }
 }

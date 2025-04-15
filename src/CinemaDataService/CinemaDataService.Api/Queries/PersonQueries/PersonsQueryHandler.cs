@@ -2,32 +2,45 @@
 using MediatR;
 using CinemaDataService.Api.Queries;
 using CinemaDataService.Domain.Aggregates.PersonAggregate;
-using CinemaDataService.Api.Exceptions.PersonExceptions;
-using CinemaDataService.Infrastructure.Repositories.UnitOfWork;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Infrastructure.Models.PersonDTO;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
-    public class PersonsQueryHandler : IRequestHandler<PersonsQuery, IEnumerable<GetPersonsResponse>>
+    public class PersonsQueryHandler : IRequestHandler<PersonsQuery, IEnumerable<PersonsResponse>>
     {
-        IUnitOfWork _unitOfWork;
+        IPersonRepository _repository;
         IMapper _mapper;
-        public PersonsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public PersonsQueryHandler(IPersonRepository repository, IMapper mapper)
         {
-            IUnitOfWork _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GetPersonsResponse>> Handle(PersonsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<PersonsResponse>> Handle(PersonsQuery request, CancellationToken cancellationToken)
         {
-            IEnumerable<Person>? Persons;
-            if (request.Email != null)
-                Persons = await _unitOfWork.Persons.GetByEmail(request.Email, cancellationToken);
-            else Persons = await _unitOfWork.Persons.GetAll(null, cancellationToken, request.Pg);
+            IEnumerable<Person>? persons;
 
-            if (Persons == null)
-                throw new TrialPersonNotFoundException("No Person was found", request.Email);
+            switch (request)
+            {
+                case PersonsJobsQuery pjq:
+                    persons = await _repository.FindByJobs(pjq.Jobs, pjq.Pg, pjq.Sort, cancellationToken);
+                    break;
+                case PersonsCountryQuery pcq:
+                    persons = await _repository.FindByCountry(pcq.Country, pcq.Pg, pcq.Sort, cancellationToken);
+                    break;
+                default:
+                    persons = await _repository.Find(pg: request.Pg, sort: request.Sort, ct:cancellationToken);
+                    break;
+            }
 
-            return _mapper.Map<IEnumerable<Person>, IEnumerable<GetPersonsResponse>>(Persons);
+            if (persons == null) {
+                // handle
+                throw new NotFoundException("Persons");
+            }
+
+            return _mapper.Map<IEnumerable<Person>, IEnumerable<PersonsResponse>>(persons);
         }
     }
 }

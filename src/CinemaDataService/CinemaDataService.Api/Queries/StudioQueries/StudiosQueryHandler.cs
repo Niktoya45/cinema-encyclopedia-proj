@@ -3,32 +3,45 @@ using MediatR;
 using CinemaDataService.Api.Queries;
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
 using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Api.Exceptions.StudioExceptions;
-using CinemaDataService.Infrastructure.Repositories.UnitOfWork;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
-    public class StudiosQueryHandler : IRequestHandler<StudiosQuery, IEnumerable<StudioResponse>>
+    public class StudiosQueryHandler : IRequestHandler<StudiosQuery, IEnumerable<StudiosResponse>>
     {
-        IUnitOfWork _unitOfWork;
+        IStudioRepository _repository;
         IMapper _mapper;
-        public StudiosQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public StudiosQueryHandler(IStudioRepository repository, IMapper mapper)
         {
-            IUnitOfWork _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<StudioResponse>> Handle(StudiosQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<StudiosResponse>> Handle(StudiosQuery request, CancellationToken cancellationToken)
         {
-            IEnumerable<Studio>? Studios;
-            if (request.Email != null)
-                Studios = await _unitOfWork.Studios.GetByEmail(request.Email, cancellationToken);
-            else Studios = await _unitOfWork.Studios.GetAll(null, cancellationToken, request.Pg);
+            IEnumerable<Studio>? studios;
 
-            if (Studios == null)
-                throw new TrialStudioNotFoundException("No Studio was found", request.Email);
+            switch (request) 
+            {
+                case StudiosYearQuery syq:
+                    studios = await _repository.FindByYear(syq.Year, syq.Pg, syq.Sort, cancellationToken);
+                    break;
+                case StudiosCountryQuery scq:
+                    studios = await _repository.FindByCountry(scq.Country, scq.Pg, scq.Sort, cancellationToken);
+                    break;
+                default:
+                    studios = await _repository.Find(pg:request.Pg, sort:request.Sort, ct:cancellationToken);
+                    break;
 
-            return _mapper.Map<IEnumerable<Studio>, IEnumerable<StudioResponse>>(Studios);
+            }
+
+            if (studios == null) {
+                // handle
+                throw new NotFoundException("Studios");
+            }
+
+            return _mapper.Map<IEnumerable<Studio>, IEnumerable<StudiosResponse>>(studios);
         }
     }
 }

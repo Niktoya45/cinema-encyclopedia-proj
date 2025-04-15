@@ -1,12 +1,44 @@
 ﻿using CinemaDataService.Domain.Aggregates.PersonAggregate;
+using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Infrastructure.Sort;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
-namespace PersonDataService.Infrastructure.Repositories.Implementations
+namespace CinemaDataService.Infrastructure.Repositories.Implementations
 {
     public class PersonRepository:EntityRepository<Person>, IPersonRepository
     {
+        public PersonRepository(CinemaDataDb db)
+        {
+            _collection = db.Persons;
+        }
+        public async Task<CinemaRecord?> AddToFilmography(string? personId, CinemaRecord cinema, CancellationToken ct)
+        {
+            return await AddRecord( p => p.Id == personId,
+                                    p => p.Filmography,
+                                    cinema,
+                                    c => c.Id == cinema.Id,
+                                    ct
+                                    );
+        }
+        public async Task<List<Person>?> FindByJobs(Job jobs, Pagination.Pagination? pg = default, SortBy? st = default,  CancellationToken ct = default)
+        {
+            return await Find(p => (p.Jobs & jobs) != 0, 
+                                pg, 
+                                st, 
+                                ct
+                                );
+        }
+        public async Task<List<Person>?> FindByCountry(Country country, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        {
+            return await Find(p => p.Country == country, 
+                                pg, 
+                                st, 
+                                ct
+                                );
+        }
         public override async Task<Person?> Update(Person entity, CancellationToken ct = default)
         {
             UpdateDefinitionBuilder<Person> builder = Builders<Person>.Update;
@@ -33,6 +65,45 @@ namespace PersonDataService.Infrastructure.Repositories.Implementations
             }
 
             return entity;
+        }
+        public async Task<CinemaRecord?> UpdateFilmography(CinemaRecord cinema, CancellationToken ct = default)
+        {
+            FilterDefinition<Person> elementMatch = Builders<Person>.Filter.ElemMatch(c => c.Filmography, s => s.Id == cinema.Id);
+            UpdateDefinition<Person> replace = Builders<Person>.Update.Set("Starrings.$", cinema);
+
+            var res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return cinema;
+        }
+        public async Task<CinemaRecord?> DeleteFromFilmography(string? personId, CinemaRecord cinema, CancellationToken ct = default)
+        {
+            FilterDefinition<Person> elementMatch = Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == cinema.Id);
+            UpdateDefinition<Person> delete = Builders<Person>.Update.PopFirst("Filmography.$");
+
+            UpdateResult res;
+
+            if (personId is null)
+            {
+                res = await _collection.UpdateManyAsync(elementMatch, delete, cancellationToken: ct);
+            }
+            else
+            {
+                FilterDefinition<Person> find = Builders<Person>.Filter.Where(p => p.Id == personId);
+
+                res = await _collection.UpdateOneAsync(find & elementMatch, delete, cancellationToken: ct);
+            }
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return cinema;
         }
     }
 }

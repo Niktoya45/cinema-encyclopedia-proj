@@ -2,27 +2,27 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.StudioDTO;
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
-using CinemaDataService.Api.Exceptions.StudioExceptions;
-using CinemaDataService.Infrastructure.Repositories.UnitOfWork;
+//using CinemaDataService.Api.Exceptions.StudioExceptions;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
 
     public class StudioQueryHandler : IRequestHandler<StudioQuery, StudioResponse>
     {
-        IUnitOfWork _unitOfWork;
+        IStudioRepository _repository;
         IMapper _mapper;
-        public StudioQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public StudioQueryHandler(IStudioRepository repository, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
         public async Task<StudioResponse> Handle(StudioQuery request, CancellationToken cancellationToken)
         {
-            Studio? Studio = await _unitOfWork.Studios.GetById(request.Id, cancellationToken);
+            Studio? Studio = await _repository.FindById(request.Id, cancellationToken);
 
-            if (Studio == null)
-                throw new TrialStudioNotFoundException(request.Id);
+            //if (Studio == null)
+                // handle
 
 
             return _mapper.Map<StudioResponse>(Studio);

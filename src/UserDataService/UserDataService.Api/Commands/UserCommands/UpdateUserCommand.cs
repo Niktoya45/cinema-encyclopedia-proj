@@ -7,14 +7,21 @@ namespace UserDataService.Api.Commands.UserCommands
     public class UpdateUserCommand : IRequest<UpdateUserResponse>
     {
 
-        public UpdateUserCommand(string id, string name, string auserId)
+        public UpdateUserCommand(
+            string id,
+            string username,
+            DateOnly? birthdate,
+            string? picture
+            )
         {
             Id = id;
-            Name = name;
+            Username = username;
+            Birthdate = birthdate;
+            Picture = picture;
         }
-
         public string Id { get; }
-
-        public string Name { get; }
+        public string Username { get; }
+        public DateOnly? Birthdate { get; }
+        public string? Picture { get; }
     }
 }

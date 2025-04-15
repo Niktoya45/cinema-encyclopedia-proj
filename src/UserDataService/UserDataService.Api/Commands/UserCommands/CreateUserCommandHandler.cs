@@ -2,24 +2,24 @@ using AutoMapper;
 using MediatR;
 using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Models.UserDTO;
-using UserDataService.Infrastructure.Repositories;
+using UserDataService.Infrastructure.Repositories.Abstractions;
 
 namespace UserDataService.Api.Commands.UserCommands
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, CreateUserResponse>
     {
-        IUnitOfWork _unitOfWork;
+        IUserRepository _repository;
         IMapper _mapper;
 
-        public CreateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public CreateUserCommandHandler(IUserRepository repository, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
         public async Task<CreateUserResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             User User = _mapper.Map<CreateUserCommand, User>(request);
-            User added = _unitOfWork.Cities.Add(User);
+            User added = _repository.Add(User);
 
             return _mapper.Map<User, CreateUserResponse>(added);
         }

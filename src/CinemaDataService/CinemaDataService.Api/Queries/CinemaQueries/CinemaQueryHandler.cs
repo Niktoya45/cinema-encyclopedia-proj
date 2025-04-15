@@ -2,30 +2,32 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Api.Exceptions.CinemaExceptions;
-using CinemaDataService.Infrastructure.Repositories.UnitOfWork;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
 
     public class CinemaQueryHandler : IRequestHandler<CinemaQuery, CinemaResponse>
     {
-        IUnitOfWork _unitOfWork;
+        ICinemaRepository _repository;
         IMapper _mapper;
-        public CinemaQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public CinemaQueryHandler(ICinemaRepository repository, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _repository = repository;
             _mapper = mapper;
         }
         public async Task<CinemaResponse> Handle(CinemaQuery request, CancellationToken cancellationToken)
         {
-            Cinema? Cinema = await _unitOfWork.Cinemas.GetById(request.Id, cancellationToken);
+            Cinema? cinema = await _repository.FindById(request.Id, cancellationToken);
 
-            if (Cinema == null)
-                throw new TrialCinemaNotFoundException(request.Id);
+            if (cinema == null) {
+                // handle
+                throw new NotFoundException(request.Id, "Cinemas");
+            }
 
 
-            return _mapper.Map<CinemaResponse>(Cinema);
+            return _mapper.Map<CinemaResponse>(cinema);
         }
     }
 }

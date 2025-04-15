@@ -16,7 +16,11 @@ namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
         [BsonRepresentation(BsonType.Int32)]
         public Language Language { get; set; }
         public double RatingScore { get; set; } = 0.0;
+
+        [BsonElement("ProductionStudios")]
         public IList<StudioRecord>? ProductionStudios { get; set; }
+
+        [BsonElement("Starrings")]
         public IList<Starring>? Starrings { get; set; }
     }
 }

@@ -1,17 +1,12 @@
 ﻿
 namespace CinemaDataService.Infrastructure.Sort
 {
-    public record class SortBy
+    public record class SortBy(bool order, string field)
     {
         public static bool Ascending = true;
 
         public static bool Descending = false;
-        public bool Order { get; set; }
-        public string Field { get; set; }
-        public SortBy(bool order, string field)
-        {
-            Order = order;
-            Field = field;
-        }
+        public bool Order { get; set; } = order;
+        public string Field { get; set; } = field;
     }
 }
