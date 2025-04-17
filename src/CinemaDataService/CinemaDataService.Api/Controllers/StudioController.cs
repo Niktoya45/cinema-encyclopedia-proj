@@ -13,7 +13,7 @@ using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
 namespace CinemaDataService.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/studios")]
     public class StudioController : Controller
     {
 
@@ -57,7 +57,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Year/{year:int}")]
+        [HttpGet("year/{year:int}")]
         [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -82,7 +82,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Country/{country}")]
+        [HttpGet("country/{country}")]
         [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -151,7 +151,7 @@ namespace CinemaDataService.Api.Controllers
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPost("{studioId}/Filmography")]
+        [HttpPost("{studioId}/filmography")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string studioId,
@@ -210,7 +210,7 @@ namespace CinemaDataService.Api.Controllers
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio is not found</response>
-        [HttpPut("Filmography/{id}")]
+        [HttpPut("filmography/{id}")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
@@ -257,8 +257,8 @@ namespace CinemaDataService.Api.Controllers
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio or cinema is not found</response>
-        [HttpDelete("Filmography/{id}")]
-        [HttpDelete("{studioId}/Filmography/{id}")]
+        [HttpDelete("filmography/{id}")]
+        [HttpDelete("{studioId}/filmography/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(

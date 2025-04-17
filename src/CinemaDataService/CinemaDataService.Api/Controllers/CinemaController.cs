@@ -13,7 +13,7 @@ using CinemaDataService.Infrastructure.Models.SharedDTO;
 namespace CinemaDataService.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/cinemas")]
     public class CinemaController : Controller
     {
 
@@ -57,7 +57,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Year/{year:int}")]
+        [HttpGet("year/{year:int}")]
         [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -82,7 +82,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Genres/{genres}")]
+        [HttpGet("genres/{genres}")]
         [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -107,7 +107,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Language/{language}")]
+        [HttpGet("language/{language}")]
         [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -132,7 +132,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("Studio/{studioId}")]
+        [HttpGet("studio/{studioId}")]
         [ProducesResponseType(typeof(IEnumerable<CinemaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -200,7 +200,7 @@ namespace CinemaDataService.Api.Controllers
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPost("{cinemaId}/ProductionStudios")]
+        [HttpPost("{cinemaId}/production_studios")]
         [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> ProductionStudios(
             [FromRoute] string cinemaId,
@@ -226,7 +226,7 @@ namespace CinemaDataService.Api.Controllers
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPost("{cinemaId}/Starrings")]
+        [HttpPost("{cinemaId}/starrings")]
         [ProducesResponseType(typeof(StarringResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Starrings(
             [FromRoute] string cinemaId,
@@ -287,7 +287,7 @@ namespace CinemaDataService.Api.Controllers
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPut("ProductionStudios/{id}")]
+        [HttpPut("production_studios/{id}")]
         [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> ProductionStudios(
             [FromRoute] string id,
@@ -312,8 +312,8 @@ namespace CinemaDataService.Api.Controllers
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPut("Starrings/{id}")]
-        [HttpPut("{cinemaId}/Starrings/{id}")]
+        [HttpPut("starrings/{id}")]
+        [HttpPut("{cinemaId}/starrings/{id}")]
         [ProducesResponseType(typeof(StarringResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Starrings(
             [FromRoute] string? cinemaId,
@@ -362,8 +362,8 @@ namespace CinemaDataService.Api.Controllers
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Production studio or cinema is not found</response>
-        [HttpDelete("ProductionStudios/{id}")]
-        [HttpDelete("{cinemaId}/ProductionStudios/{id}")]
+        [HttpDelete("production_studios/{id}")]
+        [HttpDelete("{cinemaId}/production_studios/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ProductionStudios(
@@ -384,8 +384,8 @@ namespace CinemaDataService.Api.Controllers
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Starring or cinema is not found</response>
-        [HttpDelete("Starrings/{id}")]
-        [HttpDelete("{cinemaId}/Starrings/{id}")]
+        [HttpDelete("starrings/{id}")]
+        [HttpDelete("{cinemaId}/starrings/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Starrings(

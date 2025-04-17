@@ -23,7 +23,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                     ct
                                    );
         }
-        public async Task<Starring?> AddStarring(string cinemaId, Starring starring, CancellationToken ct = default)
+        public async Task<Starring?> AddStarring(string? cinemaId, Starring starring, CancellationToken ct = default)
         {
             return await AddRecord(c => c.Id == cinemaId,
                                    c => c.Starrings,

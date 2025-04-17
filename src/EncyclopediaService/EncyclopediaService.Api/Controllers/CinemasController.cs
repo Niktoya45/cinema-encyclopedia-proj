@@ -17,17 +17,11 @@ namespace EncyclopediaService.Api.Controllers
 
         // GET: cinemas/:{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            var vm = new CinemasViewModel();
+            var vm = new CinemaViewModel { Id = id };
 
             return View(vm);
-        }
-
-        [HttpGet("cinema")]
-        public async Task<IActionResult> Cinema()
-        {
-            return View();
         }
 
         // GET: cinemas/Create

@@ -7,11 +7,11 @@ namespace EncyclopediaService.Api.Models
     {
         public int obj = 0;
         public int ColumnsCount = 4;
-        public IList<CinemasModel> List { get; set; } = Enumerable.Range(1, 28).Select(x => new CinemasModel { Id = x , Year=x+1994}).ToList();
+        public IList<CinemasModel> List { get; set; } = Enumerable.Range(1, 28).Select(x => new CinemasModel { Id = x.ToString() , Year=x+1994}).ToList();
     }
 
     public class CinemasModel{
-        public int Id { get; set; }
+        public string Id { get; set; }
         public int Year { get; set; }
     }
 }

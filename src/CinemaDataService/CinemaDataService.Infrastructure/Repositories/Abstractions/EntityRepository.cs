@@ -55,7 +55,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 
             var notDeleted = Builders<T>.Filter.Where(e => !e.IsDeleted);
 
-            var sortByAdditional = sort is null ? null
+            var sortByAdditional = sort is null ? null : sort.Field is null || sort.Order is null ? null
                                         : sort.Order == SortBy.Ascending ? 
                                             Builders<T>.Sort.Ascending(sort.Field)
                                           : Builders<T>.Sort.Descending(sort.Field);
