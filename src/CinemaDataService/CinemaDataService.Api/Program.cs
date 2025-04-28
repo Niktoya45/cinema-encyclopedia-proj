@@ -20,7 +20,7 @@ namespace CinemaDataService.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IMongoDatabase>(service =>
+            builder.Services.AddTransient<IMongoDatabase>(service =>
             {
                 MongoUrl url = new MongoUrl(builder.Configuration.GetConnectionString("mongodb"));
 
@@ -29,7 +29,7 @@ namespace CinemaDataService.Api
 
                 return db;
             });
-            builder.Services.AddScoped<CinemaDataDb>();
+            builder.Services.AddTransient<CinemaDataDb>();
 
             builder.Services.AddTransient<ICinemaRepository, CinemaRepository>();
             builder.Services.AddTransient<IPersonRepository, PersonRepository>();

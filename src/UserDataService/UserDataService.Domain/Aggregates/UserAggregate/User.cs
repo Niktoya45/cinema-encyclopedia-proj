@@ -10,7 +10,8 @@ namespace UserDataService.Domain.Aggregates.UserAggregate
         public string Id { get; set; }
         public string Username { get; set; }
         public DateOnly Birthdate { get; set; }
-        public string Picture { get; set; }
+        public string? Picture { get; set; }
+        public string? Description { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreatedAt { get; set; }
     }

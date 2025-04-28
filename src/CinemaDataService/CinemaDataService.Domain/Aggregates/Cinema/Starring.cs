@@ -9,6 +9,6 @@ namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
     {
         [BsonRepresentation(BsonType.Int32)]
         public Job Jobs { get; set; } 
-        public ActorRole ActorRole { get; set; }
+        public ActorRole? ActorRole { get; set; }
     }
 }

@@ -1,4 +1,13 @@
 ﻿
+
+.link-black {
+    color: black;
+}
+
+.link-underline-none {
+    text-decoration: none;
+}
+
 .link-underline-float:hover {
     text-decoration: underline;
 }
@@ -7,9 +16,10 @@
     text-decoration: underline blue;
 }
 
-.link-underline-offset-2-hover:hover {
-    text-decoration: underline;
-    padding-bottom: 1.25em;
+.link-underline-blue-offset-2-hover:hover {
+    color: black;
+    text-decoration: underline cadetblue;
+    transition: text-decoration 0.8s ease-out;
 }
 
 .link-underline-float:hover {

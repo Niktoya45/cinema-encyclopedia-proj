@@ -6,6 +6,6 @@ namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
     {
         Main,
         Support,
-        Epizodic
+        Episodic
     }
 }
