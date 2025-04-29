@@ -1,5 +1,6 @@
 ﻿using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace EncyclopediaService.Api.Models
 {
@@ -34,6 +35,8 @@ namespace EncyclopediaService.Api.Models
     /**/ public enum RolePriority { Main, Support, Episodic }
     /**/ public record Starring { 
 
+        public string ParentId { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string? Picture { get; set; } 
 

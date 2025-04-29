@@ -2,11 +2,11 @@
 @{
 }
 <div class="container-fluid">
-	<form id="form-edit-poster" asp-page-handler="editPoster" method="post" enctype="multipart/form-data">
-		<input type="hidden" class="form-control" asp-for="@Model.ImageCurrent">
+	<form id="form-modal-edit-poster" asp-page-handler="editPoster" method="post" enctype="multipart/form-data">
+		<input type="hidden" class="form-control" asp-for="ImageCurrent">
 		<ul class="list-group list-group-flush">
 			<li class="list-group-item mb-4 border-bottom border-white fs-6">
-				<input asp-for="@Model.Image" type="file" class="form-control" />
+				<input asp-for="Image" type="file" class="form-control" />
 			</li>
 		</ul>
 	</form>

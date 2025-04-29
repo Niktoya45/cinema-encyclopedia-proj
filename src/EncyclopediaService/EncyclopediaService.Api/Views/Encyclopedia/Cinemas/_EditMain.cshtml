@@ -15,7 +15,7 @@
 
             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Released on</li>
             <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input type="date" class="form-control" asp-for="@Model.ReleaseDate" value="@Model.ReleaseDate" />
+                <input type="date" class="form-control" asp-for="@Model.ReleaseDate" value="@(Model.ReleaseDate.ToString("yyyy-MM-dd"))" />
                 <br>
                 <span asp-validation-for="@Model.ReleaseDate" class="text-danger"></span>
             </li>

@@ -5,6 +5,8 @@ using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
+using Humanizer;
+using Azure.Storage.Sas;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -21,7 +23,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         public Cinema? Cinema { get; set; } = default!;
 
         [BindProperty]
-        public StudioRecord NewStudioRecord { get; set; } = default!;
+        public StudioRecord NewProductionStudio { get; set; } = default!;
 
         [BindProperty]
         public Starring NewStarring { get; set; } = default!;
@@ -81,9 +83,10 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             EditPoster = new EditImage { ImageCurrent = Cinema.Picture};
 
+            NewProductionStudio = new StudioRecord { ParentId = Cinema.Id, Id = "", Name = "", Picture = _settings.DefaultSmallLogoPicture };
+
             return Page();
         }
-
         public async Task<IActionResult> OnPostEditCinema([FromRoute] string id)
         {
             if (!ModelState.IsValid)
@@ -131,6 +134,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 }
             }
 
+            string newname = string.Empty;
+
             using (Stream image = EditPoster.Image.OpenReadStream())
             {
                 string imageName = EditPoster.Image.FileName;
@@ -138,9 +143,13 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
                 string hash = imageName.SHA_1();
 
-                await _containerClient.UploadBlobAsync(_settings.RootDirectory+hash+ext, image);
+                newname = _settings.RootDirectory + hash + ext;
+
+                await _containerClient.UploadBlobAsync(newname, image);
             }
-            
+
+            var uri = _containerClient.GetBlobClient(newname).GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(2)).AbsolutePath;
+
             return await OnGet(id);
         }
 

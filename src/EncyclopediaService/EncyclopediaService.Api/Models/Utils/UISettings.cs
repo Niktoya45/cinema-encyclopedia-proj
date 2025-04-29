@@ -6,6 +6,7 @@
         public long MaxFileLength { get; set; } = default;
         public string Focus { get; set; } = default!;
         public string Grid { get; set; } = default!;
+        public string Search { get; set; } = default!;
 
         public string DefaultPosterPicture { get; set; } = default!;
         public string DefaultSmallPosterPicture { get; set; } = default!;

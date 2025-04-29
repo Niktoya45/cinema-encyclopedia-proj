@@ -31,42 +31,25 @@
     </form-popup>
 
     <!-- Edit Film Poster Popup -->
-    <form-popup id="modal-edit-poster" title="Edit main information" lock="true" save-close="true" scroll="true">
+    <form-popup id="modal-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
         <partial name="_EditPoster" model="Model.EditPoster" />
     </form-popup>
 
+    <!-- Edit Starring Popup -->
+    <form-popup id="modal-edit-starring" title="Find and choose new starring" lock="true" save-close="false" scroll="true">
+        <partial name="_EditStarring" model="Model.NewStarring" />
+    </form-popup>
+
     <!-- Add Studio Popup -->
-    <div class="modal fade" id="modal-add-studio" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-edit-main-label">Choose poster picture</h5>
-                    <button type="button" class="btn-close cancel" data-bs-dismiss="modal" data-bs-target="#modal-edit-poster" aria-label="Close"></button>
-                </div>
+    <form-popup id="modal-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+        <partial name="_AddStudio" model="Model.NewProductionStudio" />
+    </form-popup>
 
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <form id="form-add-studio" asp-page-handler="editPoster" method="post">
-                            <input type="hidden" asp-for="Id" value="@Model.Id" />
-                            <input type="hidden" asp-for="Cinema.Id" value="@Model.Cinema.Id" />
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
-                                <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                                    <select class="form-control" asp-for="Cinema.Name" value="@Model.Cinema.Name" type="text" />
-                                    <br>
-                                    <span asp-validation-for="Cinema.Name" class="text-danger"></span>
-                                </li>
-                            </ul>
-                        </form>
-                    </div>
-                </div>
+    <!-- Add Starring Popup -->
+    <form-popup id="modal-add-starring" title="Find and choose new starring" lock="true" save-close="false" scroll="true">
+        <partial name="_AddStarring" model="Model.NewStarring" />
+    </form-popup>
 
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" form="form-add-studio" data-bs-target="#modal-add-studio" data-bs-dismiss="modal">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <h1>Cinema</h1>
     <div class="container mt-5" style="margin-bottom:6rem">
@@ -86,11 +69,11 @@
                 @{
                     const byte starSize = 6;
                 }
-
-                <svg width="1000" height="100" xmlns="http://www.w3.org/2000/svg">
+                <span> @Model.Cinema.RatingScore </span>
+                <svg width="@((starSize+1)*100-10)" height="100" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <clipPath id="cut">
-                            <rect width="@(70*Model.Cinema.RatingScore-10)" height="100" x="0" y="0" />
+                            <rect width="@((starSize+1)*10*Model.Cinema.RatingScore-10)" height="100" x="0" y="0" />
                         </clipPath>
                     </defs>
 
@@ -144,7 +127,7 @@
                     <div class="col-md-5">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Released on</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString())</li>
+                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString("dd-MMM-yyyy"))</li>
 
                             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Language of origin</li>
                             <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language)</li>
@@ -187,14 +170,14 @@
                                             <img src=@(studio.Picture) class="img-fluid" style="width:fit-content;height:fit-content"
                                             alt="Studio Image" />
 										</a>
-                                        <button id="delete-studio-button-@studio.Id" type="button" class="btn-close position-absolute" style="visibility:hidden;" aria-label="Close"></button>
+                                        <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="btn-close position-absolute del-record" style="visibility:hidden;" aria-label="Close"></button>
                                     </div>
                                 }
                             }
                         </div>   
                     </div>
 
-                    <!-- Edit Present Studios -->
+                    <!-- Present Studios Options -->
                     <div class="col-md-1">
 							<div class="dropdown">
 								<button id="dropdown-edit-studios" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
@@ -207,9 +190,10 @@
 
 								<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-studios">
                                     <li><a class="dropdown-item" data-bs-target="#modal-add-studio" data-bs-toggle="modal" href="#">Add</a></li>
-									<li><a class="dropdown-item" href="#">Delete</a></li>
+									<li><a id="delete-studio" class="dropdown-item show-close-buttons" href="#">Delete</a></li>
 								</ul>
                             </div>
+                            <a id="delete-studio-cancel" class="btn hide-close-buttons" style="visibility:hidden">Cancel</a>
                     </div>
 
                 </div>
@@ -306,5 +290,5 @@
         </div>
 
     </div>
-
+    <script src="~/js/events.js" asp-append-version="true"></script>
 </body>

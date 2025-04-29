@@ -34,7 +34,7 @@ namespace EncyclopediaService.Api.Models.Utils
             output.PostContent.SetHtmlContent(
                 $@"</div>
                           <div class=""modal-footer"">
-                            <button type=""submit"" class=""btn btn-secondary"" form=""form-{Id}"" data-bs-target=""{Id}"" data-bs-dismiss=""modal"">
+                            <button type=""submit"" class=""btn btn-secondary"" form=""form-{Id}"" data-bs-target=""{Id}"" {(SaveClose ? @"data-bs-dismiss=""modal""" : "")}>
                                 Save
                             </button>
                           </div>
