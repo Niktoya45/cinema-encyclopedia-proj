@@ -39,7 +39,7 @@
                             continue;
                         }
                         <div class="col-4 ps-0 pe-0">
-                            <input id="genres_@genre" type="checkbox" name="GenresBind" value="@genre" @(((@Model.Genres & (Genre)genre) != 0) ? "checked" : "") />
+                            <input id="genres_@genre" type="checkbox" name="GenresBind" value="@genre" @(((Model.Genres & (Genre)genre) != 0) ? "checked" : "") />
                             <label for="genres_@genre" class="fs-5">@((Genre)genre)</label>
                         </div>
                     }

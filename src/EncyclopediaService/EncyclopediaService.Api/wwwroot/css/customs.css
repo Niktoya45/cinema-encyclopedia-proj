@@ -25,3 +25,17 @@
 .link-underline-float:hover {
     text-decoration: underline;
 }
+
+.search-suggestions{
+    position: absolute;
+    top: 75%;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    visibility: hidden;
+}

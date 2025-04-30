@@ -11,18 +11,14 @@
         <div class="row mt-4">
             <!-- Collection Grid -->
             <div class="col-md-9">
-                @{
-                    string _css_rows = "row row-cols-4 row-cols-md-3 row-cols-sm-2";
-                    string _css_cols = "col-3 row-cols-md-4 col-sm-6";
-                }
-                
-                <div class=@(_css_rows)> 
-                    @foreach (var cinema in Model.List)                       
+
+				<div class="row row-cols-4 row-cols-md-4 row-cols-sm-2">
+					@foreach (var cinema in Model.List)                       
                     {                             
-                    <div class=@(_css_cols)>                                
-                        <div class="card mb-md-4">
+                    <div class="col-3 row-cols-md-3 col-sm-6">                                
+                            <div class="card mb-md-4 w-100" style="width:fit-content">
                             <a asp-page="/encyclopedia/cinemas/cinema" asp-route-id="@cinema.Id">
-							    <img src="~/img/grid_poster_placeholder.png" class="card-img-top" alt="Cinema @(cinema.Id)">
+							    <img src="@cinema.Picture" class="card-img-top" alt="Cinema @(cinema.Id)">
                            </a>							
                             <div class="card-body border-bottom" style="padding-bottom:1rem;">										
                                 <div class="text-truncate">                                            
@@ -39,6 +35,7 @@
                     </div>                       
                     }                        
                 </div>
+
             </div>
 
             <!-- Filter Options -->

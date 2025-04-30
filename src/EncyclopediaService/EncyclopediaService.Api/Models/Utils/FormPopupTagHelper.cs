@@ -3,11 +3,12 @@ using System.Security.Policy;
 
 namespace EncyclopediaService.Api.Models.Utils
 {
-    [HtmlTargetElement("form-popup", Attributes ="id, title, lock, scroll, save-close")]
+    [HtmlTargetElement("form-popup", Attributes ="id")]
     public class FormPopupTagHelper:TagHelper
     {
         public string Id { get; set; }
         public string? Title { get; set; }
+        public string? Size { get; set; } 
         public bool Lock { get; set; }
         public bool Scroll { get; set; }
 
@@ -19,14 +20,14 @@ namespace EncyclopediaService.Api.Models.Utils
             output.TagName = "div";
             output.PreContent.SetHtmlContent(
                 $@"<div class=""modal fade"" id=""{Id}"" {(Lock ? @"data-bs-backdrop=""static"" data-bs-keyboard=""false""" : " ")} tabindex=""-1"" aria-hidden=""true"">
-                            <div class=""modal-dialog modal-dialog-centered modal-dialog-scrollable"">
+                            <div class=""modal-dialog modal-dialog-centered {(Scroll ? "modal-dialog-scrollable" : "")} {(Size != null ? "modal-"+Size : "")}"">
                                 <div class=""modal-content"">
                                     <div class=""modal-header"">
                                     <h5 class=""modal-title"">{Title??" "}</h5>
                                     <button type=""button"" class=""btn-close cancel"" data-bs-dismiss=""modal"" data-bs-target=""#{Id}"" aria-label=""Close"">
                                     </button>
                                 </div>
-                                <div class=""modal-body"">"
+                                <div id=""inner-{Id}"" class=""modal-body"">"
             );
 
             output.Content.AppendHtml((await output.GetChildContentAsync()));

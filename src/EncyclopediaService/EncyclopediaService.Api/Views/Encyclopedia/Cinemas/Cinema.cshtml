@@ -25,7 +25,6 @@
 <body>
 
     <!-- Edit Main Information Popup -->
-
     <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
 		<partial name="_EditMain" model="Model.EditMain" />
     </form-popup>
@@ -36,8 +35,8 @@
     </form-popup>
 
     <!-- Edit Starring Popup -->
-    <form-popup id="modal-edit-starring" title="Find and choose new starring" lock="true" save-close="false" scroll="true">
-        <partial name="_EditStarring" model="Model.NewStarring" />
+    <form-popup id="modal-edit-starring" title="Edit starring" size="lg" lock="true" save-close="false" scroll="true">
+        <partial name="_EditStarring" model="Model.EditStarring" />
     </form-popup>
 
     <!-- Add Studio Popup -->
@@ -46,8 +45,8 @@
     </form-popup>
 
     <!-- Add Starring Popup -->
-    <form-popup id="modal-add-starring" title="Find and choose new starring" lock="true" save-close="false" scroll="true">
-        <partial name="_AddStarring" model="Model.NewStarring" />
+    <form-popup id="modal-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
+        <partial name="_AddStarring" model="Model.EditStarring" />
     </form-popup>
 
 
@@ -130,7 +129,7 @@
                             <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString("dd-MMM-yyyy"))</li>
 
                             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Language of origin</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language)</li>
+                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language.ToString())</li>
 
                             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Genres</li>
                             <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Cinema.Genres.BreakGenresFlag())</li>
@@ -224,7 +223,7 @@
                         </div>
 						
                         <div class="col-md-1">
-							<button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button id="button-add-starring" data-bs-target="#modal-add-starring" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
 								<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
                                     <line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
                                     <line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
@@ -262,7 +261,10 @@
                                                 @if(j == Model.Cinema.Starrings.Length){
                                                     break;
                                                 }
-                                                <partial name="_StarringCard" model="Model.Cinema.Starrings[j]"/>
+
+                                                <div class="col">
+													<partial name="_StarringCard" model="Model.Cinema.Starrings[j]" />
+                                                </div>
                                             }
                                         </div>
                                     </div>
@@ -289,6 +291,8 @@
             </div>
         </div>
 
-    </div>
-    <script src="~/js/events.js" asp-append-version="true"></script>
+	</div>
+
+	<script src="~/js/cinema_events.js" asp-append-version="true"></script>
+
 </body>

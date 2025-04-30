@@ -1,0 +1,26 @@
+﻿@model EncyclopediaService.Api.Models.CinemaRecord
+@{
+}
+
+<div class="row">
+	<div class="col-6">
+		<img src="@(Model.Picture)" style="width:fit-content" />
+	</div>
+	<div class="col-6">
+		<form id="form-modal-add-filmography" asp-page-handler="addFilmography" method="post">
+			<input type="hidden" asp-for="@(Model.ParentId)" value="@(Model.ParentId)">
+			<input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
+			<input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item form-group">
+					<label asp-for="Name">Provide name</label>
+					<br>
+					<input id="search-filmography" class="form-control" placeholder="Search.." asp-for="Name" autofocus>
+					<ul id="suggestions-filmography" class="list-group search-suggestions"></ul>
+					<br>
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</li>
+			</ul>
+		</form>
+	</div>
+</div>

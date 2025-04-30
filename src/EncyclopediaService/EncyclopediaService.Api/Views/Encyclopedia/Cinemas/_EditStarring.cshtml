@@ -1,0 +1,63 @@
+﻿@model EncyclopediaService.Api.Models.Edit.EditStarring
+@{
+}
+
+<div class="container-fluid">
+
+	<form id="form-modal-edit-starring" asp-page-handler="editStarring" method="post">
+		<input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
+		<input type="hidden" asp-for="@(Model.Name)" value="@Model.Name">
+		<div class="row">
+
+			<div class="col-6">
+				<div class="row">
+
+					<img src="@(Model.Picture)" style="width:fit-content" />
+
+				</div>
+				<div class="row">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item form-group">
+							<input id="search-starring-ds" class="form-control" placeholder="@Model.Name" asp-for="Name" value="@Model.Name" disabled>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="col-6">
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item form-group">
+						<label asp-for="Jobs">Choose occupation</label>
+						<div class="row row-cols-2">
+
+							@foreach (int job in Enum.GetValues(typeof(Job)))
+							{
+								@if (job == 0)
+								{
+									continue;
+								}
+								<div class="col-6 ps-0 pe-0">
+									<input id="edit-starring-jobs_@job" class="name-dependant" type="checkbox" name="JobsBind" value="@job" @(((Model.Jobs & (Job)job) != 0) ? "checked" : "") />
+									<label for="edit-starring-jobs_@job" class="fs-6">@((Job)job)</label>
+								</div>
+							}
+
+						</div>
+						<span asp-validation-for="@Model.Jobs" class="text-danger"></span>
+					</li>
+					<li class="list-group-item form-group">
+						<label asp-for="RoleName">Provide actor's role name</label>
+						<br>
+						<input class="form-control name-dependant jobs-dependant" asp-for="RoleName">
+					</li>
+					<li class="list-group-item form-group">
+						<label asp-for="RolePriority">Choose role priority</label>
+						<br>
+						<select class="form-control name-dependant jobs-dependant" asp-for="RolePriority" asp-items="Html.GetEnumSelectList<RolePriority>()"></select>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+	</form>
+</div>

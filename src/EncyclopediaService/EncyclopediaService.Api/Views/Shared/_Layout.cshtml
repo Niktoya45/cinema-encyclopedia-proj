@@ -35,17 +35,12 @@
 						
                         <li class="nav-item">
                             <div class="input-group">
-                                <select class="form-select bg-dark nav-link" style="width:10rem;border-top-left-radius:0;border-bottom-left-radius:0">
+                                <select id="layout-select" class="form-select bg-dark nav-link" style="width:10rem;border-top-left-radius:0;border-bottom-left-radius:0">
 									@foreach (int entity in Enum.GetValues(typeof(Entities)))
 									{
-										@if (entity == 0)
-										{
-											<option class="nav-link" selected>@((Entities)entity)</option>
-										}
-										else
-										{
-											<option class="nav-link">@((Entities)entity)</option>
-										}
+										<option class="nav-link">
+											<a asp-page="/encyclopedia/@((Entities)entity)/index">@((Entities)entity)</a>
+                                        </option>
 									}
 								</select>
 							</div>

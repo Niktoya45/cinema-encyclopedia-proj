@@ -1,0 +1,51 @@
+﻿@model EncyclopediaService.Api.Models.Edit.EditMainPerson
+@{
+}
+<div class="container-fluid">
+    <form id="form-modal-edit-main" asp-page-handler="editPerson" method="post">
+        <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
+            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+                <input class="form-control" asp-for="@Model.Name" value="@Model.Name" type="text" />
+                <br>
+                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+            </li>
+
+            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
+            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+                <input type="date" class="form-control" asp-for="@Model.BirthDate" value="@(Model.BirthDate.ToString("yyyy-MM-dd"))" />
+                <br>
+                <span asp-validation-for="@Model.BirthDate" class="text-danger"></span>
+            </li>
+
+            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
+            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+                <select asp-for="@Model.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
+                <br>
+                <span asp-validation-for="@Model.Country" class="text-danger"></span>
+            </li>
+
+            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Occupations</li>
+            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+
+                <div class="row row-cols-2">
+
+                    @foreach (int job in Enum.GetValues(typeof(Job)))
+                    {
+                        @if (job == 0)
+                        {
+                            continue;
+                        }
+                        <div class="col-6 ps-0 pe-0">
+                            <input id="jobs_@job" type="checkbox" name="JobsBind" value="@job" @(((Model.Jobs & (Job)job) != 0) ? "checked" : "") />
+                            <label for="jobs_@job" class="fs-5">@((Job)job)</label>
+                        </div>
+                    }
+
+                </div>
+                <span asp-validation-for="@Model.JobsBind" class="text-danger"></span>
+            </li>
+        </ul>
+    </form>
+</div>

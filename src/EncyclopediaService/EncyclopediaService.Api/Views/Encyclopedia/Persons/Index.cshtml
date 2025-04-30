@@ -1,0 +1,74 @@
+﻿@page
+@using EncyclopediaService.Api.Extensions;
+@model EncyclopediaService.Api.Views.Encyclopedia.Persons.IndexModel;
+@{
+    ViewData["Title"] = "Persons";
+}
+
+<h1>Persons</h1>
+
+<body>
+    <div class="container">
+        <div class="row mt-4">
+            <!-- Collection Grid -->
+            <div class="col-md-9">
+
+				<div class="row row-cols-4 row-cols-md-4 row-cols-sm-2">
+                    @foreach (var person in Model.List)
+                    {
+						<div class="col-3 row-cols-md-3 col-sm-6">
+                            <div class="card mb-md-4 w-100" style="width:fit-content">
+                                <a asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">
+                                    <img src="@person.Picture" class="card-img-top" alt="Person @(person.Id)">
+                                </a>
+                                <div class="card-body border-bottom" style="padding-bottom:1rem;">
+                                    <div class="text-truncate">
+                                        <h6 class="card-text fw-normal">
+                                            <a class="link-black link-underline-none link-underline-blue-offset-2-hover"
+                                               asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">Name of person @person.Id</a>
+                                        </h6>
+                                    </div>
+                                    <div class="row-cols-9">
+                                        <p class="text-end card-subtitle" style="color:cadetblue;">@(string.Join(" | ", person.Jobs.BreakJobsFlag()))</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <!-- Filter Options -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Filter Options</h5>
+                        <form>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option1">
+                                <label class="form-check-label" for="option1">
+                                    Option 1
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option2">
+                                <label class="form-check-label" for="option2">
+                                    Option 2
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="option3">
+                                <label class="form-check-label" for="option3">
+                                    Option 3
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
