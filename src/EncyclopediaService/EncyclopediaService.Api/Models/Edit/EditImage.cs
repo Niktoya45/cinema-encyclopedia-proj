@@ -2,7 +2,8 @@
 {
     public class EditImage
     {
-        public string? ImageCurrent { get; set; }
+        public string? ImageUri { get; set; }
+        public string? ImageId { get; set; }
         public IFormFile? Image { get; set; }
     }
 }

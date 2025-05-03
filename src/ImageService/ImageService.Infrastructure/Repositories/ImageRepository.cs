@@ -17,7 +17,12 @@ namespace ImageService.Infrastructure.Repositories
             _containerClient = containerClient;
         }
 
-        public string GetBlobUri(string path) => _containerClient.GetBlobClient(path).GenerateSasUri(BlobSasPermissions.Read, readOffset).AbsolutePath;
+        public string GetBlobUri(string path)
+        {
+            Uri uri = _containerClient.GetBlobClient(path).GenerateSasUri(BlobSasPermissions.Read, readOffset);
+
+           return uri.AbsoluteUri;
+        }
 
         public async Task<string?> GetUri(string path) 
         {
@@ -28,7 +33,7 @@ namespace ImageService.Infrastructure.Repositories
                 return null;
             }
 
-            string uri = GetBlobUri(path);
+            string uri = GetBlobUri(path.Substring(1));
 
             return uri;
         }

@@ -82,7 +82,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             EditMain = new EditMainCinema { Id = Cinema.Id, Name = Cinema.Name, ReleaseDate = Cinema.ReleaseDate, Language = Cinema.Language, Genres = Cinema.Genres, Description = Cinema.Description };
 
-            EditPoster = new EditImage { ImageCurrent = Cinema.Picture};
+            EditPoster = new EditImage {ImageId=null, ImageUri = Cinema.Picture};
 
             EditStarring = new EditStarring { Picture = _settings.DefaultSmallPersonPicture };
 
@@ -126,17 +126,22 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 // handle error?
                 return await OnGet(id);
             }
+
+            string imageName = EditPoster.Image.FileName;
+            string imageExt  = Path.GetExtension(EditPoster.Image.FileName);
+
+            string HashName = imageName.SHA_1() + imageExt;
              
-            if (EditPoster.ImageCurrent == _settings.DefaultPosterPicture)
+            if (EditPoster.ImageId is null || EditPoster.ImageId == String.Empty)
             {
                 // if cinema yet has no image
 
-                await _imageService.AddImage(EditPoster.Image.FileName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
+                await _imageService.AddImage(HashName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
             }
-            else { 
+            else if(EditPoster.ImageId != HashName) {
                 // if cinema already has an image
-                
 
+                await _imageService.ReplaceImage(EditPoster!.ImageId, HashName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
             }
 
             return await OnGet(id);

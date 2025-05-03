@@ -1,13 +1,16 @@
 using Azure.Storage.Blobs;
 using ImageService.Api.General;
 using System.Runtime;
+using System.Reflection;
+using ImageService.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+builder.Services.AddAntiforgery();
 
 builder.Services.AddTransient<BlobContainerClient>(provider =>
 {
@@ -23,20 +26,26 @@ builder.Services.AddTransient<BlobContainerClient>(provider =>
     return container;
 });
 
+builder.Services.AddTransient<IImageRepository, ImageRepository>();
 
 builder.Services.AddSingleton<ImageSettings>(provider =>
 {
     ImageSettings settings = builder.Configuration.GetSection("image_settings").Get<ImageSettings>() ?? throw new Exception("Missing \'image_settings\' appsettings section or some of its elements could not be mapped");
-    
+
     return settings;
 });
 
-builder.Services.AddAntiforgery();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

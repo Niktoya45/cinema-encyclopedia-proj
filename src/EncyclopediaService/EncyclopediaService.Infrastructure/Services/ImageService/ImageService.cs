@@ -55,7 +55,7 @@ namespace EncyclopediaService.Infrastructure.Services.ImageService
 
             DeleteImageRequest payload = new DeleteImageRequest { Id = id, Size = sizes };
 
-            var response = await _imageHttpClient.PostAsJsonAsync<DeleteImageRequest>("", payload);
+            var response = await _imageHttpClient.DeleteAsync($"images?id={payload.Id}&size={(int)payload.Size}");
 
             if (response.IsSuccessStatusCode)
             {
