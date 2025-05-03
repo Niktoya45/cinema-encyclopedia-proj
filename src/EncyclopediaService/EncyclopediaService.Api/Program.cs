@@ -45,7 +45,12 @@ namespace EncyclopediaService.Api
                 return settings;
             });
 
-            builder.Services.AddHttpClient<IImageService, ImageService>();
+            builder.Services.AddHttpClient<IImageService, ImageService>(client => 
+            {
+                string conn = builder.Configuration.GetConnectionString("ImageService") ?? throw new Exception("Missing ImageService route path in ConnectionStrings");
+
+                client.BaseAddress = new Uri(conn);
+            });
 
             var app = builder.Build();
 

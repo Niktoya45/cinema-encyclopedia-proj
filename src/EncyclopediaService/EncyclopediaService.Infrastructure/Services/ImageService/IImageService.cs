@@ -1,10 +1,12 @@
 ﻿
+using Shared.ImageService.Models.Flags;
+
 namespace EncyclopediaService.Infrastructure.Services.ImageService
 {
     public interface IImageService
     {
-        void AddImage(string id, string imageBase64, ImageSize sizes);
-        void ReplaceImage(string id, string imageBase64, ImageSize sizes);
-        void DeleteImage(string id, ImageSize sizes);
+        Task<string?> AddImage(string imageName, string imageBase64, ImageSize sizes);
+        Task<string?> ReplaceImage(string id, string imageName, string imageBase64, ImageSize sizes);
+        Task<string?> DeleteImage(string id, ImageSize sizes);
     }
 }

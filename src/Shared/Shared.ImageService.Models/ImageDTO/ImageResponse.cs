@@ -1,7 +1,7 @@
 ﻿
-using ImageService.Infrastructure.Models.Flags;
+using Shared.ImageService.Models.Flags;
 
-namespace ImageService.Infrastructure.Models.ImageDTO
+namespace Shared.ImageService.Models.ImageDTO
 {
     public class ImageResponse
     {

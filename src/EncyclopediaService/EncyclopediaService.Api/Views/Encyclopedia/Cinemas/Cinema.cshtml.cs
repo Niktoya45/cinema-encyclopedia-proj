@@ -5,14 +5,14 @@ using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
-using Azure.Storage.Sas;
-
+using EncyclopediaService.Infrastructure.Services.ImageService;
+using Shared.ImageService.Models.Flags;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
     public class CinemaModel:PageModel
     {
-        private BlobContainerClient _containerClient { get; init; }
+        private IImageService _imageService { get; init; }
         private UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet = true)]
@@ -33,9 +33,9 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         [BindProperty]
         public EditImage? EditPoster { get; set; }
 
-        public CinemaModel(BlobContainerClient containerClient, UISettings settings) 
+        public CinemaModel(IImageService imageService, UISettings settings) 
         {
-            _containerClient = containerClient;
+            _imageService = imageService;
             _settings = settings;
         }
 
@@ -126,38 +126,18 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 // handle error?
                 return await OnGet(id);
             }
-
-            if (EditPoster.ImageCurrent != _settings.DefaultPosterPicture) 
+             
+            if (EditPoster.ImageCurrent == _settings.DefaultPosterPicture)
             {
-                var delres = await _containerClient.DeleteBlobIfExistsAsync(_settings.RootDirectory + EditPoster.ImageCurrent);
+                // if cinema yet has no image
 
-                if (!delres.Value) 
-                {
-                    // handle
-                }
+                await _imageService.AddImage(EditPoster.Image.FileName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
             }
-
-            string newname = string.Empty;
-
-            bool service_added = false;
-
-            if (service_added) { 
+            else { 
+                // if cinema already has an image
                 
+
             }
-
-            using (Stream image = EditPoster.Image.OpenReadStream())
-            {
-                string imageName = EditPoster.Image.FileName;
-                string ext = Path.GetExtension(imageName);
-
-                string hash = imageName.SHA_1();
-
-                newname =  hash + ext;
-
-                await _containerClient.UploadBlobAsync(newname, image);
-            }
-
-            var uri = _containerClient.GetBlobClient(newname).GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(2)).AbsolutePath;
 
             return await OnGet(id);
         }
