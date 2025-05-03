@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using EncyclopediaService.Api.Models.Utils;
+using EncyclopediaService.Infrastructure.Services.ImageService;
 
 namespace EncyclopediaService.Api
 {
@@ -46,19 +45,7 @@ namespace EncyclopediaService.Api
                 return settings;
             });
 
-            builder.Services.AddTransient<BlobContainerClient>(provider =>
-            {
-                string uri = builder.Configuration.GetValue<string>("azure_blob:endpoint")??throw new Exception("Missing \'endpoint\' in \'azure_blob\' appsettings section");
-                string acc = builder.Configuration.GetValue<string>("azure_blob:account")??throw new Exception("Missing \'account\' in \'azure_blob\' appsettings section"); 
-                string key = builder.Configuration.GetValue<string>("azure_blob:key")??throw new Exception("Missing \'key\' in \'azure_blob\' appsettings section"); 
-                string con = builder.Configuration.GetValue<string>("azure_blob:container")??throw new Exception("Missing \'container\' in \'azure_blob\' appsettings section");
-
-                BlobServiceClient service = new($"DefaultEndpointsProtocol=https;AccountName={acc};AccountKey={key}");
-
-                BlobContainerClient container = service.GetBlobContainerClient(con);
-
-                return container;
-            });
+            builder.Services.AddHttpClient<IImageService, ImageService>();
 
             var app = builder.Build();
 

@@ -6,8 +6,7 @@ using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
 using Azure.Storage.Sas;
-using Microsoft.Extensions.Hosting;
-using System;
+
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -140,6 +139,12 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             string newname = string.Empty;
 
+            bool service_added = false;
+
+            if (service_added) { 
+                
+            }
+
             using (Stream image = EditPoster.Image.OpenReadStream())
             {
                 string imageName = EditPoster.Image.FileName;
@@ -147,7 +152,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
                 string hash = imageName.SHA_1();
 
-                newname = _settings.RootDirectory + hash + ext;
+                newname =  hash + ext;
 
                 await _containerClient.UploadBlobAsync(newname, image);
             }

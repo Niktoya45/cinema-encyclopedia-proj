@@ -23,4 +23,8 @@
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EncyclopediaService.Infrastructure\EncyclopediaService.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

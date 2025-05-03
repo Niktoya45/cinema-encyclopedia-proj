@@ -1,0 +1,71 @@
+﻿
+
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+using System.Runtime;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace ImageService.Infrastructure.Repositories
+{
+    public class ImageRepository:IImageRepository
+    {
+        BlobContainerClient _containerClient;
+
+        DateTimeOffset readOffset = DateTimeOffset.UtcNow.AddHours(2);
+        public ImageRepository(BlobContainerClient containerClient) 
+        {
+            _containerClient = containerClient;
+        }
+
+        public string GetBlobUri(string path) => _containerClient.GetBlobClient(path).GenerateSasUri(BlobSasPermissions.Read, readOffset).AbsolutePath;
+
+        public async Task<string?> GetUri(string path) 
+        {
+            var res = await _containerClient.GetBlobClient(path).ExistsAsync();
+
+            if (!res.Value)
+            {
+                return null;
+            }
+
+            string uri = GetBlobUri(path);
+
+            return uri;
+        }
+        public async Task<string?> AddByUrl(string path, Stream image) 
+        {
+            var res = await _containerClient.UploadBlobAsync(path, image);
+
+            if (res.GetRawResponse().IsError) 
+            {
+                return null;
+            }
+
+            string uri = GetBlobUri(path);
+
+            return uri;
+        }
+        public async Task<string?> ReplaceByUrl(string pathOld, string pathNew, Stream image)
+        {
+            var res = await _containerClient.DeleteBlobIfExistsAsync(pathOld);
+
+            if (!res.Value)
+            {
+                return null;
+            }
+
+            return await AddByUrl(pathNew, image);
+        }
+        public async Task<string?> DeleteByUrl(string path)
+        {
+            var res = await _containerClient.DeleteBlobIfExistsAsync(path);
+
+            if (!res.Value)
+            {
+                return null;
+            }
+
+            return path;
+        }
+    }
+}
