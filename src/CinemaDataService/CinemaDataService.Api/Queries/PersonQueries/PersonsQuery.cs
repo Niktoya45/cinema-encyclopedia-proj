@@ -1,7 +1,6 @@
 ﻿using MediatR;
-using CinemaDataService.Infrastructure.Pagination;
 using CinemaDataService.Infrastructure.Models.PersonDTO;
-using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {

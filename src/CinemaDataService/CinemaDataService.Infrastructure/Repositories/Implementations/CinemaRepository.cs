@@ -2,7 +2,7 @@
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
-using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
@@ -32,7 +32,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                     ct
                                    );
         }
-        public async Task<List<Cinema>?> FindByYear(int year, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Cinema>?> FindByYear(int year, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find(c => c.ReleaseDate.Year == year,
                               pg,
@@ -40,14 +40,14 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                               ct
                               );
         }
-        public async Task<List<Cinema>?> FindByGenres(Genre genre, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Cinema>?> FindByGenres(Genre genre, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find(c => (c.Genres & genre) != 0,
                                pg,
                                st,
                                ct);
         }
-        public async Task<List<Cinema>?> FindByLanguage(Language language, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Cinema>?> FindByLanguage(Language language, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find(c => c.Language == language,
                               pg,
@@ -55,7 +55,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                               ct
                 );
         }
-        public async Task<List<Cinema>?> FindByStudioId(string studioId, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Cinema>?> FindByStudioId(string studioId, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
 
             FilterDefinition<Cinema> condition = Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studioId);

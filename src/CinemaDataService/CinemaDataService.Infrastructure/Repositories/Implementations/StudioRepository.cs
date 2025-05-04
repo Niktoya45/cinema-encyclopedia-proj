@@ -4,7 +4,7 @@ using MongoDB.Driver;
 using System.Linq.Expressions;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 
 namespace CinemaDataService.Infrastructure.Repositories.Implementations
 {
@@ -23,7 +23,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                     ct
                 );
         }
-        public async Task<List<Studio>?> FindByYear(int year, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Studio>?> FindByYear(int year, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find( s => s.FoundDate.Year == year,
                                 pg,
@@ -31,7 +31,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                 ct
                 );
         }
-        public async Task<List<Studio>?> FindByCountry(Country country, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Studio>?> FindByCountry(Country country, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find(s => s.Country == country,
                     pg,

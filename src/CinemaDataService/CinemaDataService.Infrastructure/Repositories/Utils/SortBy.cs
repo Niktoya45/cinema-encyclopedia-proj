@@ -1,5 +1,4 @@
-﻿
-namespace CinemaDataService.Infrastructure.Sort
+﻿namespace CinemaDataService.Infrastructure.Repositories.Utils
 {
     public record class SortBy(bool? order, string? field)
     {

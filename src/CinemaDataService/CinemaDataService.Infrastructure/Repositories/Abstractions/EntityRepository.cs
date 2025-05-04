@@ -3,8 +3,7 @@ using CinemaDataService.Domain.Aggregates.Base;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Domain.Aggregates.PersonAggregate;
 using CinemaDataService.Infrastructure.Context;
-using CinemaDataService.Infrastructure.Pagination;
-using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -42,14 +41,14 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
             return record;
         }
 
-        public async Task<List<T>?> Find(Expression<Func<T, bool>>? query = null, Pagination.Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default)
+        public async Task<List<T>?> Find(Expression<Func<T, bool>>? query = null, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default)
         {
             var condition = Builders<T>.Filter.Where(query ?? (e => true));
 
             return await Find(condition, pg, sort, ct);
         }
 
-        public async Task<List<T>?> Find(FilterDefinition<T> condition, Pagination.Pagination? pg = default,  SortBy? sort=default, CancellationToken ct = default)
+        public async Task<List<T>?> Find(FilterDefinition<T> condition, Pagination? pg = default,  SortBy? sort=default, CancellationToken ct = default)
         {   
             pg ??= new Pagination.Pagination(0, null);
 

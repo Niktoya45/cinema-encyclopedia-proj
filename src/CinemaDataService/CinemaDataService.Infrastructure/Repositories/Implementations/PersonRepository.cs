@@ -2,7 +2,7 @@
 using CinemaDataService.Domain.Aggregates.Shared;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
-using CinemaDataService.Infrastructure.Sort;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
@@ -23,7 +23,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                     ct
                                     );
         }
-        public async Task<List<Person>?> FindByJobs(Job jobs, Pagination.Pagination? pg = default, SortBy? st = default,  CancellationToken ct = default)
+        public async Task<List<Person>?> FindByJobs(Job jobs, Pagination? pg = default, SortBy? st = default,  CancellationToken ct = default)
         {
             return await Find(p => (p.Jobs & jobs) != 0, 
                                 pg, 
@@ -31,7 +31,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                 ct
                                 );
         }
-        public async Task<List<Person>?> FindByCountry(Country country, Pagination.Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        public async Task<List<Person>?> FindByCountry(Country country, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
             return await Find(p => p.Country == country, 
                                 pg, 

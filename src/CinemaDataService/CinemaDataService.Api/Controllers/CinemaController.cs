@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using CinemaDataService.Infrastructure.Pagination;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Infrastructure.Sort;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Api.Commands.CinemaCommands.CreateCommands;
 using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands;
 using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Repositories.Utils;
 
 namespace CinemaDataService.Api.Controllers
 {
