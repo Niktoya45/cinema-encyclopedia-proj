@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ImageService.Infrastructure.Models.ImageDTO;
 using MediatR;
 using ImageService.Api.Requests;
+using System.Net;
 
 namespace ImageService.Api.Controllers
 {
@@ -16,59 +17,60 @@ namespace ImageService.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> OnGet([FromQuery] GetImageRequest request)
+        public async Task<IActionResult> OnGet([FromQuery] GetImageRequest request, CancellationToken ct)
         {
-            ImageResponse response = await _mediator.Send(
-                new GetImage
-                {
-                    Id = request.Id,
-                    Size = request.Size
-                }
-            );
+            ImageResponse? response = await _mediator.Send(
+                    new GetImage
+                    {
+                        Id = request.Id,
+                        Size = request.Size
+                    }
+                );
 
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> OnPost([FromBody] AddImageRequest request)
+        public async Task<IActionResult> OnPost([FromBody] AddImageRequest request, CancellationToken ct)
         {
-            ImageResponse response = await _mediator.Send(
-                new AddImage { 
-                    Id = request.Id,
-                    Size = request.Size,
-                    FileBase64 = request.FileBase64
-                }
-            );
+            ImageResponse? response = await _mediator.Send(
+                    new AddImage
+                    {
+                        Id = request.Id,
+                        Size = request.Size,
+                        FileBase64 = request.FileBase64
+                    }
+                );
 
             return Ok(response);
         }
 
         [HttpPut]
-        public async Task<IActionResult> OnPut([FromBody] ReplaceImageRequest request)
+        public async Task<IActionResult> OnPut([FromBody] ReplaceImageRequest request, CancellationToken ct)
         {
-            ImageResponse response = await _mediator.Send(
-                new ReplaceImage
-                {
-                    Id = request.Id,
-                    NewId = request.NewId,
-                    Size = request.Size,
-                    FileBase64 = request.FileBase64
-                }
-            );
+            ImageResponse? response = await _mediator.Send(
+                    new ReplaceImage
+                    {
+                        Id = request.Id,
+                        NewId = request.NewId,
+                        Size = request.Size,
+                        FileBase64 = request.FileBase64
+                    }
+                );
 
             return Ok(response);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> OnDelete([FromQuery] DeleteImageRequest request)
+        public async Task<IActionResult> OnDelete([FromQuery] DeleteImageRequest request, CancellationToken ct)
         {
-            ImageResponse response = await _mediator.Send(
-                new DeleteImage
-                {
-                    Id = request.Id,
-                    Size = request.Size
-                }
-            );
+            ImageResponse? response = await _mediator.Send(
+                    new DeleteImage
+                    {
+                        Id = request.Id,
+                        Size = request.Size
+                    }
+                );
 
             return Ok(response);
         }

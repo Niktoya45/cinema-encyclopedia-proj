@@ -39,6 +39,10 @@ namespace ImageService.Infrastructure.Repositories
         }
         public async Task<string?> AddByUrl(string path, Stream image) 
         {
+            if (image is null)
+                return null;
+
+
             var res = await _containerClient.UploadBlobAsync(path, image);
 
             if (res.GetRawResponse().IsError) 
@@ -52,12 +56,10 @@ namespace ImageService.Infrastructure.Repositories
         }
         public async Task<string?> ReplaceByUrl(string pathOld, string pathNew, Stream image)
         {
-            var res = await _containerClient.DeleteBlobIfExistsAsync(pathOld);
-
-            if (!res.Value)
-            {
+            if (image is null)
                 return null;
-            }
+
+            var res = await _containerClient.DeleteBlobIfExistsAsync(pathOld);
 
             return await AddByUrl(pathNew, image);
         }

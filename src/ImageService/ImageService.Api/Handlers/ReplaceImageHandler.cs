@@ -1,10 +1,12 @@
-﻿using ImageService.Api.Exceptions;
+﻿using ImageMagick;
+using ImageService.Api.Exceptions;
 using ImageService.Api.General;
 using ImageService.Api.Requests;
 using ImageService.Infrastructure.Models.Flags;
 using ImageService.Infrastructure.Models.ImageDTO;
 using ImageService.Infrastructure.Repositories;
 using MediatR;
+using System.IO;
 
 namespace ImageService.Api.Handlers
 {
@@ -20,33 +22,56 @@ namespace ImageService.Api.Handlers
         public async Task<ImageResponse> Handle(ReplaceImage request, CancellationToken cancellationToken)
         {
 
-            string subDirectory = request.Size switch
-            {
-                ImageSize.Tiny => _settings.DirectoryTiny,
-                ImageSize.Small => _settings.DirectorySmall,
-                ImageSize.Medium => _settings.DirectoryMedium,
-                ImageSize.Big => _settings.DirectoryBig,
-                ImageSize.Large => _settings.DirectoryLarge,
-                _ => ""
-            };
-
-            string pathOld = _settings.RootDirectory + subDirectory + request.Id;
-
-            string pathNew = _settings.RootDirectory + subDirectory + request.NewId;
+            Dictionary<ImageSize, string> urisSAS = new Dictionary<ImageSize, string>();
 
             string? uriSAS = null;
 
-            using (MemoryStream image = new MemoryStream(Convert.FromBase64String(request.FileBase64)))
             {
-                uriSAS = await _repository.ReplaceByUrl(pathOld, pathNew, image);
+                byte[] originalBytes = Convert.FromBase64String(request.FileBase64);
+
+                string pathOld = "";
+
+                string pathNew = "";
+
+
+                foreach (ImageSize size in Enum.GetValues<ImageSize>())
+                {
+                    pathOld = _settings.RootDirectory + _settings.Directory[request.Size] + request.Id;
+
+                    if ((request.Size & size) == 0)
+                    {
+                        await _repository.DeleteByUrl(pathOld);
+
+                        continue;
+                    }
+
+                    pathNew = _settings.RootDirectory + _settings.Directory[request.Size] + request.NewId;
+
+                    using (MagickImage image = new MagickImage(originalBytes))
+                    {
+                        if (image.Width < image.Height)
+                        {
+                            image.InterpolativeResize(_settings.Normalize[size], 0, PixelInterpolateMethod.Bilinear);
+                        }
+                        else
+                        {
+                            image.InterpolativeResize(0, _settings.Normalize[size], PixelInterpolateMethod.Bilinear);
+                        }
+
+                        uriSAS = await _repository.ReplaceByUrl(pathOld, pathNew, new MemoryStream(image.ToByteArray()));
+
+                        if (uriSAS is null)
+                        {
+                            throw new ImageNotAddedException($"Image {request.Id} was not replaced with {request.NewId} for size: {size}");
+                        }
+
+                        urisSAS.Add(size, uriSAS);
+                    }
+                }
             }
 
-            if (uriSAS is null)
-            {
-                throw new ImageNotFoundException();
-            }
+            return new ImageResponse { Id = request.Id, Uris = urisSAS, Size = request.Size };
 
-            return new ImageResponse { Id = request.Id, Uri = uriSAS, Size = request.Size };
         }
     }
 }

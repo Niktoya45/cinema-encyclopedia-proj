@@ -19,26 +19,33 @@ namespace ImageService.Api.Handlers
         }
         public async Task<ImageResponse> Handle(GetImage request, CancellationToken cancellationToken)
         {
-            string subDirectory = request.Size switch
+            Dictionary<ImageSize, string> urisSAS = new Dictionary<ImageSize, string>();
+
+            string path = "";
+
+            string? uriSAS = null;
+
+            foreach (ImageSize size in Enum.GetValues<ImageSize>())
             {
-                ImageSize.Tiny => _settings.DirectoryTiny,
-                ImageSize.Small => _settings.DirectorySmall,
-                ImageSize.Medium => _settings.DirectoryMedium,
-                ImageSize.Big => _settings.DirectoryBig,
-                ImageSize.Large => _settings.DirectoryLarge,
-                _ => ""
-            };
 
-            string path = _settings.RootDirectory + subDirectory + request.Id;
+                if ((request.Size & size) == 0)
+                {
+                    continue;
+                }
 
-            string? uriSAS = await _repository.GetUri(path);
+                path = _settings.RootDirectory + _settings.Directory[size] + request.Id;
 
-            if (uriSAS is null) 
-            {
-                throw new ImageNotFoundException();
+                uriSAS = await _repository.GetUri(path);
+
+                if (uriSAS is null)
+                {
+                    throw new ImageNotFoundException($"Image {request.Id} was not deleted for size {request.Size}");
+                }
+
+                urisSAS.Add(size, uriSAS);
             }
 
-            return new ImageResponse {Id = request.Id, Uri = uriSAS, Size = request.Size};
+            return new ImageResponse { Id = request.Id, Uris = urisSAS, Size = request.Size };
         }
     }
 }

@@ -4,7 +4,10 @@ using ImageService.Api.Requests;
 using ImageService.Infrastructure.Models.Flags;
 using ImageService.Infrastructure.Models.ImageDTO;
 using ImageService.Infrastructure.Repositories;
+using ImageMagick;
 using MediatR;
+using static System.Net.Mime.MediaTypeNames;
+
 
 namespace ImageService.Api.Handlers
 {
@@ -19,32 +22,49 @@ namespace ImageService.Api.Handlers
         }
         public async Task<ImageResponse> Handle(AddImage request, CancellationToken cancellationToken)
         {
-
-            string subDirectory = request.Size switch
-            {
-                ImageSize.Tiny => _settings.DirectoryTiny,
-                ImageSize.Small => _settings.DirectorySmall,
-                ImageSize.Medium => _settings.DirectoryMedium,
-                ImageSize.Big => _settings.DirectoryBig,
-                ImageSize.Large => _settings.DirectoryLarge,
-                _ => ""
-            };
-
-            string path = _settings.RootDirectory + subDirectory + request.Id;
+            Dictionary<ImageSize, string> urisSAS = new Dictionary<ImageSize, string>();
 
             string? uriSAS = null;
 
-            using (MemoryStream image = new MemoryStream(Convert.FromBase64String(request.FileBase64)))
             {
-                uriSAS = await _repository.AddByUrl(path, image);
+                byte[] originalBytes = Convert.FromBase64String(request.FileBase64);
+                
+                string path = "";
+
+                foreach (ImageSize size in Enum.GetValues<ImageSize>())
+                {
+                    if ((request.Size & size) == 0)
+                    {
+                        continue;
+                    }
+
+                    path = _settings.RootDirectory + _settings.Directory[size] + request.Id;
+
+                    using (MagickImage image = new MagickImage(originalBytes))
+                    {
+                        if (image.Width < image.Height)
+                        {
+                            image.InterpolativeResize(_settings.Normalize[size], 0, PixelInterpolateMethod.Bilinear);
+                        }
+                        else
+                        {
+                            image.InterpolativeResize(0, _settings.Normalize[size], PixelInterpolateMethod.Bilinear);
+                        }
+
+                        uriSAS = await _repository.AddByUrl(path, new MemoryStream(image.ToByteArray()));
+
+
+                        if (uriSAS is null)
+                        {
+                            throw new ImageNotAddedException($"Image {request.Id} was not added for size: {size}");
+                        }
+
+                        urisSAS.Add(size, uriSAS);
+                    }
+                }
             }
 
-            if (uriSAS is null)
-            {
-                throw new ImageNotAddedException();
-            }
-
-            return new ImageResponse { Id = request.Id, Uri = uriSAS, Size = request.Size };
+            return new ImageResponse { Id = request.Id, Uris = urisSAS, Size = request.Size };
         }
     }
 }
