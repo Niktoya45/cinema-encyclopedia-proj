@@ -1,6 +1,6 @@
-﻿@page
+﻿@page "{handler?}"
 @using EncyclopediaService.Api.Extensions;
-@model EncyclopediaService.Api.Views.Encyclopedia.Persons.IndexModel;
+@model EncyclopediaService.Api.Views.Encyclopedia.Persons.AllModel;
 @{
     ViewData["Title"] = "Persons";
 }
@@ -29,7 +29,7 @@
                                         </h6>
                                     </div>
                                     <div class="row-cols-9">
-                                        <p class="text-end card-subtitle" style="color:cadetblue;">@(string.Join(" | ", person.Jobs.BreakJobsFlag()))</p>
+                                        <p class="text-end card-subtitle fs-6" style="color:cadetblue;">@(string.Join(" | ", person.Jobs.BreakJobsFlag()))</p>
                                     </div>
                                 </div>
                             </div>
@@ -43,27 +43,32 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Filter Options</h5>
-                        <form>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="option1">
-                                <label class="form-check-label" for="option1">
-                                    Option 1
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="option2">
-                                <label class="form-check-label" for="option2">
-                                    Option 2
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="option3">
-                                <label class="form-check-label" for="option3">
-                                    Option 3
-                                </label>
-                            </div>
-                        </form>
+                        <h4 class="card-title">Filter Options</h4>
+
+						<div class="row row-cols-1 card-group">
+							<h6 class="card-subtitle col-9 offset-3">by year: </h6>
+							<form id="form-filter-by-year" method="get">
+								<div class="form-check col-6 offset-6">
+									<input class="form-check-input" type="checkbox" value="" id="option1">
+									<label class="form-check-label" for="option1">
+										Option 1
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" value="" id="option2">
+									<label class="form-check-label" for="option2">
+										Option 2
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" value="" id="option3">
+									<label class="form-check-label" for="option3">
+										Option 3
+									</label>
+								</div>
+							</form>
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -14,11 +14,27 @@ namespace CinemaDataService.Api.Mappings
     {
         public StarringMappingProfile() 
         {
-            CreateMap<CreateStarringCommand, Starring>();
+            CreateMap<CreateStarringCommand, Starring>()
+                .ForMember(s => s.ActorRole, 
+                opt => opt.MapFrom(csc => 
+                    new ActorRole {
+                        Name = csc.RoleName, Priority = csc.RolePriority 
+                    }
+                ));
+
             CreateMap<CreateCinemaStarringCommand, Starring>()
                 .IncludeBase<CreateStarringCommand, Starring>();
 
-            CreateMap<UpdateStarringCommand, Starring>();
+            CreateMap<UpdateStarringCommand, Starring>()
+                    .ForMember(s => s.ActorRole,
+                opt => opt.MapFrom(usc =>
+                    new ActorRole
+                    {
+                        Name = usc.RoleName,
+                        Priority = usc.RolePriority
+                    }
+                ));
+
             CreateMap<UpdateCinemaStarringCommand, Starring>()
                 .IncludeBase<UpdateStarringCommand, Starring>();
 
@@ -28,7 +44,11 @@ namespace CinemaDataService.Api.Mappings
 
 
             CreateMap<Starring, StarringResponse>()
-                .ForMember(ps => ps.ParentId, opt => opt.Ignore());
+                .ForMember(sr => sr.ParentId, opt => opt.Ignore())
+                .ForMember(sr => sr.RoleName,
+                opt => opt.MapFrom(s => s.ActorRole == null ? null : s.ActorRole.Name))
+                .ForMember(sr => sr.RolePriority,
+                opt => opt.MapFrom(s => s.ActorRole == null ? 0 : s.ActorRole.Priority));
 
         }
     }

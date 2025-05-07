@@ -29,7 +29,10 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.CreateCommands
                 throw new NotFoundException(request.Id, "Cinemas");
             }
 
-            return _mapper.Map<Starring, StarringResponse>(added);
+            StarringResponse response = _mapper.Map<Starring, StarringResponse>(added);
+            response.ParentId = request.CinemaId;
+
+            return response;
         }
     }
 }

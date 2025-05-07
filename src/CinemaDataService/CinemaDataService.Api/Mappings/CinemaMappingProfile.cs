@@ -17,7 +17,6 @@ namespace CinemaDataService.Api.Mappings
                 .ForMember(c => c.IsDeleted, opt => opt.Ignore());
 
             CreateMap<UpdateCinemaCommand, Cinema>()
-                .ForMember(c => c.Id, opt => opt.Ignore())
                 .ForMember(c => c.RatingScore, opt => opt.Ignore())
                 .ForMember(c => c.CreatedAt, opt => opt.Ignore())
                 .ForMember(c => c.IsDeleted, opt => opt.Ignore());

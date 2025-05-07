@@ -18,3 +18,9 @@ for (let i = 0; i < selectLayout.options.length; i++) {
         break;
     }
 }
+
+anchorBrandLayout = document.getElementById("brand");
+
+if (window.location.pathname.toLowerCase().includes(anchorBrandLayout.href)) {
+    anchorBrandLayout.href = "#";
+}

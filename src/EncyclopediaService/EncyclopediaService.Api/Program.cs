@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;
+using EncyclopediaService.Api.Models.Sort;
 
 namespace EncyclopediaService.Api
 {
@@ -27,7 +28,7 @@ namespace EncyclopediaService.Api
                 .AddRazorPagesOptions(opts =>
                     {
                         opts.RootDirectory = "/Views";
-                        opts.Conventions.AddPageRoute("/Encyclopedia/Cinemas", "{*url}");
+                        opts.Conventions.AddPageRoute("/Encyclopedia/Cinemas/All", "{*url}");
 
                         opts.Conventions.AddPageRoute("/Encyclopedia/Cinemas/Cinema", "/Encyclopedia/Cinemas/{id}");
                         opts.Conventions.AddPageRoute("/Encyclopedia/Persons/Person", "/Encyclopedia/Persons/{id}");
@@ -40,9 +41,30 @@ namespace EncyclopediaService.Api
 
             builder.Services.AddSingleton<UISettings>(provider => 
             {
-                UISettings settings = builder.Configuration.GetSection("ui_settings").Get<UISettings>()??throw new Exception("Missing \'ui_settings\' appsettings section or some of its elements could not be mapped");
+                UISettings settings = builder.Configuration.GetSection("ui_settings:common").Get<UISettings>()??throw new Exception("Missing \'ui_settings:common\' appsettings section or some of its elements could not be mapped");
 
                 return settings;
+            });
+
+            builder.Services.AddSingleton<SortCinemas>(provider =>
+            {
+                SortCinemas sort = builder.Configuration.GetSection("ui_settings:sort:cinemas").Get<SortCinemas>() ?? throw new Exception("Missing \'ui_settings:sort:cinemas\' appsettings section or some of its elements could not be mapped");
+
+                return sort;
+            });
+
+            builder.Services.AddSingleton<SortPersons>(provider =>
+            {
+                SortPersons sort = builder.Configuration.GetSection("ui_settings:sort:persons").Get<SortPersons>() ?? throw new Exception("Missing \'ui_settings:sort:persons\' appsettings section or some of its elements could not be mapped");
+
+                return sort;
+            });
+
+            builder.Services.AddSingleton<SortStudios>(provider =>
+            {
+                SortStudios sort = builder.Configuration.GetSection("ui_settings:sort:studios").Get<SortStudios>() ?? throw new Exception("Missing \'ui_settings:sort:studios\' appsettings section or some of its elements could not be mapped");
+
+                return sort;
             });
 
             builder.Services.AddHttpClient<IImageService, ImageService>(client => 

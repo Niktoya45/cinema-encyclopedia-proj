@@ -46,6 +46,11 @@
                 </div>
                 <span asp-validation-for="@Model.JobsBind" class="text-danger"></span>
             </li>
+
+            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
+            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+                <textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
+            </li>
         </ul>
     </form>
 </div>

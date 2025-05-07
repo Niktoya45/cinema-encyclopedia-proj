@@ -21,9 +21,9 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
         public async Task<StarringResponse> Handle(UpdateCinemaStarringCommand request, CancellationToken cancellationToken)
         {
             //handle data validation
-            Starring productionStudio = _mapper.Map<UpdateCinemaStarringCommand, Starring>(request);
+            Starring starring = _mapper.Map<UpdateCinemaStarringCommand, Starring>(request);
 
-            Starring? updated = await _repository.UpdateStarring(productionStudio, cancellationToken);
+            Starring? updated = await _repository.UpdateStarring(starring, cancellationToken);
 
             if (updated == null)
             {

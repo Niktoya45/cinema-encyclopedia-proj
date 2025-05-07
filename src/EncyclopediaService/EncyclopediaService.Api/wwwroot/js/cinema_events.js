@@ -36,6 +36,7 @@ addJobsCheckbox.addEventListener('click', function (e) {
     });
 });
 
+
 // update content of starring edit partial
 
 var refsEditStarring = document.querySelectorAll(".dropdown-menu .dropdown-reuse-edit-starring");

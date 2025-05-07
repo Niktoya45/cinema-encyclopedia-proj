@@ -4,14 +4,16 @@ using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
+using EncyclopediaService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Shared.ImageService.Models.Flags;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
 {
     public class PersonModel:PageModel
     {
-        private BlobContainerClient _containerClient { get; init; }
+        private IImageService _imageService { get; init; }
         private UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet=true)]
@@ -29,12 +31,12 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
         [BindProperty]
         public EditImage? EditPicture { get; set; }
 
-        public PersonModel(BlobContainerClient containerClient, UISettings settings)
+        public PersonModel(IImageService imageService, UISettings settings)
         {
-            _containerClient = containerClient;
+            _imageService = imageService;
             _settings = settings;
         }
-        public async Task<IActionResult> OnGet(string id) 
+        public async Task<IActionResult> OnGet([FromRoute] string id) 
         {
             // send data request instead of block below
 
@@ -67,7 +69,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
 
             EditMain = new EditMainPerson { Id = Person.Id, Name = Person.Name, BirthDate = Person.BirthDate, Country = Person.Country, Jobs = Person.Jobs, Description = Person.Description };
 
-            EditPicture = new EditImage { ImageCurrent = Person.Picture };
+            EditPicture = new EditImage { ImageId = null, ImageUri=Person.Picture };
 
             NewFilmography = new CinemaRecord { ParentId = Person.Id, Id = "", Name = "", Picture = _settings.DefaultSmallPosterPicture };
 
@@ -119,7 +121,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             return await OnGet(id);
         }
 
-        public async Task<IActionResult> OnPostEditPoster([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditPicture([FromRoute] string id)
         {
             // Implement: after receiving image name send put request to mediatre proxy
 
@@ -140,31 +142,23 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 return await OnGet(id);
             }
 
-            if (EditPicture.ImageCurrent != _settings.DefaultPersonPicture)
+            string imageName = EditPicture.Image.FileName;
+            string imageExt = Path.GetExtension(imageName);
+
+            string HashName = imageName.SHA_1() + imageExt;
+
+            if (EditPicture.ImageId is null || EditPicture.ImageId == String.Empty)
             {
-                var delres = await _containerClient.DeleteBlobIfExistsAsync(_settings.RootDirectory + EditPicture.ImageCurrent);
+                // if cinema yet has no image
 
-                if (!delres.Value)
-                {
-                    // handle
-                }
+                await _imageService.AddImage(HashName, EditPicture.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
-
-            string newname = string.Empty;
-
-            using (Stream image = EditPicture.Image.OpenReadStream())
+            else if (EditPicture.ImageId != HashName)
             {
-                string imageName = EditPicture.Image.FileName;
-                string ext = Path.GetExtension(imageName);
+                // if cinema already has an image
 
-                string hash = imageName.SHA_1();
-
-                newname = _settings.RootDirectory + hash + ext;
-
-                await _containerClient.UploadBlobAsync(newname, image);
+                await _imageService.ReplaceImage(EditPicture!.ImageId, HashName, EditPicture.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
-
-            var uri = _containerClient.GetBlobClient(newname).GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(2)).AbsolutePath;
 
             return await OnGet(id);
         }

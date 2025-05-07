@@ -9,6 +9,9 @@ using CinemaDataService.Api.Commands.PersonCommands.CreateCommands;
 using CinemaDataService.Api.Commands.PersonCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.PersonCommands.DeleteCommands;
 using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -34,15 +37,32 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PersonResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null, 
+            CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new PersonsQuery(st, pg));
+            var response = await _mediator.Send(new PersonsQuery(st, pg), ct);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsync(
+            [FromQuery] string search,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null,
+            CancellationToken ct = default
+        )
+        {
+            var response = await _mediator.Send(new PersonsSearchQuery(search, st, pg), ct);
 
             return Ok(response);
         }
@@ -58,16 +78,17 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("country/{country}")]
-        [ProducesResponseType(typeof(IEnumerable<PersonResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Country(
             [FromRoute] Country country,
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null, 
+            CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new PersonsCountryQuery(country, st, pg));
+            var response = await _mediator.Send(new PersonsCountryQuery(country, st, pg), ct);
 
             return Ok(response);
         }
@@ -83,16 +104,17 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("jobs/{jobs}")]
-        [ProducesResponseType(typeof(IEnumerable<PersonResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Jobs(
             [FromRoute] Job jobs,
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null,
+            CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new PersonsJobsQuery(jobs, st, pg));
+            var response = await _mediator.Send(new PersonsJobsQuery(jobs, st, pg), ct);
 
             return Ok(response);
         }
@@ -108,9 +130,10 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAsync(
-            [FromRoute] string id)
+            [FromRoute] string id, 
+            CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new PersonQuery(id));
+            var response = await _mediator.Send(new PersonQuery(id), ct);
 
             return Ok(response);
         }
@@ -124,7 +147,8 @@ namespace CinemaDataService.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> PostAsync(
-            [FromBody] CreatePersonRequest request
+            [FromBody] CreatePersonRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -136,7 +160,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Picture,
                         request.Filmography,
                         request.Description
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -153,7 +178,8 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string personId,
-            [FromBody] CreateFilmographyRequest request
+            [FromBody] CreateFilmographyRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -163,7 +189,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Name,
                         request.Year,
                         request.Picture
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -177,12 +204,13 @@ namespace CinemaDataService.Api.Controllers
         /// <returns>Updated person instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">Person is not found</response>
-        [HttpPut]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
             [FromQuery] string id,
-            [FromBody] UpdatePersonRequest request)
+            [FromBody] UpdatePersonRequest request, 
+            CancellationToken ct = default)
         {
             var response = await _mediator.Send(
                 new UpdatePersonCommand(
@@ -194,7 +222,27 @@ namespace CinemaDataService.Api.Controllers
                         request.Picture,
                         request.Filmography,
                         request.Description
-                    )
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
+
+        [HttpPut("{id}/picture")]
+        [ProducesResponseType(typeof(UpdatePictureResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutAsync(
+            [FromRoute] string id,
+            [FromBody] UpdatePictureRequest request,
+            CancellationToken ct = default)
+        {
+            var response = await _mediator.Send(
+                new UpdatePersonPictureCommand(
+                        id,
+                        request.Picture
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -213,7 +261,8 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string id,
-            [FromBody] UpdateFilmographyRequest request
+            [FromBody] UpdateFilmographyRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -222,7 +271,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Name,
                         request.Year,
                         request.Picture
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -235,13 +285,14 @@ namespace CinemaDataService.Api.Controllers
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Person is not found</response>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteAsync(
-            [FromQuery] string id)
+            [FromRoute] string id, 
+            CancellationToken ct = default)
         {
-            await _mediator.Send(new DeletePersonCommand(id));
+            await _mediator.Send(new DeletePersonCommand(id), ct);
 
             return Ok();
         }
@@ -260,10 +311,11 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string? personId,
-            [FromRoute] string id
+            [FromRoute] string id,
+            CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeletePersonFilmographyCommand(personId, id));
+            await _mediator.Send(new DeletePersonFilmographyCommand(personId, id), ct);
 
             return Ok();
         }

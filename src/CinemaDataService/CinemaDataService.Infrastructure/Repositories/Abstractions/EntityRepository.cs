@@ -1,10 +1,9 @@
 ﻿using System.Linq.Expressions;
 using CinemaDataService.Domain.Aggregates.Base;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Domain.Aggregates.PersonAggregate;
-using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Utils;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -50,7 +49,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 
         public async Task<List<T>?> Find(FilterDefinition<T> condition, Pagination? pg = default,  SortBy? sort=default, CancellationToken ct = default)
         {   
-            pg ??= new Pagination.Pagination(0, null);
+            pg ??= new Pagination(0, null);
 
             var notDeleted = Builders<T>.Filter.Where(e => !e.IsDeleted);
 
@@ -81,12 +80,43 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
             return await FindOne(e => e.Id == id, ct);
         }
 
+        public async Task<List<T>?> FindByName(string[] tokens, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default)
+        {
+            List<BsonRegularExpression> exprs = new List<BsonRegularExpression>();
+
+            foreach (string token in tokens) 
+            {
+                exprs.Add(new BsonRegularExpression(token, "i"));
+            }
+
+            FilterDefinition<T> condition = Builders<T>.Filter.In(e => e.Name, exprs);
+
+            return await Find(condition, pg, sort, ct);
+        }
+
         public async Task<T?> FindByName(string name, CancellationToken ct = default)
         {
             return await FindOne(e => e.Name == name, ct);
         }
 
         public abstract Task<T?> Update(T entity, CancellationToken ct = default);
+
+        public async Task<T?> UpdatePicture(string id, string? picture, CancellationToken ct = default)
+        {
+            T? entity = await FindById(id, ct);
+
+            var update = Builders<T>.Update.Set(e => e.Picture, picture);
+
+            if (entity is null) {
+                return null;
+            }
+
+            var find = Builders<T>.Filter.Where(e => e.Id == entity.Id);
+
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct); ;
+
+            return entity;
+        }
 
         public async Task<T?> Delete(string id, CancellationToken ct = default)
         {

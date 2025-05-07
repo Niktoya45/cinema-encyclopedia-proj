@@ -6,6 +6,6 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands
 {
     public class DeleteCinemaStarringCommand:DeleteStarringCommand
     {
-        public DeleteCinemaStarringCommand(string parentId, string starringId) : base(parentId, starringId) { }
+        public DeleteCinemaStarringCommand(string? parentId, string starringId) : base(parentId, starringId) { }
     }
 }

@@ -12,6 +12,7 @@ namespace CinemaDataService.Infrastructure.Models.CinemaDTO
         public Language Language { get; set; }
         public double RatingScore { get; set; }
         public string? Picture { get; set; }
+        public string? PictureUri { get; set; }
         public StudioRecord[]? ProductionStudios { get; set; }
         public Starring[]? Starrings { get; set; }
         public string? Description { get; set; }

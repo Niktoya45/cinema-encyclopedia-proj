@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EncyclopediaService.Api.Models;
-using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;
-using Shared.ImageService.Models.Flags;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -54,7 +52,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Genres = Genre.Western | Genre.Mystery | Genre.Thriller,
                 Language = 0,
                 RatingScore = 5.5,
-                ProductionStudios = new StudioRecord[] { new StudioRecord { Picture = "/img/grid_logo_placeholder.png" }, new StudioRecord { Picture = "/img/grid_logo_placeholder.png" } },
+                ProductionStudios = new StudioRecord[] { new StudioRecord { Id = "1", Picture = "/img/grid_logo_placeholder.png" }, new StudioRecord { Id = "2", Picture = "/img/grid_logo_placeholder.png" } },
                 Starrings = new Starring[] {
                     new Starring { Id = "1", Name="Name Surname 1", Picture="/img/grid_person_placeholder.png", Jobs=Job.Actor, RoleName="Role Name Long Long", RolePriority = RolePriority.Main},
                     new Starring { Id = "2", Name="Name Surname 2", Picture="/img/grid_person_placeholder.png", Jobs=Job.Actor, RoleName="Role Name Long Long", RolePriority = RolePriority.Main},
@@ -105,6 +103,9 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Cinema.Name = EditMain.Name.Trim();
                 Cinema.Genres = EditMain.GenresBind.Aggregate((acc, g) => acc | g);
                 Cinema.Description = EditMain.Description == null? null : EditMain.Description.Trim();
+
+                //var response = _gateway.UpdateCinema(Cinema); 
+                //return Ok(response);
             }
 
             return await OnGet(id);
@@ -128,7 +129,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             }
 
             string imageName = EditPoster.Image.FileName;
-            string imageExt  = Path.GetExtension(EditPoster.Image.FileName);
+            string imageExt  = Path.GetExtension(imageName);
 
             string HashName = imageName.SHA_1() + imageExt;
              
@@ -136,12 +137,12 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             {
                 // if cinema yet has no image
 
-                await _imageService.AddImage(HashName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
+                await _imageService.AddImage(HashName, EditPoster.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
             else if(EditPoster.ImageId != HashName) {
                 // if cinema already has an image
 
-                await _imageService.ReplaceImage(EditPoster!.ImageId, HashName, EditPoster.Image.OpenReadStream().ToBase64(), ImageSize.None);
+                await _imageService.ReplaceImage(EditPoster!.ImageId, HashName, EditPoster.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
 
             return await OnGet(id);
@@ -182,7 +183,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             return await OnGet(id);
         }
-        public PartialViewResult OnPostReuseEditStarringPartial()
+
+        public IActionResult OnPostReuseEditStarringPartial()
         {
             EditStarring!.JobsBind = new List<Job>();
             return Partial("_EditStarring", EditStarring);

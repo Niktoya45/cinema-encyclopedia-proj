@@ -4,4 +4,208 @@
 
 }
 
-<h1>Studio</h1>
+<body>
+
+    <!-- Edit Main Information Popup -->
+    <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+        <partial name="_EditMain" model="Model.EditMain" />
+    </form-popup>
+
+    <!-- Edit Studio Picture Popup -->
+    <form-popup id="modal-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
+        <partial name="_EditPicture" model="Model.EditLogo" />
+    </form-popup>
+
+    <!-- Add Filmography Popup -->
+    <form-popup id="modal-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
+        <partial name="_AddFilm" model="Model.NewFilmography" />
+    </form-popup>
+
+
+    <h1>Studio</h1>
+    <div class="container mt-5" style="margin-bottom:6rem">
+
+        <div class="row">
+
+            <div class="col-md-9 offset-md-1">
+                <h1 class="display-5">@Model.Studio.Name</h1>
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+
+        <hr>
+        <div class="row"></div>
+
+        <div class="row">
+
+            <!-- Studio Picture -->
+            <div class="col-md-3 offset-1">
+                <img src=@(Model.Studio.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Studio Image">
+            </div>
+
+            <!-- Studio Picture Options -->
+            <div class="col-md-1">
+
+                <div class="dropdown">
+                    <button id="dropdown-edit-picture" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                            <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                            <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                        </svg>
+                    </button>
+
+                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-picture">
+                        <li>
+                            <a class="dropdown-item" data-bs-target="#modal-edit-picture" data-bs-toggle="modal" href="#">Replace picture</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-7">
+                <div class="row">
+
+                    <!-- Main Object Information Col-1 -->
+                    <div class="col-md-5">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Date found</li>
+                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Studio.FoundDate.ToString("dd-MMM-yyyy"))</li>
+
+                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Country of origin</li>
+                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Studio.Country.ToString())</li>
+
+                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Vice president</li>
+                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@((Model.Studio.PresidentName == null ? "Unknown" : Model.Studio.PresidentName.ToString()))</li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-1"></div>
+
+                    <!-- Main Object Information Col-2 (Optional) -->
+                    <div class="col-md-5"></div>
+
+                    <!-- Main Object Information Options -->
+                    <div class="col-md-1">
+                        <div class="dropdown">
+                            <button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                                    <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                                    <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+                                </svg>
+                            </button>
+
+                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
+                                <li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Description Block -->
+        <hr>
+        <div class="row">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Biography</li>
+                <li class="list-group-item mb-8 border-bottom shadow-sm fs-5">
+                    @(Model.Studio.Description)
+                </li>
+            </ul>
+        </div>
+
+        <!-- Filmography Block -->
+        <hr>
+        <div class="row border-bottom">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
+                    <div class="row">
+
+                        <div class="col-md-11">
+                            <span>Filmography</span>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button id="button-add-filmography" data-bs-target="#modal-add-filmography" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+                                <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
+                                    <line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </li>
+            </ul>
+
+            <!-- Carousel Block -->
+            <div class="row" style="block-size:350px">
+                @if (Model.Studio.Filmography != null)
+                {
+                    <div id="carousel-filmography" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
+
+                        <div class="col-1 text-bg-dark"></div>
+
+                        <div class="col-10 offset-1">
+                            <div class="carousel-inner">
+                                @{
+                                    const int r = 2;
+                                    const int c = 6;
+                                    int k = r * c;
+                                    int m = Model.Studio.Filmography.Length / k;
+                                    int L = m * k;
+                                }
+
+                                <!-- Carousel Items -->
+                                @for (int i = 0; i < L + k; i += k)
+                                {
+                                    <div class="@(i==0? "carousel-item active" : "carousel-item")">
+                                        <div class="row row-cols-@c">
+                                            @for (int j = i; j < i + k; j++)
+                                            {
+                                                @if (j == Model.Studio.Filmography.Length)
+                                                {
+                                                    break;
+                                                }
+                                                <div class="col">
+                                                    <partial name="_FilmCard" model="Model.Studio.Filmography[j]" />
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-1 text-bg-dark"></div>
+
+                        <!-- Slide Buttons -->
+                        @if (Model.Studio.Filmography.Length > 4)
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/js/studio_events.js" asp-append-version="true"></script>
+
+</body>

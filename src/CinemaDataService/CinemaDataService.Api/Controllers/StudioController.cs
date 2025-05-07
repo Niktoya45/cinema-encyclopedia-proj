@@ -8,6 +8,9 @@ using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
 using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -38,10 +41,26 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null, CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new StudiosQuery(st, pg));
+            var response = await _mediator.Send(new StudiosQuery(st, pg), ct);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsync(
+            [FromQuery] string search,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null,
+            CancellationToken ct = default
+        )
+        {
+            var response = await _mediator.Send(new StudiosSearchQuery(search, st, pg), ct);
 
             return Ok(response);
         }
@@ -63,10 +82,11 @@ namespace CinemaDataService.Api.Controllers
         public async Task<IActionResult> Year(
             [FromRoute] int year,
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null, 
+            CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new StudiosYearQuery(year, st, pg));
+            var response = await _mediator.Send(new StudiosYearQuery(year, st, pg), ct);
 
             return Ok(response);
         }
@@ -88,10 +108,11 @@ namespace CinemaDataService.Api.Controllers
         public async Task<IActionResult> Country(
             [FromRoute] Country country,
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] Pagination? pg = null, 
+            CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new StudiosCountryQuery(country, st, pg));
+            var response = await _mediator.Send(new StudiosCountryQuery(country, st, pg), ct);
 
             return Ok(response);
         }
@@ -107,10 +128,11 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAsync(
-            [FromRoute] string id)
+            [FromRoute] string id,
+            CancellationToken ct = default)
         {
             var response = await _mediator.Send(
-                new StudioQuery(id)
+                new StudioQuery(id), ct
                 );
 
             return Ok(response);
@@ -125,7 +147,8 @@ namespace CinemaDataService.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> PostAsync(
-            [FromBody] CreateStudioRequest request
+            [FromBody] CreateStudioRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -137,7 +160,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Filmography,
                         request.PresidentName,
                         request.Description
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -154,7 +178,8 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string studioId,
-            [FromBody] CreateFilmographyRequest request
+            [FromBody] CreateFilmographyRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -164,7 +189,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Name,
                         request.Year,
                         request.Picture
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -183,7 +209,8 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
             [FromRoute] string id,
-            [FromBody] UpdateStudioRequest request)
+            [FromBody] UpdateStudioRequest request, 
+            CancellationToken ct = default)
         {
             var response = await _mediator.Send(
                 new UpdateStudioCommand(
@@ -195,7 +222,27 @@ namespace CinemaDataService.Api.Controllers
                         request.Filmography,
                         request.PresidentName,
                         request.Description
-                    )
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
+
+        [HttpPut("{id}/picture")]
+        [ProducesResponseType(typeof(UpdatePictureResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutAsync(
+            [FromRoute] string id,
+            [FromBody] UpdatePictureRequest request,
+            CancellationToken ct = default)
+        {
+            var response = await _mediator.Send(
+                new UpdateStudioPictureCommand(
+                        id,
+                        request.Picture
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -214,7 +261,8 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string id,
-            [FromBody] UpdateFilmographyRequest request
+            [FromBody] UpdateFilmographyRequest request, 
+            CancellationToken ct = default
             )
         {
             var response = await _mediator.Send(
@@ -223,7 +271,8 @@ namespace CinemaDataService.Api.Controllers
                         request.Name,
                         request.Year,
                         request.Picture
-                    )
+                    ),
+                ct
                 );
 
             return Ok(response);
@@ -240,10 +289,11 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteAsync(
-            [FromRoute] string id
+            [FromRoute] string id,
+            CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteStudioCommand(id));
+            await _mediator.Send(new DeleteStudioCommand(id), ct);
 
             return Ok();
         }
@@ -262,10 +312,11 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             [FromRoute] string? studioId,
-            [FromRoute] string id
+            [FromRoute] string id,
+            CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, id));
+            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, id), ct);
 
             return Ok();
         }

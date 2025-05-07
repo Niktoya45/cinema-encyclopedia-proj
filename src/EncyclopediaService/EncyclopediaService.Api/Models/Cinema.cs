@@ -30,7 +30,17 @@ namespace EncyclopediaService.Api.Models
         Thriller = 0b_0000_0100_0000_0000,
         Western = 0b_0000_1000_0000_0000
     }
-    /**/ public enum Language;
+    /**/
+    public enum Language
+    {
+        [Display(Name = ". . .")]
+        None,
+        English,
+        German,
+        French,
+        Spanish,
+        Italian
+    }
 
     /**/ public enum RolePriority { Main, Support, Episodic }
     /**/ public record Starring { 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Domain.Aggregates.Shared;
 using CinemaDataService.Infrastructure.Models.SharedDTO;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
@@ -31,7 +32,11 @@ namespace CinemaDataService.Api.Commands.StudioCommands.UpdateCommands
                 throw new NotFoundException(request.Id, "Studio");
             }
 
-            return _mapper.Map<CinemaRecord, FilmographyResponse>(updated);
+            FilmographyResponse response = _mapper.Map<CinemaRecord, FilmographyResponse>(updated);
+            response.ParentId = null;
+
+            return response;
+
         }
     }
 }
