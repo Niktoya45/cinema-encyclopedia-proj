@@ -2,7 +2,7 @@
 using MediatR;
 using UserDataService.Infrastructure.Models.UserDTO;
 using UserDataService.Domain.Aggregates.UserAggregate;
-//using UserDataService.Api.Exceptions.UserExceptions;
+using UserDataService.Api.Exceptions.InfrastructureExceptions;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 
 namespace UserDataService.Api.Queries.UserQueries
@@ -19,14 +19,14 @@ namespace UserDataService.Api.Queries.UserQueries
         }
         public async Task<GetUserResponse> Handle(UserQuery request, CancellationToken cancellationToken)
         {
-            User? User = await _repository.FindById(request.Id, cancellationToken);
+            User? user = await _repository.FindById(request.Id, cancellationToken);
 
-            if (User == null) { 
-                // handle
+            if (user == null) {
+                new NotFoundException(request.Id, "Users");
             }
 
 
-            return _mapper.Map<GetUserResponse>(User);
+            return _mapper.Map<GetUserResponse>(user);
         }
     }
 }

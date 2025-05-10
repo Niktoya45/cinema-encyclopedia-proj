@@ -1,5 +1,5 @@
 ﻿using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {

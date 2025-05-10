@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using CinemaDataService.Infrastructure.Models.PersonDTO;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
-    public class PersonsQuery : IRequest<IEnumerable<PersonsResponse>>
+    public class PersonsQuery : IRequest<Page<PersonsResponse>>
     {
         public SortBy? Sort { get; }
         public Pagination Pg { get; }

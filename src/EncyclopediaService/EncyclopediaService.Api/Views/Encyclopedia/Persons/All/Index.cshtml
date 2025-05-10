@@ -1,0 +1,175 @@
+﻿@page "{handler?}"
+@using EncyclopediaService.Api.Extensions;
+@model EncyclopediaService.Api.Views.Encyclopedia.Persons.All.IndexModel;
+@{
+    ViewData["Title"] = "Persons";
+}
+
+<h1>Persons</h1>
+
+<body>
+    <div class="container">
+        <div class="row mt-4">
+            <!-- Collection Grid -->
+            <div class="col-md-9">
+
+				<div class="row row-cols-4 row-cols-md-4 row-cols-sm-2">
+                    @foreach (var person in Model.List)
+                    {
+						<div class="col-3 row-cols-md-3 col-sm-6">
+                            <div class="card mb-md-4 w-100" style="width:fit-content">
+                                <a asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">
+                                    <img src="@person.Picture" class="card-img-top" alt="Person @(person.Id)">
+                                </a>
+                                <div class="card-body border-bottom" style="padding-bottom:1rem;">
+                                    <div class="text-truncate">
+                                        <h6 class="card-text fw-normal">
+                                            <a class="link-black link-underline-none link-underline-blue-offset-2-hover"
+                                               asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">@person.Name</a>
+                                        </h6>
+                                    </div>
+                                    <div class="row-cols-9">
+                                        <p class="text-end card-subtitle fs-6" style="color:cadetblue;">@(string.Join(" | ", person.Jobs.BreakJobsFlag()))</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <!-- Filter and Sort Options -->
+            <div class="col-md-3">
+
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title fs-4">Filter Options</p>
+                        <hr />
+                        <form id="filter-options-year" method="get" asp-page="index" asp-page-handler="jobs">
+                            <div class="row row-cols-1 card-group mt-3">
+                                <h5 class="card-subtitle col-11 offset-1 mb-2">by occupation:</h5>
+
+                                @foreach (var job in Enum.GetValues<Job>())
+                                {
+                                    @if (job == 0)
+                                    {
+                                        continue;
+                                    }
+
+                                    <div class="form-check col-8 offset-4">
+                                        <input class="form-check-input form-submit" type="checkbox" value="@job" id="options-job-@job" name="jobsbind" checked="@((Model._filterOptions.JobsBind.Exists(g => g==job)))">
+                                        <label class="form-check-label" for="option-job-@job">
+                                            @((Job)job)
+                                        </label>
+                                    </div>
+                                }
+
+                            </div>
+                        </form>
+                        <p class="text-muted">-----------------------------------</p>
+                        <form id="filter-options-country" method="get" asp-page="index" asp-page-handler="country">
+                            <div class="row row-cols-1 card-group mt-3">
+                                <h5 class="card-subtitle col-11 offset-1 mb-2">by country:</h5>
+
+                                <div class="form-check col-10 offset-2">
+                                    <select class="form-select form-submit" name="languagebind" asp-for="_filterOptions.CountryBind" asp-items="Html.GetEnumSelectList<Country>()">
+                                    </select>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 text-center">
+                        |
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title fs-4">Sort Options</p>
+                        <hr />
+                        <form id="sort-options" method="get">
+                            <div class="row row-cols-1 card-group mt-3">
+                                <h5 class="card-subtitle">Order</h5>
+                                <div class="col-12 mt-2 mb-2">
+                                    <div class="row">
+                                        <div class="form-check col-5 offset-2">
+                                            <input class="form-check-input form-submit" type="radio" value="true" name="order" id="asc" checked="@(Model.Order??false)">
+                                            <label class="form-check-label" for="asc">
+                                                ascending
+                                            </label>
+                                        </div>
+                                        <div class="form-check col-5">
+                                            <input class="form-check-input form-submit" type="radio" value="false" name="order" id="dsc" checked="@(Model.Order??false)">
+                                            <label class="form-check-label" for="dsc">
+                                                descending
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-muted">-----------------------------------</p>
+                                <h5 class="card-subtitle">By</h5>
+                                <div class="row mt-2"></div>
+                                @foreach (KeyValuePair<string, string> sort in Model._sortOptions.MapToQueryKey)
+                                {
+                                    <div class="form-check col-8 offset-4">
+                                        <input class="form-check-input form-submit" type="radio" value="@sort.Value" name="by" id="sort-@sort.Value" checked="@(sort.Value==Model.By)">
+                                        <label class="form-check-label" for="sort-@sort.Value">
+                                            @Model._sortOptions.MapToDisplay[sort.Key]
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <nav aria-label="...">
+                <ul id="pages" class="pagination pagination-lg justify-content-end">
+
+                    @{
+                        const byte ps = 3;
+
+                        int aft = Model.IsEnd ? 0 : 1;
+
+                        int lid = (Model.PageNum < ps && ((Model.PageNum + aft) < ps)) ? Model.PageNum + aft : ps;
+
+                        int dif = aft - (lid - 1);
+
+                        int n = lid + dif;
+                    }
+
+                    <li class="page-item">
+                        <a class="page-link" href="@(Model.PageNum<=(ps/2+1) ? null : $"?pageNum={Model.PageNum+dif-1}")" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int off = dif; off < n; off++)
+                    {
+                        <li class="page-item page-num @(off==0 ? "active" : "")">
+                            <a class="page-link" href="@(off==0 ? "#" : $"?pageNum={Model.PageNum+off}")">@(Model.PageNum + off)</a>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <a class="page-link" href="@((Model.IsEnd && Model.PageNum>=(lid - ps/2 - 1)) ? null : $"?pageNum={Model.PageNum+n}")" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+    <script src="~/js/index_events.js" asp-append-version="true"></script>
+
+</body>
+
+

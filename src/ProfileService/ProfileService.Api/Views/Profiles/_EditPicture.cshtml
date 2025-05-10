@@ -1,0 +1,14 @@
+﻿@model ProfileService.Api.Models.Edit.EditImage
+@{
+}
+<div class="container-fluid">
+	<form id="form-modal-edit-picture" asp-page-handler="editPicture" method="post" enctype="multipart/form-data">
+		<input type="hidden" class="form-control" asp-for="ImageId">
+		<input type="hidden" class="form-control" asp-for="ImageUri">
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item mb-4 border-bottom border-white fs-6">
+				<input asp-for="Image" type="file" class="form-control" />
+			</li>
+		</ul>
+	</form>
+</div>

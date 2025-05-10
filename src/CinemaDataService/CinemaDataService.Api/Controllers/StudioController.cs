@@ -7,7 +7,6 @@ using CinemaDataService.Api.Queries.StudioQueries;
 using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
-using CinemaDataService.Infrastructure.Repositories.Utils;
 using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
@@ -36,7 +35,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
@@ -50,17 +49,16 @@ namespace CinemaDataService.Api.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync(
+        public async Task<IActionResult> Search(
             [FromQuery] string search,
-            [FromQuery] SortBy? st = null,
             [FromQuery] Pagination? pg = null,
             CancellationToken ct = default
         )
         {
-            var response = await _mediator.Send(new StudiosSearchQuery(search, st, pg), ct);
+            var response = await _mediator.Send(new StudiosSearchQuery(search, pg), ct);
 
             return Ok(response);
         }
@@ -76,7 +74,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("year/{year:int}")]
-        [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Year(
@@ -102,7 +100,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("country/{country}")]
-        [ProducesResponseType(typeof(IEnumerable<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Country(

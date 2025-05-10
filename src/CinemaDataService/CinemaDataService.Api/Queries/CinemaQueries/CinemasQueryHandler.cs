@@ -4,11 +4,12 @@ using CinemaDataService.Api.Queries;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
-    public class CinemasQueryHandler : IRequestHandler<CinemasQuery, IEnumerable<CinemasResponse>>
+    public class CinemasQueryHandler : IRequestHandler<CinemasQuery, Page<CinemasResponse>>
     {
         ICinemaRepository _repository;
         IMapper _mapper;
@@ -18,7 +19,7 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CinemasResponse>> Handle(CinemasQuery request, CancellationToken cancellationToken)
+        public async Task<Page<CinemasResponse>> Handle(CinemasQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Cinema>? cinemas = null;
 
@@ -50,7 +51,12 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
                 throw new NotFoundException("Cinemas");
             }
 
-            return _mapper.Map<IEnumerable<Cinema>, IEnumerable<CinemasResponse>>(cinemas);
+            IEnumerable<CinemasResponse> response = _mapper.Map<IEnumerable<Cinema>, IEnumerable<CinemasResponse>>(cinemas);
+
+            int countRequested = request.Pg.Take - Pagination._add;
+            bool isEnd = response.Count() <= countRequested;
+
+            return new Page<CinemasResponse> { IsEnd =  isEnd, Response = (isEnd ? response : response.Take(countRequested)) };
         }
     }
 }

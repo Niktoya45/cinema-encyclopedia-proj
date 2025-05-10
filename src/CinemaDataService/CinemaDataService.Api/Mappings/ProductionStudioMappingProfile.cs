@@ -28,7 +28,8 @@ namespace CinemaDataService.Api.Mappings
 
 
             CreateMap<StudioRecord, ProductionStudioResponse>()
-                .ForMember(ps => ps.ParentId, opt => opt.Ignore());
+                .ForMember(psr => psr.ParentId, opt => opt.Ignore())
+                .ForMember(psr => psr.PictureUri, opt => opt.Ignore()); 
         }
     }
 }

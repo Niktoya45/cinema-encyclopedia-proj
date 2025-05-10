@@ -1,20 +1,14 @@
-﻿using CinemaDataService.Infrastructure.Models.PersonDTO;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+﻿using CinemaDataService.Api.Queries.SharedQueries;
+using CinemaDataService.Infrastructure.Models.PersonDTO;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 using MediatR;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
-    public class PersonsSearchQuery : IRequest<IEnumerable<PersonsResponse>>
+    public class PersonsSearchQuery: SearchQuery
     {
-        public SortBy? Sort { get; }
-        public Pagination Pg { get; }
-        public string[] Search { get; }
-
-        public PersonsSearchQuery(string search, SortBy? sort = null, Pagination? pagination = null, string? email = null)
+        public PersonsSearchQuery(string search, Pagination? pagination = null) : base(search, pagination)
         {
-            Search = search.ToLower().Split();
-            Sort = sort;
-            Pg = pagination ?? new Pagination(0, Pagination._max);
         }
     }
 }

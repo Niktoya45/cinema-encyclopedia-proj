@@ -8,10 +8,10 @@ namespace EncyclopediaService.Api.Models.Filter
 
         public List<int> YearsChoice = Enumerable.Range(1, 12).Select(i => DateTime.Now.Year - i * 10).ToList();
 
-        [BindProperty]
-        public List<int> YearsBind { get; set; }
+        [BindProperty(SupportsGet =true, Name ="yearsbind")]
+        public List<int> YearsBind { get; set; } = new List<int>();
 
-        [BindProperty]
-        public Country CountryChoice { get; set; }
+        [BindProperty(SupportsGet =true, Name ="countrybind")]
+        public Country CountryBind { get; set; }
     }
 }

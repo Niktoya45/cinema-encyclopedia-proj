@@ -9,7 +9,7 @@ namespace CinemaDataService.Infrastructure.Models.StudioDTO
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public DateOnly FoundYear { get; set; }
+        public DateOnly FoundDate { get; set; }
         public Country Country { get; set; }
         public string? Picture { get; set; }
         public string? PictureUri { get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using CinemaDataService.Domain.Aggregates.Base;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Infrastructure.Repositories
 {

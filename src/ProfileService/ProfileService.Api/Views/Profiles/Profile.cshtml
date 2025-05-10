@@ -1,0 +1,115 @@
+﻿@page
+@model ProfileService.Api.Views.Profiles.ProfileModel
+@{
+
+}
+
+<body>
+
+    <!-- Edit Main Information Popup -->
+    <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+        <partial name="_EditMain" model="Model.EditMain" />
+    </form-popup>
+
+    <!-- Edit Profile Picture Popup -->
+    <form-popup id="modal-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
+        <partial name="_EditPicture" model="Model.EditProfilePicture" />
+    </form-popup>
+	
+
+    <h1>Profile</h1>
+    <div class="container mt-5" style="margin-bottom:6rem">
+
+		<div class="row">
+
+			<div class="col-md-9">
+				<span class="fs-4">@Model.Profile.Username</span>
+			</div>
+
+			<div class="col-md-2"></div>
+
+		</div>
+
+		<hr>
+		<div class="row"></div>
+
+		<div class="row">
+
+			<!-- Profile Picture -->
+			<div class="col-md-3 offset-1">
+				<img src=@(Model.Profile.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Profile Image">
+			</div>
+
+			<!-- Profile Picture Options -->
+			<div class="col-md-1">
+
+				<div class="dropdown">
+					<button id="dropdown-edit-picture" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+						<svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+							<circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+							<circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+						</svg>
+					</button>
+
+					<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-picture">
+						<li>
+							<a class="dropdown-item" data-bs-target="#modal-edit-picture" data-bs-toggle="modal" href="#">Replace profile picture</a>
+						</li>
+					</ul>
+
+				</div>
+
+			</div>
+
+			<div class="col-md-7">
+				<div class="row">
+
+					<!-- Main Object Information Col-1 -->
+					<div class="col-md-5">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
+							<li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Profile.Birthdate.Year == 1900 ? "-" : Model.Profile.Birthdate.ToString("dd-MM-yyyy"))</li>
+						</ul>
+					</div>
+
+					<div class="col-md-1"></div>
+
+					<!-- Main Object Information Col-2 (Optional) -->
+					<div class="col-md-5"></div>
+
+					<!-- Main Object Information Options -->
+					<div class="col-md-1">
+						<div class="dropdown">
+							<button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+								<svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+									<circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+									<circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
+								</svg>
+							</button>
+
+							<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
+								<li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Description Block -->
+		<hr>
+		<div class="row">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">About</li>
+				<li class="list-group-item mb-8 border-bottom shadow-sm fs-5">
+					@(Model.Profile.Description)
+				</li>
+			</ul>
+		</div>
+
+    </div>
+</body>

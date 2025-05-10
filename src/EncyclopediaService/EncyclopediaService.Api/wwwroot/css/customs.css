@@ -39,3 +39,70 @@
     border-radius: 5px;
     visibility: hidden;
 }
+
+#account {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #202428;
+    text-decoration: none;
+    height: 100%;
+    transition: background-color 0.1s ease-in;
+}
+
+.navbar-collapse .nav-item {
+    display: flex;
+    align-items:center;
+    padding: 0;
+    height: auto;
+}
+
+#account #account-icon circle {
+    fill: #202428;
+    stroke: #aaaaaa;
+    stroke-width: 2;
+    transition: fill 0.1s ease-in;
+}
+
+#account #account-icon line {
+    stroke: #aaaaaa;
+    stroke-width: 2;
+}
+
+#account:hover {
+    background-color: #404448;
+    transition: background-color 0.1s ease-in;
+}
+
+#account:hover #account-icon circle {
+    fill: #404448;
+    transition: fill 0.1s ease-in;
+}
+
+#account #account-name {
+    text-align: center;
+    font-weight: 600;
+}
+
+#rating {
+    background: none;
+    border: none;
+    margin: auto;
+    color: #ffaa22;
+    padding: 0.4rem 1rem;
+    text-decoration: dotted underline #ffdd44;
+    text-decoration-thickness: 0.2rem;
+    text-underline-offset: 0.3rem;
+}
+
+.star {
+    fill:#ffdd44; 
+    stroke:none; 
+    stroke-width:0;
+}
+
+.star-empty {
+    fill: none;
+    stroke: black;
+    stroke-width: 0.1rem;
+}

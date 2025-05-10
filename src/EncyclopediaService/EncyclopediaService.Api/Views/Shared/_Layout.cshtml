@@ -18,7 +18,7 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse hstack d-sm-inline-flex align-items-center">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link" href="/encyclopedia/cinemas/all/">Home</a>
@@ -48,6 +48,20 @@
 
                         <li class="nav-item">
                             <input id="search" class="form-control ms-2 rounded-2" type="text" style="width:40rem" placeholder=" . . . " />
+                        </li>
+
+                        <li class="nav-item ms-auto">
+                            <a id="account" href="#">
+                                <div class="input-group">
+                                    <span id="account-name" class="nav-link fs-6"> Account </span>
+									<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
+										<circle cx="22" cy="43" r="21" />
+										<circle cx="21" cy="15" r="12" />
+										<line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
+									</svg>
+                                </div>
+
+                            </a>
                         </li>
                     </ul>
 

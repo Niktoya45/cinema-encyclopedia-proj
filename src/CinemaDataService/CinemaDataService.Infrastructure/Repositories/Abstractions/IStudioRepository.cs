@@ -1,7 +1,7 @@
 ﻿
 using CinemaDataService.Domain.Aggregates.Shared;
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 {

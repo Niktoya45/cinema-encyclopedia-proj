@@ -1,19 +1,12 @@
-﻿using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Infrastructure.Repositories.Utils;
-using MediatR;
+﻿using CinemaDataService.Api.Queries.SharedQueries;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
-    public class StudiosSearchQuery : IRequest<IEnumerable<StudiosResponse>>
+    public class StudiosSearchQuery : SearchQuery
     {
-        public StudiosSearchQuery(string search, SortBy? sort = null, Pagination? pagination = null)
+        public StudiosSearchQuery(string search, Pagination? pagination = null) : base(search, pagination)
         {
-            Search = search.ToLower().Split();
-            Sort = sort;
-            Pg = pagination ?? new Pagination(0, Pagination._max);
         }
-        public SortBy? Sort { get; }
-        public Pagination Pg { get; }
-        public string[] Search { get; }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
-    public class CinemasQuery : IRequest<IEnumerable<CinemasResponse>>
+    public class CinemasQuery : IRequest<Page<CinemasResponse>>
     {
         public CinemasQuery(
             SortBy? sort = null,

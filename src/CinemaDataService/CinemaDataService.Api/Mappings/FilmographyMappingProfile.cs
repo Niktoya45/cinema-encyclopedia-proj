@@ -37,7 +37,8 @@ namespace CinemaDataService.Api.Mappings
 
 
             CreateMap<CinemaRecord, FilmographyResponse>()
-                .ForMember(ps => ps.ParentId, opt => opt.Ignore());
+                .ForMember(fr => fr.ParentId, opt => opt.Ignore())
+                .ForMember(fr => fr.PictureUri, opt => opt.Ignore());
 
         }
     }

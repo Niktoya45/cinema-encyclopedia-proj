@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using CinemaDataService.Domain.Aggregates.Base;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -105,13 +105,15 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
         {
             T? entity = await FindById(id, ct);
 
-            var update = Builders<T>.Update.Set(e => e.Picture, picture);
-
             if (entity is null) {
                 return null;
             }
 
+            entity.Picture = picture;
+
+            var update = Builders<T>.Update.Set(e => e.Picture, entity.Picture);
             var find = Builders<T>.Filter.Where(e => e.Id == entity.Id);
+
 
             var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct); ;
 

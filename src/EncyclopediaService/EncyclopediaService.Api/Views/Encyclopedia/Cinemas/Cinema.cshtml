@@ -64,27 +64,30 @@
         </div>
 
         <div class="row">
-            <div class="col-md-5 offset-md-5">
+            <div class="col-md-7 offset-md-5">
                 @{
-                    const byte starSize = 6;
+                    const byte starSize = 5;
+                    const byte starCount = 10;
+                    const byte starSpan = 1;
+                    const float K = 10;
                 }
-                <span> @Model.Cinema.RatingScore </span>
-                <svg width="@((starSize+1)*100-10)" height="100" xmlns="http://www.w3.org/2000/svg">
+                
+                <svg width="@(((starSize+starSpan)*starCount-starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <clipPath id="cut">
-                            <rect width="@((starSize+1)*10*Model.Cinema.RatingScore-10)" height="100" x="0" y="0" />
+                            <rect width="@(((starSize+starSpan)*starCount-starSpan)*K*(Model.Cinema.RatingScore)/starCount)" height="@(starSize*K*1.5)" x="0" y="0" />
                         </clipPath>
                     </defs>
 
-                    @for (byte i = 0; i < 10; i++)
+                    @for (byte i = 0; i < starCount; i++)
                     {
-                        <polygon points="@Star(starSize, i*70)" fill="#ffdd44" stroke="none" stroke-width="0" clip-path="url(#cut)"></polygon>
-                        <polygon points="@Star(starSize, i*70)" fill="none" stroke="black" stroke-width="1.5"></polygon>
+                        <polygon class="star" points="@Star(starSize, i*(starSize+starSpan)*K)" clip-path="url(#cut)"></polygon>
+                        <polygon class="star-empty" points="@Star(starSize, i*(starSize+starSpan)*K)"></polygon>
                     }
-                </svg>
-            </div>
+				</svg>
+                <button id="rating" class="fs-3 fw-bold"> @Model.Cinema.RatingScore </button>
 
-            <div class="col-md-2"></div>
+            </div>
         </div>
 
         <hr>

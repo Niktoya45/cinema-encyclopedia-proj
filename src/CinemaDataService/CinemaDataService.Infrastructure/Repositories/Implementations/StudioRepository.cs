@@ -4,7 +4,7 @@ using MongoDB.Driver;
 using System.Linq.Expressions;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Infrastructure.Repositories.Implementations
 {

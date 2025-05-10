@@ -1,7 +1,7 @@
 ﻿
 
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Infrastructure.Repositories.Utils;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 {
@@ -15,6 +15,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
         public Task<List<Cinema>?> FindByStudioId(string studioId, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);
         public Task<StudioRecord?> UpdateProductionStudio(StudioRecord studio, CancellationToken ct = default);
         public Task<Starring?> UpdateStarring(Starring starring, CancellationToken ct = default);
+        public Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct = default);
         public Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct = default);
         public Task<Starring?> DeleteStarring(string? cinemaId, Starring starring, CancellationToken ct = default);
     }

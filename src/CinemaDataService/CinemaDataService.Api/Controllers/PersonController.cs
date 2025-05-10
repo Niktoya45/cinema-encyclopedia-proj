@@ -8,7 +8,6 @@ using CinemaDataService.Infrastructure.Models.StudioDTO;
 using CinemaDataService.Api.Commands.PersonCommands.CreateCommands;
 using CinemaDataService.Api.Commands.PersonCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.PersonCommands.DeleteCommands;
-using CinemaDataService.Infrastructure.Repositories.Utils;
 using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
@@ -37,7 +36,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
@@ -52,17 +51,16 @@ namespace CinemaDataService.Api.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync(
+        public async Task<IActionResult> Search(
             [FromQuery] string search,
-            [FromQuery] SortBy? st = null,
             [FromQuery] Pagination? pg = null,
             CancellationToken ct = default
         )
         {
-            var response = await _mediator.Send(new PersonsSearchQuery(search, st, pg), ct);
+            var response = await _mediator.Send(new PersonsSearchQuery(search, pg), ct);
 
             return Ok(response);
         }
@@ -78,7 +76,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("country/{country}")]
-        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Country(
@@ -104,7 +102,7 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("jobs/{jobs}")]
-        [ProducesResponseType(typeof(IEnumerable<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Jobs(

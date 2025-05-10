@@ -1,4 +1,4 @@
-﻿namespace CinemaDataService.Infrastructure.Repositories.Utils
+﻿namespace CinemaDataService.Infrastructure.Models.SharedDTO
 {
     public record class SortBy(bool? order, string? field)
     {

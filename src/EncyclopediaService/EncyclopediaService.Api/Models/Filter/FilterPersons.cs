@@ -8,10 +8,10 @@ namespace EncyclopediaService.Api.Models.Filter
 
         public Job JobsChoice { get; set; }
 
-        [BindProperty]
-        public List<Job> JobsBind { get; set; }
+        [BindProperty(SupportsGet=true, Name ="jobsbind")]
+        public List<Job> JobsBind { get; set; } = new List<Job>();
 
-        [BindProperty]
-        public Country CountryChoice { get; set; }
+        [BindProperty(SupportsGet=true, Name="countrybind")]
+        public Country CountryBind { get; set; }
     }
 }

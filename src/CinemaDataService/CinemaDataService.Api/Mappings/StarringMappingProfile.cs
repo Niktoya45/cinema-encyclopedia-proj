@@ -48,7 +48,8 @@ namespace CinemaDataService.Api.Mappings
                 .ForMember(sr => sr.RoleName,
                 opt => opt.MapFrom(s => s.ActorRole == null ? null : s.ActorRole.Name))
                 .ForMember(sr => sr.RolePriority,
-                opt => opt.MapFrom(s => s.ActorRole == null ? 0 : s.ActorRole.Priority));
+                opt => opt.MapFrom(s => s.ActorRole == null ? 0 : s.ActorRole.Priority))
+                .ForMember(sr => sr.PictureUri, opt => opt.Ignore());
 
         }
     }

@@ -11,13 +11,6 @@ var routes = {
 
 var selectLayout = document.getElementById("layout-select");
 
-for (let i = 0; i < selectLayout.options.length; i++) {
-    if (window.location.href.toLowerCase().includes(routes[i])) {
-        selectLayout.selectedIndex = i;
-        selectLayout.options[i].firstChild.href = "#";
-        break;
-    }
-}
 
 anchorBrandLayout = document.getElementById("brand");
 

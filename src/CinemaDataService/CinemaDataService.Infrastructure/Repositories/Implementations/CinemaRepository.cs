@@ -1,8 +1,8 @@
 ﻿using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
 using CinemaDataService.Infrastructure.Context;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
-using CinemaDataService.Infrastructure.Repositories.Utils;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
@@ -119,6 +119,39 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
             }
 
             return starring;
+        }
+        public async Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct = default)
+        {
+            Cinema? cinema = await FindById(id, ct);
+
+            if (cinema is null)
+            {
+                return null;
+            }
+            if (rating == 0) 
+            {
+                return cinema;
+            }
+
+            cinema.Rating.Score *= cinema.Rating.N;
+
+            if (rating < 0)
+            {
+                cinema.Rating.N--;
+            }
+            else {
+                cinema.Rating.N++;
+            }
+
+            cinema.Rating.Score += rating;
+            cinema.Rating.Score /= cinema.Rating.N;
+
+            var update = Builders<Cinema>.Update.Set(e => e.Rating, cinema.Rating);
+            var find = Builders<Cinema>.Filter.Where(e => e.Id == cinema.Id);
+
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct); ;
+
+            return cinema;
         }
         public async Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct = default) 
         {

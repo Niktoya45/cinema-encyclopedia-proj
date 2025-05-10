@@ -1,8 +1,8 @@
 ﻿using CinemaDataService.Domain.Aggregates.PersonAggregate;
 using CinemaDataService.Domain.Aggregates.Shared;
 using CinemaDataService.Infrastructure.Context;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
-using CinemaDataService.Infrastructure.Repositories.Utils;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 

@@ -1,8 +1,6 @@
 ﻿using CinemaDataService.Domain.Aggregates.Base;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using System.Globalization;
-using MongoDB.Driver.Search;
 
 namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
 {
@@ -15,7 +13,7 @@ namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
 
         [BsonRepresentation(BsonType.Int32)]
         public Language Language { get; set; }
-        public double RatingScore { get; set; } = 0.0;
+        public RatingScore Rating { get; set; } = new RatingScore();
 
         [BsonElement("ProductionStudios")]
         public IList<StudioRecord>? ProductionStudios { get; set; }

@@ -28,7 +28,6 @@ namespace EncyclopediaService.Api
                 .AddRazorPagesOptions(opts =>
                     {
                         opts.RootDirectory = "/Views";
-                        opts.Conventions.AddPageRoute("/Encyclopedia/Cinemas/All", "{*url}");
 
                         opts.Conventions.AddPageRoute("/Encyclopedia/Cinemas/Cinema", "/Encyclopedia/Cinemas/{id}");
                         opts.Conventions.AddPageRoute("/Encyclopedia/Persons/Person", "/Encyclopedia/Persons/{id}");
@@ -79,13 +78,19 @@ namespace EncyclopediaService.Api
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Views/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+
+            app.MapFallback(context => {
+                context.Response.Redirect("/encyclopedia/cinemas/all/");
+                return Task.CompletedTask;
+            });
 
             app.UseRouting();
 

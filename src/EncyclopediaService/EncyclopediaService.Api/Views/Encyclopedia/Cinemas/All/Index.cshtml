@@ -1,5 +1,5 @@
 ﻿@page "{handler?}"
-@model EncyclopediaService.Api.Views.Encyclopedia.Cinemas.AllModel;
+@model EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All.IndexModel;
 @{
     ViewData["Title"] = "Cinemas";
 }
@@ -24,7 +24,7 @@
                                     <div class="text-truncate">                                            
                                         <h6 class="card-text fw-normal">												
                                             <a class="link-black link-underline-none link-underline-blue-offset-2-hover"                                                   
-                                            asp-page="/encyclopedia/cinemas/cinema" asp-route-id="@cinema.Id">Title of cinema @cinema.Id</a>                                            
+                                            asp-page="/encyclopedia/cinemas/cinema" asp-route-id="@cinema.Id">@cinema.Name</a>                                            
                                         </h6>										
                                     </div>                                        
                                     <div class="row-cols-9">										
@@ -39,19 +39,19 @@
             </div>
 
             <!-- Filter and Sort Options -->
-            <div class="col-md-3">
+			<div id ="filter-and-sort" class="col-md-3">
                 <div class="card">
-                    <div id="filter-and-sort" class="card-body">
+                    <div  class="card-body">
                         <p class="card-title fs-4">Filter Options</p>
                         <hr/>
-                        <form id="filter-options-year" method="get" asp-page-handler="year">
+                        <form id="filter-options-year" method="get" asp-page="index" asp-page-handler="years">
                             <div class="row row-cols-1 card-group mt-3">
                                 <h5 class="card-subtitle col-11 offset-1 mb-2">by year:</h5>
 
                                 @foreach (var year in Model._filterOptions.YearsChoice)
                                 {
                                     <div class="form-check col-8 offset-4">
-                                        <input class="form-check-input" type="checkbox" value="@year" id="options-year-@year" name="_filterOptions.YearsBind" checked="@(Model._filterOptions.YearsBind.Exists(y => y==year))">
+                                        <input class="form-check-input form-submit" type="checkbox" value="@year" id="options-year-@year" name="yearsbind" checked="@(Model._filterOptions.YearsBind.Exists(y => y==year))">
                                         <label class="form-check-label" for="option-year-@year">
                                             @year - @(year < Model._filterOptions.YearsChoice.First() ? year+10 : "later")
                                         </label>
@@ -61,7 +61,7 @@
                             </div>
                         </form>
                         <p class="text-muted">-----------------------------------</p>
-                        <form id="filter-options-genre" method="get">
+                        <form id="filter-options-genre" method="get" asp-page="index" asp-page-handler="genres">
                             <div class="row row-cols-1 card-group mt-3">
                                 <h5 class="card-subtitle col-11 offset-1 mb-2">by genre:</h5>
 
@@ -73,7 +73,7 @@
                                     }
 
                                     <div class="form-check col-8 offset-4">
-                                        <input class="form-check-input" type="checkbox" value="@genre" id="options-genre-@genre" name="_filterOptions.GenresBind" checked="@((Model._filterOptions.GenresBind.Exists(g => g==genre)))">
+                                        <input class="form-check-input form-submit" type="checkbox" value="@genre" id="options-genre-@genre" name="genresbind" checked="@((Model._filterOptions.GenresBind.Exists(g => g==genre)))">
                                         <label class="form-check-label" for="option-genre-@genre">
                                             @((Genre)genre)
                                         </label>
@@ -83,26 +83,26 @@
                             </div>
                         </form>
                         <p class="text-muted">-----------------------------------</p>
-                        <form id="filter-options-language" method="get">
+                        <form id="filter-options-language" method="get" asp-page="index" asp-page-handler="language">
                             <div class="row row-cols-1 card-group mt-3">
                                 <h5 class="card-subtitle col-11 offset-1 mb-2">by language:</h5>
 
                                 <div class="form-check col-10 offset-2">
-                                    <select class ="form-select" asp-for="_filterOptions.LanguageBind" asp-items="Html.GetEnumSelectList<Language>()">
+                                    <select class="form-select form-submit" name="languagebind" asp-for="_filterOptions.LanguageBind" asp-items="Html.GetEnumSelectList<Language>()">
                                     </select>
                                 </div>
 
                             </div>
                         </form>
                         <p class="text-muted">-----------------------------------</p>
-                        <form id="filter-options-studio" method="get">
+                        <form id="filter-options-studio" method="get" asp-page="index" asp-page-handler="studios">
                             <div class="row row-cols-1 card-group mt-3">
                                 <h5 class="card-subtitle col-11 offset-1 mb-2">by studio:</h5>
 
                                 @foreach (var studio in Model._filterOptions.StudiosChoice)
                                 {
                                     <div class="form-check col-8 offset-4">
-                                        <input class="form-check-input" type="checkbox" value="@studio.Id" id="options-studio-@studio" name="_filterOptions.StudiosBind" checked="@(Model._filterOptions.StudiosBind.Exists(sid => sid == studio.Id))">
+                                        <input class="form-check-input form-submit" type="checkbox" value="@studio.Id" id="options-studio-@studio" name="studiosdind" checked="@(Model._filterOptions.StudiosBind.Exists(sid => sid == studio.Id))">
                                         <label class="form-check-label" for="option-studio-@studio">
                                             @studio.Name
                                         </label>
@@ -128,13 +128,13 @@
                                 <div class="col-12 mt-2 mb-2">
                                     <div class="row">
                                         <div class="form-check col-5 offset-2">
-                                            <input class="form-check-input" type="radio" value="true" name="Order" id="asc" checked="@(Model.Order??false)">
+                                            <input class="form-check-input form-submit sort-options-order" type="radio" value="true" name="order" id="asc" checked="@(Model.Order??false)">
                                             <label class="form-check-label" for="asc">
                                                 ascending
                                             </label>
                                         </div>
                                         <div class="form-check col-5">
-                                            <input class="form-check-input" type="radio" value="false" name="Order" id="dsc" checked="@(Model.Order??false)">
+                                            <input class="form-check-input form-submit sort-options-order" type="radio" value="false" name="order" id="dsc" checked="@(!Model.Order??false)">
                                             <label class="form-check-label" for="dsc">
                                                 descending
                                             </label>
@@ -147,9 +147,9 @@
                                 @foreach (KeyValuePair<string, string> sort in Model._sortOptions.MapToQueryKey)
                                 {
                                     <div class="form-check col-8 offset-4">
-                                        <input class="form-check-input" type="radio" value="@sort.Value" name="By" id="sort-@sort.Value">
+                                        <input class="form-check-input form-submit sort-options-by" type="radio" value="@sort.Value" name="by" id="sort-@sort.Value" checked="@(sort.Value==Model.By)">
                                         <label class="form-check-label" for="sort-@sort.Value">
-                                            @Model._sortOptions.MapToQueryKey[sort.Key]
+                                            @Model._sortOptions.MapToDisplay[sort.Key]
                                         </label>
                                     </div>
                                 }

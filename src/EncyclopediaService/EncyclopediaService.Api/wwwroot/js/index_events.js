@@ -21,3 +21,40 @@ if (currentSearch.size) {
         }
     });
 }
+
+
+// submit filter and sort options forms simply by clicking on a form element
+
+var placeFilterAndSort = document.getElementById("filter-and-sort");
+
+var formsInputs = placeFilterAndSort.querySelectorAll(".form-submit");
+
+formsInputs.forEach(function (input) {
+
+    if (input.classList.contains("form-select")) {
+
+        input.addEventListener('change', function (e) {
+            let targetForm = e.target.closest("form");
+            targetForm.submit();
+        });
+
+    } else {
+
+        input.addEventListener('click', function (e) {
+            let targetForm = e.target.closest("form");
+
+            if (targetForm.id == "sort-options") {
+
+                let checkAlsoClass = e.target.classList.contains('sort-options-order') ? '.sort-options-by' : '.sort-options-order';
+
+                let checkAlso = targetForm.querySelectorAll(checkAlsoClass);
+
+                if (!Array.from(checkAlso).some(r => r.checked))
+                    checkAlso[0].checked = true;
+            }
+
+            targetForm.submit();
+
+        });
+    }
+});
