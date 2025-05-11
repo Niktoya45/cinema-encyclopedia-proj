@@ -96,9 +96,29 @@
 }
 
 .star {
-    fill:#ffdd44; 
-    stroke:none; 
-    stroke-width:0;
+    fill: #ffdd44;
+    stroke: none;
+    stroke-width: 0;
+}
+
+#collapse-stars {
+    padding: 1rem 1rem;
+    border-radius: 0.3rem;
+}
+
+#collapse-stars .star.rail {
+    fill: none;
+    stroke: none;
+    stroke-width: 0;
+    clip-path: none;
+}
+
+#collapse-stars .rail:hover .star.rail{
+    fill: #ffdd447c;
+}
+
+#collapse-stars .rail:has( ~ .rail:hover) .star.rail{
+    fill: #ffdd447c;
 }
 
 .star-empty {
@@ -106,3 +126,4 @@
     stroke: black;
     stroke-width: 0.1rem;
 }
+

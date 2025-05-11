@@ -1,7 +1,7 @@
 using MediatR;
 using UserDataService.Infrastructure.Models.UserDTO;
 
-namespace UserDataService.Api.Commands.UserCommands
+namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
     public class DeleteUserCommand : IRequest<Unit>
     {

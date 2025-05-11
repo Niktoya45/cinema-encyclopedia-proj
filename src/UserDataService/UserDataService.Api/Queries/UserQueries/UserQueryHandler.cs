@@ -8,7 +8,7 @@ using UserDataService.Infrastructure.Repositories.Abstractions;
 namespace UserDataService.Api.Queries.UserQueries
 {
 
-    public class UserQueryHandler : IRequestHandler<UserQuery, GetUserResponse>
+    public class UserQueryHandler : IRequestHandler<UserQuery, UserResponse>
     {
         IUserRepository _repository;
         IMapper _mapper;
@@ -17,7 +17,7 @@ namespace UserDataService.Api.Queries.UserQueries
             _repository = repository;
             _mapper = mapper;
         }
-        public async Task<GetUserResponse> Handle(UserQuery request, CancellationToken cancellationToken)
+        public async Task<UserResponse> Handle(UserQuery request, CancellationToken cancellationToken)
         {
             User? user = await _repository.FindById(request.Id, cancellationToken);
 
@@ -26,7 +26,7 @@ namespace UserDataService.Api.Queries.UserQueries
             }
 
 
-            return _mapper.Map<GetUserResponse>(user);
+            return _mapper.Map<User, UserResponse>(user);
         }
     }
 }

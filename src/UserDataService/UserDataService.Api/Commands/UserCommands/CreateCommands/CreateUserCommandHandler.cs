@@ -4,7 +4,7 @@ using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Models.UserDTO;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 
-namespace UserDataService.Api.Commands.UserCommands
+namespace UserDataService.Api.Commands.UserCommands.CreateCommands
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, CreateUserResponse>
     {

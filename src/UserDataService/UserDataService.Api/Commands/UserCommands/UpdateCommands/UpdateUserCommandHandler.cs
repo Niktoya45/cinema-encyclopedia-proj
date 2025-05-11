@@ -5,7 +5,7 @@ using UserDataService.Infrastructure.Models.UserDTO;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 //using UserDataService.Api.Exceptions.UserExceptions;
 
-namespace UserDataService.Api.Commands.UserCommands
+namespace UserDataService.Api.Commands.UserCommands.UpdateCommands
 {
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UpdateUserResponse>
     {

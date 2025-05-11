@@ -42,7 +42,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
             if (PageNum < 1) PageNum = pageNum;
             // handle data transfer instead of below
 
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name="Cinema "+ x, Year = x + 1994, Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name="Cinema "+ x, Year = x + 1994, Rating=((x%10)+0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
 
             IsEnd = List.Count < MaxPerPage;
 
@@ -52,7 +52,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         public async Task<IActionResult> OnGetYears([FromQuery] short pageNum = 1)
         {   
             // handle data transfer to Year endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
 
             IsEnd = List.Count < MaxPerPage;
 
@@ -62,7 +62,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         public async Task<IActionResult> OnGetGenres([FromQuery] short pageNum = 1)
         {
             // handle data transfer to Genre endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
 
             return Page();
         }
@@ -70,7 +70,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         public async Task<IActionResult> OnGetLanguage([FromQuery] short pageNum = 1)
         {
             // handle data transfer to Language endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
 
             return Page();
         }
@@ -78,7 +78,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         public async Task<IActionResult> OnGetStudio([FromQuery] short pageNum = 1)
         {
             // handle data transfer to Studios endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
 
             return Page();
         }

@@ -6,6 +6,7 @@ namespace EncyclopediaService.Api.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public int Year { get; set; }
+        public double Rating { get; set; }
         public string? Picture { get; set; } = default(string);
     }
 }

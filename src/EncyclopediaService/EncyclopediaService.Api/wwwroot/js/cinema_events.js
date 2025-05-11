@@ -94,7 +94,6 @@ refsEditStarring.forEach(function (ref) {
     });
 });
 
-
 // display hint choices forcstarring search field
 
 const choices = ["Actor 1", "Actor 2", "Director 3", "Director 4", "Scenarist 5", "Scenarist 6", "Producer 7", "Producer 8"];
@@ -135,3 +134,38 @@ searchStarring.addEventListener("input", function (e) {
         });
     }
 });
+
+
+
+// make user rating change
+
+var starsCollapse = document.getElementById("collapse-stars");
+var starsClick = starsCollapse.querySelectorAll("button.rail");
+var stars = Array.from(starsClick).map(starClick => starClick.querySelector(".star"));
+
+
+for (let i = 0; i < stars.length; i++) {
+
+    starsClick.item(i).addEventListener('click', function (e) {
+ 
+        for (let j = 0; j < stars.length; j++) {
+            if (j < i) {
+                stars[j].classList.remove('rail');
+            }
+            else if (j > i) {
+                if (stars[j].classList.contains('rail')) {
+                    break;
+                }
+                stars[j].classList.add('rail');
+            }
+            else {
+                if (stars[j].classList.contains('rail')) {
+                    stars[j].classList.remove('rail');
+                } else {
+                    stars[j].classList.add('rail');
+                }
+            }
+        }
+
+    });
+}

@@ -1,5 +1,4 @@
-﻿
-namespace UserDataService.Infrastructure.Pagination
+﻿namespace UserDataService.Infrastructure.Models.SharedDTO
 {
     public record Pagination
     {

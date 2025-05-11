@@ -3,6 +3,22 @@
 @{
     ViewData["Title"] = "Cinemas";
 }
+@functions {
+    string Star(byte size, float x = 0.0f, float y = 0.0f)
+    {
+
+        List<float> xs = new List<float> { 5.0f, 6.5f, 10.0f, 7.5f, 8.0f, 5.0f, 2.0f, 2.5f, 0.0f, 3.5f };
+        List<float> ys = new List<float> { 0.0f, 3.5f, 4.0f, 6.5f, 10.0f, 8.0f, 10.0f, 6.5f, 4.0f, 3.5f };
+
+        string points = Enumerable.Zip(xs, ys).Select(p => $"{x + p.First * size},{y + p.Second * size} ").Aggregate((acc, p) => acc + p);
+
+        return points;
+    }
+}
+
+@{
+    int hash = 0;
+}
 
 <h1>Cinemas</h1>
 
@@ -27,8 +43,31 @@
                                             asp-page="/encyclopedia/cinemas/cinema" asp-route-id="@cinema.Id">@cinema.Name</a>                                            
                                         </h6>										
                                     </div>                                        
-                                    <div class="row-cols-9">										
-                                        <p class="text-end card-subtitle" style="color:cadetblue;">@(cinema.Year)</p>                                      
+                                    <div class="row mt-2">
+                                        @{
+                                            byte starSize = 2;
+                                            const float K = 10;
+                                            const float max = 10.0f;
+                                        }
+                                        <div class="col d-flex align-bottom">
+											<svg width="@(starSize*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
+												<defs>
+                                                    @{ hash = cinema.Name.GetHashCode(); }
+													<clipPath id="cut-star-@hash" class="cut-stars">
+														<rect width="@(starSize*K*(cinema.Rating)/max)" height="@(starSize*K*1.5)" x="0" y="0" />
+													</clipPath>
+												</defs>
+
+												<polygon class="star" points="@Star(starSize)" clip-path="url(#cut-star-@hash)"></polygon>
+												<polygon class="star-empty" points="@Star(starSize)"></polygon>
+
+											</svg>
+                                            
+                                            
+										</div>
+										<div class="col">
+                                            <p class="text-end card-subtitle" style="color:cadetblue;">@(cinema.Year)</p>
+                                        </div>
                                     </div>                                 
                                 </div>                               
                             </div>                          

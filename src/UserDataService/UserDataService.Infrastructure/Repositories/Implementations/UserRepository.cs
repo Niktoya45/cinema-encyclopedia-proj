@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using System.Linq.Expressions;
 using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Context;
+using UserDataService.Infrastructure.Models.SharedDTO;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 
 namespace UserDataService.Infrastructure.Repositories.Implementations
@@ -22,19 +23,19 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
 
             return user;
         }
-        public async Task<CinemaRecord?> AddToCinemaList(CinemaRecord cinema, CancellationToken ct = default)
+        public async Task<LabeledRecord?> AddToLabeledList(LabeledRecord cinema, CancellationToken ct = default)
         {
-            User? user = await FindById(cinema.UserId);
+            User? user = await FindById(cinema.UserId, ct);
 
             if (user == null)
             {
                 return null;
             }
 
-            var findIfExists = Builders<CinemaRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.Id == cinema.Id));
-            var updateLabel = Builders<CinemaRecord>.Update.Set(r => r.Label, cinema.Label);
+            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.Id == cinema.Id));
+            var updateLabel = Builders<LabeledRecord>.Update.Set(r => r.Label, cinema.Label);
 
-            var res = await _db.CinemaRecords.UpdateOneAsync(findIfExists, updateLabel, new UpdateOptions { IsUpsert = true }, ct);
+            var res = await _db.LabeledRecords.UpdateOneAsync(findIfExists, updateLabel, new UpdateOptions { IsUpsert = true }, ct);
 
             if (!res.IsAcknowledged)
             {
@@ -42,6 +43,28 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             }
 
             return cinema;
+        }
+
+        public async Task<RatingRecord?> AddToRatingList(RatingRecord rating, CancellationToken ct = default) 
+        {
+            User? user = await FindById(rating.UserId, ct);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.Id == rating.Id));
+            var updateLabel = Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating);
+
+            var res = await _db.RatingRecords.UpdateOneAsync(findIfExists, updateLabel, new UpdateOptions { IsUpsert = true }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return rating;
         }
 
         public async Task<User?> FindOne(Expression<Func<User, bool>>? query = null, CancellationToken ct = default)
@@ -58,26 +81,40 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return await FindOne(u => u.Id == id, ct);
         }
 
-        public async Task<List<CinemaRecord>?> FindCinemaList(Pagination.Pagination? pg = default, Expression<Func<CinemaRecord, bool>>? query = null, CancellationToken ct = default) {
+        public async Task<List<LabeledRecord>?> FindCinemasList(Pagination? pg = default, Expression<Func<LabeledRecord, bool>>? query = null, CancellationToken ct = default) {
             
-            var condition = Builders<CinemaRecord>.Filter.Where(query??(r => true));
-            var sort = Builders<CinemaRecord>.Sort.Descending(r => r.AddedAt);
+            var condition = Builders<LabeledRecord>.Filter.Where(query??(r => true));
+            var sort = Builders<LabeledRecord>.Sort.Descending(r => r.AddedAt);
 
-            return await _db.CinemaRecords.Find(condition).Sort(sort).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
+            return await _db.LabeledRecords.Find(condition).Sort(sort).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
         }
 
-        public async Task<List<CinemaRecord>?> FindCinemaByUserId(string userId, Pagination.Pagination? pg = default, CancellationToken ct = default)
+        public async Task<List<RatingRecord>?> FindRatingsList(Pagination? pg = default, Expression<Func<RatingRecord, bool>>? query = null, CancellationToken ct = default)
         {
-            return await FindCinemaList(pg, r => (r.UserId == userId), ct);
+
+            var condition = Builders<RatingRecord>.Filter.Where(query ?? (r => true));
+            var sort = Builders<RatingRecord>.Sort.Descending(r => r.AddedAt);
+
+            return await _db.RatingRecords.Find(condition).Sort(sort).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
         }
 
-        public async Task<List<CinemaRecord>?> FindCinemaByUserIdLabel(string userId, Label label, Pagination.Pagination? pg = default, CancellationToken ct = default)
+        public async Task<List<LabeledRecord>?> FindCinemasByUserId(string userId, Pagination? pg = default, CancellationToken ct = default)
         {
-            return await FindCinemaList(
+            return await FindCinemasList(pg, r => (r.UserId == userId), ct);
+        }
+
+        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label label, Pagination? pg = default, CancellationToken ct = default)
+        {
+            return await FindCinemasList(
                                         pg,
                                     r => (r.UserId == userId) && (r.Label & label) != 0,
                                         ct
                                         );
+        }
+
+        public async Task<List<RatingRecord>?> FindRatingsByUserId(string userId, Pagination? pg = default, CancellationToken ct = default)
+        {
+            return await FindRatingsList(pg, r => (r.UserId == userId), ct);
         }
 
         public async Task<User?> Update(User user, CancellationToken ct = default) {
@@ -105,7 +142,7 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
 
         public async Task<User?> Delete(string id, CancellationToken ct = default)
         {
-            User? found = await FindById(id);
+            User? found = await FindById(id, ct);
 
             if (found == null)
             {
@@ -120,17 +157,38 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return found;
         }
 
-        public async Task<CinemaRecord?> DeleteFromCinemaList(CinemaRecord cinema, CancellationToken ct)
+        public async Task<LabeledRecord?> DeleteFromCinemaList(LabeledRecord cinema, CancellationToken ct = default)
         {
-            var findIfExists = Builders<CinemaRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.Id == cinema.Id));
+            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.CinemaId == cinema.CinemaId));
+            var sortByTimeAdded = Builders<LabeledRecord>.Sort.Descending(r => r.AddedAt);
 
-            var res = await _db.CinemaRecords.DeleteOneAsync(findIfExists, ct);
+            LabeledRecord found = await _db.LabeledRecords.Find(findIfExists).Sort(sortByTimeAdded).FirstOrDefaultAsync(ct);
 
-            if (!res.IsAcknowledged) {
+            var res = await _db.LabeledRecords.DeleteOneAsync(findIfExists, ct);
+
+            if (!res.IsAcknowledged)
+            {
                 return null;
             }
 
-            return cinema;
+            return found;
+        }
+
+        public async Task<RatingRecord?> DeleteFromRatingList(RatingRecord rating, CancellationToken ct = default)
+        {
+            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.CinemaId == rating.CinemaId));
+            var sortByTimeAdded = Builders<RatingRecord>.Sort.Descending(r => r.AddedAt);
+
+            RatingRecord found = await _db.RatingRecords.Find(findIfExists).Sort(sortByTimeAdded).FirstOrDefaultAsync(ct);
+
+            var res = await _db.RatingRecords.DeleteOneAsync(findIfExists, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return found;
         }
     }
 }

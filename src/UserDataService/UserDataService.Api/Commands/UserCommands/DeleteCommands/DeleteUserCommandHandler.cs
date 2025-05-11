@@ -3,7 +3,7 @@ using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 //using UserDataService.Api.Exceptions;
 
-namespace UserDataService.Api.Commands.UserCommands
+namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
     public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Unit>
     {

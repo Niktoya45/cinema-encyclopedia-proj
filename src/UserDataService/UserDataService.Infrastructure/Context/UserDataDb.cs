@@ -8,13 +8,15 @@ namespace UserDataService.Infrastructure.Context
     {
         public IMongoDatabase _mongodb { get; init; }
         public IMongoCollection<User> Users { get; init; }
-        public IMongoCollection<CinemaRecord> CinemaRecords { get; init; }
+        public IMongoCollection<LabeledRecord> LabeledRecords { get; init; }
+        public IMongoCollection<RatingRecord> RatingRecords { get; init; }
 
         public UserDataDb(IMongoDatabase mongodb)
         {
             _mongodb = mongodb;
 
-            CinemaRecords = _mongodb.GetCollection<CinemaRecord>("cinema_records");
+            LabeledRecords = _mongodb.GetCollection<LabeledRecord>("labeled_records");
+            RatingRecords = _mongodb.GetCollection<RatingRecord>("rating_records");
             Users = _mongodb.GetCollection<User>("users");
         }
     }

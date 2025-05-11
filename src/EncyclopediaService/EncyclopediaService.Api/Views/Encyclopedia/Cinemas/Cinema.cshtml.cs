@@ -31,6 +31,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         [BindProperty]
         public EditImage? EditPoster { get; set; }
 
+        public float UserScore { get; set; }
+
         public CinemaModel(IImageService imageService, UISettings settings) 
         {
             _imageService = imageService;
@@ -213,6 +215,13 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             }
 
             return await OnGet(id);
+        }
+
+        public async Task OnPostRate([FromRoute] string id, [FromQuery] byte score)
+        {
+            UserScore = score;
+
+            //return Page();
         }
 
     }

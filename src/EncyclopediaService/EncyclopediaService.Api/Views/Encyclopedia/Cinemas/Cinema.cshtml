@@ -66,15 +66,15 @@
         <div class="row">
             <div class="col-md-7 offset-md-5">
                 @{
-                    const byte starSize = 5;
+                    byte starSize = 5;
                     const byte starCount = 10;
-                    const byte starSpan = 1;
+                    float starSpan = 1;
                     const float K = 10;
                 }
-                
+
                 <svg width="@(((starSize+starSpan)*starCount-starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <clipPath id="cut">
+                        <clipPath id="cut" class="cut-stars">
                             <rect width="@(((starSize+starSpan)*starCount-starSpan)*K*(Model.Cinema.RatingScore)/starCount)" height="@(starSize*K*1.5)" x="0" y="0" />
                         </clipPath>
                     </defs>
@@ -84,9 +84,32 @@
                         <polygon class="star" points="@Star(starSize, i*(starSize+starSpan)*K)" clip-path="url(#cut)"></polygon>
                         <polygon class="star-empty" points="@Star(starSize, i*(starSize+starSpan)*K)"></polygon>
                     }
-				</svg>
-                <button id="rating" class="fs-3 fw-bold"> @Model.Cinema.RatingScore </button>
+                </svg>
+                <button id="rating" type="button" class="fs-3 fw-bold" data-bs-toggle="dropdown" data-bs-target="#collapse-stars" aria-expanded="false">
+					@Model.Cinema.RatingScore
+                </button>
+                <div class="dropdown-menu align-items-center" id="collapse-stars" aria-labelledby="rating">
+					<div>
+                        @{
+                            starSize = 3;
+                            starSpan = 0.6f;
+                        }
 
+                        <div id="rate-cinema" method="post">
+                        @for (byte i = 0; i < starCount; i++)
+                        {
+                            <button class="rail" style="background:none;border:none;padding:0;width:auto;text-decoration:none">
+								<svg width="@((starSize+starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
+									<polygon class="star rail" points="@Star(starSize, 0)" ></polygon>
+									<polygon class="star-empty" points="@Star(starSize, 0)"></polygon>
+								</svg>
+                            </button>
+
+                        }
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
 
