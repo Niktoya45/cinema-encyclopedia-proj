@@ -127,3 +127,95 @@
     stroke-width: 0.1rem;
 }
 
+.offcanvas-backdrop.fade.show{
+    opacity: 0;
+}
+
+
+#label-options-toggle {
+    border: none;
+    background-color: #708498;
+    padding: 0.3rem 0.2rem 0.3rem 0.4rem;
+    color: #aaaaaa;
+    height: auto;
+    width: auto;
+    transition: background 0.1s ease-in;
+    border-radius: 0.5rem;
+    z-index:2;
+    position:relative;
+}
+
+#label-options-toggle:hover {
+    background-color: #748088;
+    transition: background 0.1s ease-in;
+}
+
+#label-options-toggle:has(+ #collapse-labels-body #collapse-labels.show ){
+    background-color: #748088;
+}
+
+#collapse-labels-body {
+    position: relative;
+    max-height:1rem;
+    display:inline;
+    z-index:1;
+}
+
+#collapse-labels-body #collapse-labels{
+   position: absolute;
+   padding: 0.1rem;
+   top:-0.6rem;
+   z-index:1;
+}
+
+#labels {
+    padding: 0.15rem;
+    background-color: #606e68; 
+    border: none;
+    padding-left: 2.85rem;
+    z-index: 1;
+}
+
+#labels button{
+    background-color:#606e68;
+    border-radius: 0.2rem;
+    color: #aaaaaa; 
+    border: none;
+    margin: 0 0.1rem;
+    padding: 0.1rem;
+    transition: background-color ease-in 0.1s;
+}
+
+#labels button:hover{
+    background-color: #849098;
+    transition: background-color ease-in 0.1s;
+}
+
+.label-icons line {
+    stroke:whitesmoke;
+    stroke-width: 4;
+}
+
+.label-icons polygon {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill:whitesmoke;
+}
+
+.label-icons circle {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill: whitesmoke;
+}
+
+.label-icons .empty {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill: none;
+}
+
+.label-icons .thin {
+    stroke: whitesmoke;
+    stroke-width: 3;
+    fill: none;
+}

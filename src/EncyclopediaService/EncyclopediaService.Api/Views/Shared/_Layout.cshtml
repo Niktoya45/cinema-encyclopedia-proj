@@ -51,7 +51,7 @@
                         </li>
 
                         <li class="nav-item ms-auto">
-                            <a id="account" href="#">
+                            <a id="account" data-bs-toggle="offcanvas" href="#account-options" aria-controls="account-options">
                                 <div class="input-group">
                                     <span id="account-name" class="nav-link fs-6"> Account </span>
 									<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
@@ -73,6 +73,47 @@
         <main role="main" class="pb-2">
             @RenderBody()
         </main>
+
+		<div class="offcanvas offcanvas-end box-shadow bg-dark" tabindex="-1" id="account-options" aria-labelledby="account-optionsLabel" style="height:100%;width:15%;">
+            <div class="offcanvas-header bg-dark">
+                <h5 id="account-optionsLabel" class="text-muted">Options</h5>
+            </div>
+            <div class="offcanvas-body bg-dark mb-3">
+                <div class="navbar-dark bg-dark h-100">
+                    <div class="vstack align-items-center h-100">
+                        <ul class="navbar-nav flex-grow-1 w-100 mb-2" style="height:80%">
+                            <li class="nav-item">
+                                <a class="nav-link">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link">Marked</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
+
+                                <div class="collapse" id="account-options-page">
+                                    <div class="card card-body bg-dark">
+                                        <ul class="navbar-nav">
+                                            @foreach (int entity in Enum.GetValues(typeof(Entities)))
+                                            { 
+                                                <li class="nav-item">
+                                                    <a class="nav-link">@((Entities)entity)</a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav flex-grow-1 mt-auto w-100 mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="border-top footer text-muted">

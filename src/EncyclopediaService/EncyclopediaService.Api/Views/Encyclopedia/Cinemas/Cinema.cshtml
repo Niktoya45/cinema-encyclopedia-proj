@@ -120,7 +120,70 @@
 
             <!-- Film Poster -->
             <div class="col-md-3 offset-1">
-				<img src=@(Model.Cinema.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Poster Image">
+                <div class="row">
+					<img src=@(Model.Cinema.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Poster Image">
+                </div>
+                <div class="row">
+
+                    <div class="col mt-3 mb-1">
+
+                        <button id="label-options-toggle" title="mark as.." type="button" data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
+                                                        
+                            <svg id="pencil" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                
+                                <line x1="1" x2="16" y1="31" y2="24"></line>
+                                <line x1="2" x2="2" y1="31" y2="32" stroke-width="3"></line>
+                                <line x1="1" x2="7" y1="31" y2="16"></line>
+                                <line x1="15" x2="8" y1="23" y2="16"></line>
+                                <line x1="15" x2="31" y1="24" y2="10"></line>
+                                <line x1="5" x2="24" y1="19" y2="2"></line>
+                                <line x1="31" x2="24" y1="10" y2="2"></line>
+                                <line x1="18" x2="26" y1="7" y2="16"></line>
+                                
+                            </svg>
+
+                        </button>
+
+                        <div id="collapse-labels-body">
+							<div id="collapse-labels" class="collapse collapse-horizontal">
+								<div id="labels" class="card card-body hstack">
+									<button title="favorite">
+                                        <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12"/>
+                                        </svg>
+                                    </button>
+									<button title="planned">
+                                        <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3"/>
+                                            <line class="thin" x1="17" x2="17" y1="17" y2="9"></line>
+                                            <line class="thin" x1="17" x2="22" y1="17" y2="22"></line>
+                                            <line x1="16" x2="18" y1="17" y2="17" stroke-width="3"></line>
+                                        </svg>
+                                    </button>
+									<button title="watching">
+                                        <svg id="monitor" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon class="empty" points="7,4 4,7 4,23 7,26 28,26 31,23 31,7 28,4" />
+                                            <polygon points="12,10 10,12 10,18 12,20  23,20 25,18 25,12 23,10"/>
+                                            <line class="thin" x1="14" x2="21" y1="27" y2="27"/>
+                                            <line x1="10" x2="25" y1="30" y2="30"/>
+                                        </svg>
+                                    </button>
+									<button title="seen">
+                                        <svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4"/>
+                                            <polygon points="17,7 20,12 21,13 23,14 27,14 27,16 27,17 25,9"/>
+                                            <polygon points="17,27 20,22 21,21 23,20 27,20 27,17 27,19 25,25"/>
+                                            <polygon points="17,27 14,22 13,21 11,20 7,20 7,17 7,19 10,25"/>
+                                            <polygon points="17,7 14,12 13,13 11,14 7,14 7,16 7,17 10,9"/>
+                                        </svg>
+                                    </button>
+								</div>
+							</div>
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
 
             <!-- Film Poster Options -->
