@@ -1,0 +1,449 @@
+﻿:root {
+    --mark-favored: #d25a5a;
+    --mark-planned: #dca050; 
+    --mark-watching: #6495c8; 
+    --mark-seen: #aa78b4; 
+
+    --mark-favored-q: #d25a5a88;
+    --mark-planned-q: #dca05088; 
+    --mark-watching-q: #6495c888; 
+    --mark-seen-q: #aa78b488; 
+}
+
+.link-black {
+    color: black;
+}
+
+.link-underline-none {
+    text-decoration: none;
+}
+
+.link-underline-float:hover {
+    text-decoration: underline;
+}
+
+.link-underline-blue-float:hover {
+    text-decoration: underline blue;
+}
+
+.link-underline-blue-offset-2-hover:hover {
+    color: black;
+    text-decoration: underline cadetblue;
+    transition: text-decoration 0.8s ease-out;
+}
+
+.link-underline-float:hover {
+    text-decoration: underline;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 75%;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    visibility: hidden;
+}
+
+#account {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #202428;
+    text-decoration: none;
+    height: 100%;
+    transition: background-color 0.1s ease-in;
+}
+
+.navbar-collapse .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    height: auto;
+}
+
+#account #account-icon circle {
+    fill: #202428;
+    stroke: #aaaaaa;
+    stroke-width: 2;
+    transition: fill 0.1s ease-in;
+}
+
+#account #account-icon line {
+    stroke: #aaaaaa;
+    stroke-width: 2;
+}
+
+#account:hover {
+    background-color: #404448;
+    transition: background-color 0.1s ease-in;
+}
+
+#account:hover #account-icon circle {
+   fill: #404448;
+   transition: fill 0.1s ease-in;
+}
+
+#account #account-name {
+    text-align: center;
+    font-weight: 600;
+}
+
+#rating {
+    background: none;
+    border: none;
+    margin: auto;
+    color: #ffaa22;
+    padding: 0.4rem 1rem;
+    text-decoration: dotted underline #ffdd44;
+    text-decoration-thickness: 0.2rem;
+    text-underline-offset: 0.3rem;
+}
+
+.star {
+    fill: #ffdd44;
+    stroke: none;
+    stroke-width: 0;
+}
+
+#collapse-stars {
+    padding: 1rem 1rem;
+    border-radius: 0.3rem;
+}
+
+#collapse-stars .star.rail {
+   fill: none;
+   stroke: none;
+   stroke-width: 0;
+   clip-path: none;
+}
+
+#collapse-stars .rail:hover .star.rail {
+   fill: #ffdd447c;
+}
+
+#collapse-stars .rail:has( ~ .rail:hover) .star.rail {
+   fill: #ffdd447c;
+}
+
+.star-empty {
+    fill: none;
+    stroke: black;
+    stroke-width: 0.1rem;
+}
+
+.offcanvas-backdrop.fade.show {
+    opacity: 0;
+}
+
+
+#label-options-toggle {
+    border: none;
+    background-color: #708498;
+    padding: 0.3rem 0.2rem 0.3rem 0.4rem;
+    color: #aaaaaa;
+    height: auto;
+    width: auto;
+    transition: background 0.1s ease-in;
+    border-radius: 0.5rem;
+    z-index: 2;
+    position: relative;
+}
+
+#label-options-toggle:hover {
+   background-color: #748088;
+   transition: background 0.1s ease-in;
+}
+
+#label-options-toggle:has(+ #collapse-labels-body #collapse-labels.show ) {
+   background-color: #748088;
+}
+
+#collapse-labels-body {
+    position: relative;
+    max-height: 1rem;
+    display: inline;
+    z-index: 1;
+}
+
+#collapse-labels-body #collapse-labels {
+    position: absolute;
+    padding: 0.1rem;
+    top: -0.6rem;
+    z-index: 1;
+}
+
+#labels {
+    padding: 0.15rem;
+    background-color: #606e68;
+    border: none;
+    padding-left: 2.85rem;
+    z-index: 1;
+}
+
+#labels button {
+    background-color: #606e68;
+    border-radius: 0.2rem;
+    color: #aaaaaa;
+    border: none;
+    margin: 0 0.1rem;
+    padding: 0.1rem;
+    transition: background-color ease-in 0.1s;
+}
+
+#labels button:hover {
+   background-color: #849098;
+   transition: background-color ease-in 0.1s;
+}
+
+.label-icons line {
+    stroke: whitesmoke;
+    stroke-width: 4;
+}
+
+.label-icons polygon {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill: whitesmoke;
+}
+
+.label-icons circle {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill: whitesmoke;
+}
+
+.label-icons .empty {
+    stroke: whitesmoke;
+    stroke-width: 4;
+    fill: none;
+}
+
+.label-icons .thin {
+    stroke: whitesmoke;
+    stroke-width: 3;
+    fill: none;
+}
+
+#list-tabs {
+   width: 100%;
+   border-radius: 0.5rem 0.5rem 0.2rem 0.2rem;
+   border-top-right-radius: 1.5rem;
+
+   &:has( #mark-favored.active) {  background-color: var(--mark-favored); }
+   &:has( #mark-planned.active) {  background-color: var(--mark-planned); }
+   &:has( #mark-watching.active){  background-color: var(--mark-watching); }
+   &:has( #mark-seen.active)    {  background-color: var(--mark-seen); }
+}
+
+#list-tabs .switch-tab:has(> .active){
+    border-radius: 0.5rem 0 0 0;
+    border:none;
+}
+
+#list-tabs .switch-tab .link {
+    border: inherit;
+}
+
+#list-tabs .switch-tab .link.active {
+    border: none;
+}
+
+#tabfolder {
+    overflow: visible;
+    background-color: inherit;
+    border-top-right-radius: 1.5rem;
+}
+
+#tabs {
+    position: relative;
+    overflow: visible;
+    margin-top: 1.5rem;
+}
+
+#tabs .switch-tab {
+    position:relative;
+    top: -1.2rem;
+    z-index:2;
+}
+
+#tabs .switch-tab{
+    background-color: white;
+}
+
+#tabs .switch-tab:first-child{
+    border-radius: 0.5rem 0 0 0;
+}
+
+#tabs .switch-tab:last-child{
+    border-radius: 0 0.5rem 0 0;
+}
+
+#tabs .switch-tab:has( .link:hover){
+    border: initial;
+    top: -1.6rem;
+
+    transition: top ease-in 0.2s;
+}
+
+#tabs .switch-tab .link .icon-wrapper{
+    background-color:#202228;
+    border-radius: 0.5rem;
+    padding: 0.3rem;
+}
+
+#mark-favored.active,
+#mark-favored.active .label-icons line,
+#mark-favored.active .label-icons polygon,
+#mark-favored.active .label-icons circle,
+#mark-favored:hover,
+#mark-favored:hover .label-icons line,
+#mark-favored:hover .label-icons polygon,
+#mark-favored:hover .label-icons circle 
+{
+    background-color: var(--mark-favored);
+    fill: var(--mark-favored-q);
+    stroke:  var(--mark-favored-q);
+}
+#mark-planned.active,
+#mark-planned.active .label-icons line,
+#mark-planned.active .label-icons polygon,
+#mark-planned.active .label-icons circle,
+#mark-planned:hover,
+#mark-planned:hover .label-icons line,
+#mark-planned:hover .label-icons polygon,
+#mark-planned:hover .label-icons circle 
+{ 
+    background-color: var(--mark-planned); 
+    fill: var(--mark-planned-q);
+    stroke: var(--mark-planned-q);
+}
+
+#mark-watching.active,
+#mark-watching.active .label-icons line,
+#mark-watching.active .label-icons polygon,
+#mark-watching.active .label-icons circle,
+#mark-watching:hover,
+#mark-watching:hover .label-icons line,
+#mark-watching:hover .label-icons polygon,
+#mark-watching:hover .label-icons circle 
+{ 
+    background-color: var(--mark-watching); 
+    fill: var(--mark-watching-q);
+    stroke: var(--mark-watching-q);
+
+}
+
+#mark-seen.active,
+#mark-seen.active .label-icons line,
+#mark-seen.active .label-icons polygon,
+#mark-seen.active .label-icons circle,
+#mark-seen:hover,
+#mark-seen:hover .label-icons line,
+#mark-seen:hover .label-icons polygon,
+#mark-seen:hover .label-icons circle 
+{    
+    background-color: var(--mark-seen); 
+    fill: var(--mark-seen-q);
+    stroke: var(--mark-seen-q);
+}
+
+#mark-favored { background-color: var(--mark-favored-q); }
+#mark-favored .label-icons line,
+#mark-favored .label-icons polygon,
+#mark-favored .label-icons circle
+{ 
+    fill: var(--mark-favored-q);
+    stroke:  var(--mark-favored-q);
+}
+#mark-planned  { background-color: var(--mark-planned-q); }
+#mark-planned .label-icons line,
+#mark-planned .label-icons polygon,
+#mark-planned .label-icons circle {
+    fill: var(--mark-planned-q);
+    stroke: var(--mark-planned-q);
+}
+#mark-watching { background-color: var(--mark-watching-q); }
+#mark-watching .label-icons line,
+#mark-watching .label-icons polygon,
+#mark-watching .label-icons circle {
+    fill: var(--mark-watching-q);
+    stroke: var(--mark-watching-q);
+}
+#mark-seen     { background-color: var(--mark-seen-q); }
+#mark-seen .label-icons line,
+#mark-seen .label-icons polygon,
+#mark-seen .label-icons circle {
+    fill: var(--mark-seen-q);
+    stroke: var(--mark-seen-q);
+}
+
+.empty-list-message {
+    padding: 8rem 5rem;
+    font-size: 2rem;
+    color: #225555; 
+    font-weight: 400;
+}
+
+#list {
+   width: 100%; 
+   background-color: inherit;
+   border: none;
+}
+
+.table-list thead{
+    padding: 0.5rem 0rem 1rem 0rem;
+    border-radius: 1rem 1rem 0.5rem 0.5rem;
+}
+
+.table-list th[scope='col'],
+.table-list th[scope='row']{
+    text-align:center;
+}
+
+.table-list th[scope='col']{
+    background-color: rgba(10, 10, 10, .4);
+}
+
+.table-list th[scope='col']:first-child {
+    border-top-left-radius: 1rem;
+}
+
+.table-list th[scope='col']:last-child {
+    border-top-right-radius: 1rem;
+}
+
+.table-list tr:nth-of-type(even) th[scope='row']{
+    background-color: rgba(10, 10, 10, .3);
+}
+
+.table-list tr:nth-of-type(odd) th[scope='row']{
+    background-color: rgba(10, 10, 10, .2);
+}
+
+.table-list tr:nth-of-type(even) td{
+    background-color: rgba(240, 240, 240, .6);
+}
+
+.table-list tr:nth-of-type(odd) td{
+    background-color: rgba(240, 240, 240, .4);
+}
+
+.table-list th span{
+    color: white;
+    opacity:0.5;
+}
+
+.table-list td{
+    text-align:center;
+}
+
+.hide-delete {
+    display:none;
+    transition: ease-in 0.3s;
+}

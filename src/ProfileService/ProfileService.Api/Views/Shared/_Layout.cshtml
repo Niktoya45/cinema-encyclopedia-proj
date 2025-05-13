@@ -7,13 +7,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/customs.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EncyclopediaService.Api.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a id="brand" class="navbar-brand" href="/encyclopedia/cinemas/all/">Cinema Encyclopedia</a>
+                <a id="brand" class="navbar-brand" href="https://localhost:7116/encyclopedia/cinemas/all/">Cinema Encyclopedia</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,11 +20,26 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" href="/encyclopedia/cinemas/all/">Home</a>
+                            <a class="nav-link" href="https://localhost:7116/encyclopedia/cinemas/all/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/encyclopedia/cinemas/all/">Privacy</a>
+                            <a class="nav-link" href="https://localhost:7116/encyclopedia/cinemas/all/">Privacy</a>
                         </li>
+
+                        <li class="nav-item ms-auto">
+                            <a id="account" data-bs-toggle="offcanvas" href="#account-options" aria-controls="account-options">
+                                <div class="input-group">
+                                    <span id="account-name" class="nav-link fs-6"> Account </span>
+                                    <svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="22" cy="43" r="21" />
+                                        <circle cx="21" cy="15" r="12" />
+                                        <line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
+                                    </svg>
+                                </div>
+
+                            </a>
+                        </li>
+
                     </ul>
 
                 </div>
@@ -36,6 +50,48 @@
         <main role="main" class="pb-2">
             @RenderBody()
         </main>
+
+        <div class="offcanvas offcanvas-end box-shadow bg-dark" tabindex="-1" id="account-options" aria-labelledby="account-optionsLabel" style="height:100%;width:15%;">
+            <div class="offcanvas-header bg-dark">
+                <h5 id="account-optionsLabel" class="text-muted">Options</h5>
+            </div>
+            <div class="offcanvas-body bg-dark mb-3">
+                <div class="navbar-dark bg-dark h-100">
+                    <div class="vstack align-items-center h-100">
+                        <ul class="navbar-nav flex-grow-1 w-100 mb-2" style="height:80%">
+                            <li class="nav-item">
+                                <a class="nav-link">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/profiles/3/marked">Marked List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
+
+                                <div class="collapse" id="account-options-page">
+                                    <div class="card card-body bg-dark">
+                                        <ul class="navbar-nav">
+                                            @foreach (Entities entity in Enum.GetValues(typeof(Entities)))
+                                            {
+                                                <option class="nav-link">
+                                                    <a href="/encyclopedia/@(entity.ToString().ToLower())/all/">@(entity)</a>
+                                                </option>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav flex-grow-1 mt-auto w-100 mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <footer class="border-top footer text-muted">

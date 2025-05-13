@@ -28,6 +28,7 @@ namespace ProfileService.Api
                     opts.RootDirectory = "/Views";
 
                     opts.Conventions.AddPageRoute("/Profiles/Profile", "/Profiles/{id}");
+                    opts.Conventions.AddPageRoute("/Profiles/Marked", "/Profiles/{id}/Marked");
 
                     // for test purposes
                     opts.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());

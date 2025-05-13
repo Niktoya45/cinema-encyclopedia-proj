@@ -4,7 +4,6 @@ using EncyclopediaService.Api.Models;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
-using System.ComponentModel;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
 {

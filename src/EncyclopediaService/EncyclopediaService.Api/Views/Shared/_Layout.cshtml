@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/customs.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EncyclopediaService.Api.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -36,10 +35,10 @@
                         <li class="nav-item">
                             <div class="input-group">
                                 <select id="layout-select" class="form-select bg-dark nav-link" style="width:10rem;border-top-left-radius:0;border-bottom-left-radius:0">
-									@foreach (int entity in Enum.GetValues(typeof(Entities)))
+									@foreach (Entities entity in Enum.GetValues(typeof(Entities)))
 									{
 										<option class="nav-link">
-											<a href="/encyclopedia/@((Entities)entity)/all/">@((Entities)entity)</a>
+											<a href="/encyclopedia/@(entity.ToString().ToLower())/all/">@(entity)</a>
                                         </option>
 									}
 								</select>
@@ -83,7 +82,7 @@
                     <div class="vstack align-items-center h-100">
                         <ul class="navbar-nav flex-grow-1 w-100 mb-2" style="height:80%">
                             <li class="nav-item">
-                                <a class="nav-link">Profile</a>
+                                <a class="nav-link" href="https://localhost:7236/profiles/3">Profile</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link">Marked</a>
