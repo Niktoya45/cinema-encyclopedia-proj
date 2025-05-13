@@ -25,6 +25,19 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
 
             switch (request)
             {
+                case CinemasIdQuery ciq:
+
+                    IList<Cinema> list = new List<Cinema>();
+
+                    foreach (string id in ciq.Ids) 
+                    {
+                        list.Add(await _repository.FindById(id, cancellationToken)?? throw new NotFoundException(id, "Cinemas") );
+                    }
+
+                    cinemas = list;
+
+                    break;
+
                 case CinemasYearQuery cyq:
                     cinemas = await _repository.FindByYear(cyq.Year, cyq.Pg, cyq.Sort, cancellationToken);
                     break;
