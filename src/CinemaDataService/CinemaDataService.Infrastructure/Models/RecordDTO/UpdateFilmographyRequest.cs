@@ -1,6 +1,4 @@
-﻿
-
-namespace CinemaDataService.Infrastructure.Models.SharedDTO
+﻿namespace CinemaDataService.Infrastructure.Models.RecordDTO
 {
     public class UpdateFilmographyRequest
     {

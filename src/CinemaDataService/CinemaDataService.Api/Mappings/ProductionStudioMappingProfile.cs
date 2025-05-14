@@ -6,7 +6,7 @@ using CinemaDataService.Api.Commands.SharedCommands.CreateCommands;
 using CinemaDataService.Api.Commands.SharedCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.SharedCommands.DeleteCommands;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Mappings
 {

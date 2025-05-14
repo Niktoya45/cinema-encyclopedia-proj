@@ -9,7 +9,7 @@ using CinemaDataService.Api.Commands.SharedCommands.CreateCommands;
 using CinemaDataService.Api.Commands.SharedCommands.DeleteCommands;
 using CinemaDataService.Api.Commands.SharedCommands.UpdateCommands;
 using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Mappings
 {
@@ -34,7 +34,6 @@ namespace CinemaDataService.Api.Mappings
                 .IncludeBase<DeleteFilmographyCommand, CinemaRecord>();
             CreateMap<DeleteStudioFilmographyCommand, CinemaRecord>()
                 .IncludeBase<DeleteFilmographyCommand, CinemaRecord>();
-
 
             CreateMap<CinemaRecord, FilmographyResponse>()
                 .ForMember(fr => fr.ParentId, opt => opt.Ignore())

@@ -1,5 +1,6 @@
 
 using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Infrastructure.Models.PersonDTO
 {
@@ -12,7 +13,7 @@ namespace CinemaDataService.Infrastructure.Models.PersonDTO
         public Job Jobs { get; set; }
         public string? Picture { get; set; }
         public string? PictureUri { get; set; }
-        public CinemaRecord[]? Filmography { get; set; }
+        public FilmographyResponse[]? Filmography { get; set; }
         public string? Description { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using CinemaDataService.Api.Commands.PersonCommands.DeleteCommands;
 using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Controllers
 {

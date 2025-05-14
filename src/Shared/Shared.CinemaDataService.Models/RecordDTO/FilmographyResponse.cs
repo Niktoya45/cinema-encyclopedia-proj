@@ -1,6 +1,4 @@
-﻿
-
-namespace CinemaDataService.Infrastructure.Models.SharedDTO
+﻿namespace Shared.CinemaDataService.Models.RecordDTO
 {
     public class FilmographyResponse
     {
@@ -8,7 +6,7 @@ namespace CinemaDataService.Infrastructure.Models.SharedDTO
         public string Id { get; set; }
         public string Name { get; set; }
         public int Year { get; set; }
-        public string? Picture { get; set; } = default(string);
-        public string? PictureUri { get; set; } = default(string);
+        public string? Picture { get; set; } = default;
+        public string? PictureUri { get; set; } = default;
     }
 }

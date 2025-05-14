@@ -2,7 +2,7 @@
 using CinemaDataService.Api.Commands.PersonCommands.UpdateCommands;
 using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using MediatR;
 

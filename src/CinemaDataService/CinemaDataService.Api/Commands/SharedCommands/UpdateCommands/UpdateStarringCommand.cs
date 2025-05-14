@@ -1,6 +1,6 @@
 ﻿using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 using MediatR;
 
 namespace CinemaDataService.Api.Commands.SharedCommands.UpdateCommands

@@ -1,7 +1,4 @@
-﻿
-using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+﻿using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 
 namespace CinemaDataService.Infrastructure.Models.CinemaDTO
 {

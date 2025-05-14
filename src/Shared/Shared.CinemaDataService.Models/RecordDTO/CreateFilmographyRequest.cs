@@ -1,5 +1,4 @@
-﻿
-namespace CinemaDataService.Infrastructure.Models.SharedDTO
+﻿namespace Shared.CinemaDataService.Models.RecordDTO
 {
     public class CreateFilmographyRequest
     {

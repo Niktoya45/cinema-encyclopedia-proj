@@ -1,8 +1,10 @@
 ﻿
-namespace CinemaDataService.Infrastructure.Models.SharedDTO
+
+namespace Shared.CinemaDataService.Models.RecordDTO
 {
-    public class UpdateProductionStudioRequest
+    public record Value
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public string? Picture { get; set; } = default(string);
     }

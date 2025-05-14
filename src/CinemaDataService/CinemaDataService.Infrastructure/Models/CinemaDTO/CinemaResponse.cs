@@ -1,5 +1,6 @@
 
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Infrastructure.Models.CinemaDTO
 {
@@ -13,8 +14,8 @@ namespace CinemaDataService.Infrastructure.Models.CinemaDTO
         public RatingScore Rating { get; set; } = new RatingScore();
         public string? Picture { get; set; }
         public string? PictureUri { get; set; }
-        public StudioRecord[]? ProductionStudios { get; set; }
-        public Starring[]? Starrings { get; set; }
+        public ProductionStudioResponse[]? ProductionStudios { get; set; }
+        public StarringResponse[]? Starrings { get; set; }
         public string? Description { get; set; }
 
     }

@@ -1,8 +1,6 @@
-﻿
-using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Domain.Aggregates.Shared;
+﻿using Shared.CinemaDataService.Models.Flags;
 
-namespace CinemaDataService.Infrastructure.Models.SharedDTO
+namespace Shared.CinemaDataService.Models.RecordDTO
 {
     public class StarringResponse
     {
@@ -12,7 +10,7 @@ namespace CinemaDataService.Infrastructure.Models.SharedDTO
         public Job Jobs { get; set; }
         public string? RoleName { get; set; }
         public RolePriority? RolePriority { get; set; }
-        public string? Picture { get; set; } = default(string);
-        public string? PictureUri { get; set; } = default(string);
+        public string? Picture { get; set; } = default;
+        public string? PictureUri { get; set; } = default;
     }
 }

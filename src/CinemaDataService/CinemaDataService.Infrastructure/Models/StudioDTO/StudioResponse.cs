@@ -1,7 +1,6 @@
 
 using CinemaDataService.Domain.Aggregates.Shared;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Infrastructure.Models.StudioDTO
 {
@@ -13,7 +12,7 @@ namespace CinemaDataService.Infrastructure.Models.StudioDTO
         public Country Country { get; set; }
         public string? Picture { get; set; }
         public string? PictureUri { get; set; }
-        public CinemaRecord[]? Filmography { get; set; }
+        public FilmographyResponse[]? Filmography { get; set; }
         public string? PresidentName { get; set; }
         public string? Description { get; set; }
     }
