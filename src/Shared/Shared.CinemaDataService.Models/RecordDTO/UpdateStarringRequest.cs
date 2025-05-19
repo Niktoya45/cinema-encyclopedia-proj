@@ -4,7 +4,7 @@ using Shared.CinemaDataService.Models.Flags;
 
 namespace Shared.CinemaDataService.Models.RecordDTO
 {
-    public class UpdateStarringResponseRequest
+    public class UpdateStarringRequest
     {
         public string Name { get; set; }
         public Job Jobs { get; set; }

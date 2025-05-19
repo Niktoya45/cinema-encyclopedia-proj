@@ -51,8 +51,14 @@ namespace ImageService.Api.Handlers
                             image.InterpolativeResize(0, _settings.Normalize[size], PixelInterpolateMethod.Bilinear);
                         }
 
-                        uriSAS = await _repository.AddByUrl(path, new MemoryStream(image.ToByteArray()));
-
+                        try
+                        {
+                            uriSAS = await _repository.AddByUrl(path, new MemoryStream(image.ToByteArray()));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ImageNotAddedException($"Image {request.Id} was not added for size: {size}");
+                        }
 
                         if (uriSAS is null)
                         {

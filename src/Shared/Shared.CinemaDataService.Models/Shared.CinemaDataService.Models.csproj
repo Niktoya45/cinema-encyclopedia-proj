@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Shared.UserDataService.Models</PackageId>
+    <PackageId>Shared.CinemaDataService.Models</PackageId>
     <Version>1.0.0</Version>
     <Authors>TBorozdina</Authors>
     <Company>EncyclopediaProject</Company>

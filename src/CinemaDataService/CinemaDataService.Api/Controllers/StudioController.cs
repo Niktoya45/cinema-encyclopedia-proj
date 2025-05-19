@@ -7,9 +7,6 @@ using CinemaDataService.Api.Queries.StudioQueries;
 using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
-using CinemaDataService.Api.Queries.CinemaQueries;
-using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Controllers

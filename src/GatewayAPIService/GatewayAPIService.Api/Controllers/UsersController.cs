@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MediatR;
-using UserDataService.Api.Commands.UserCommands.CreateCommands;
-using UserDataService.Api.Commands.UserCommands.UpdateCommands;
-using UserDataService.Api.Commands.UserCommands.DeleteCommands;
-using UserDataService.Api.Queries.UserQueries;
-using UserDataService.Infrastructure.Models.UserDTO;
-using UserDataService.Infrastructure.Models.LabeledDTO;
-using UserDataService.Infrastructure.Models.RatingDTO;
-using UserDataService.Domain.Aggregates.UserAggregate;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Shared.UserDataService.Models.LabeledDTO;
+using Shared.UserDataService.Models.RatingDTO;
+using Shared.UserDataService.Models.UserDTO;
 
-namespace UserDataService.Api.Controllers
+namespace GatewayAPIService.Api.Controllers
 {
     [ApiController]
     [Route("api/users")]
@@ -49,36 +44,13 @@ namespace UserDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
         [HttpGet("{id}/label")]
-        [HttpGet("{id}/label/{label}")]
         [ProducesResponseType(typeof(IEnumerable<LabeledResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Labeled(
             [FromRoute] string id,
-            [FromRoute] Label? label,
             CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new UserLabeledQuery(id, label), ct);
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Gets possible cinema rating by current user
-        /// </summary>
-        /// <param name="userId">authorized user Id</param>
-        /// <param name="cinemaId">authorized user Id</param>
-        /// <returns></returns>
-        /// <response code="200">Success</response>
-        /// <response code="400">User is not found</response>
-        [HttpGet("{userId}/rating/{cinemaId}")]
-        [ProducesResponseType(typeof(RatingResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Rating(
-            [FromRoute] string userId,
-            [FromRoute] string cinemaId,
-            CancellationToken ct = default)
-        {
-            var response = await _mediator.Send(new UserCinemaRatingQuery(userId, cinemaId), ct);
+            var response = await _mediator.Send(new UserLabeledQuery(id), ct);
 
             return Ok(response);
         }
@@ -121,8 +93,8 @@ namespace UserDataService.Api.Controllers
             )
         {
             var response = await _mediator.Send(new CreateLabeledCommand(
-                                        userId, 
-                                        request.CinemaId, 
+                                        userId,
+                                        request.CinemaId,
                                         request.Label), ct);
 
             return Ok(response);
@@ -230,13 +202,13 @@ namespace UserDataService.Api.Controllers
         [HttpDelete("{userId}/rating/{cinemaId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteRating(
+        public async Task<IActionResult> Rating(
             [FromRoute] string userId,
             [FromRoute] string cinemaId,
             CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteRatingCommand(userId, cinemaId), ct);
+            await _mediator.Send(new DeleteLabeledCommand(userId, cinemaId), ct);
 
             return Ok();
         }

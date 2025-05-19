@@ -1,28 +1,20 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using CinemaDataService.Api.Queries.PersonQueries;
-using CinemaDataService.Infrastructure.Models.PersonDTO;
-using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Api.Commands.PersonCommands.CreateCommands;
-using CinemaDataService.Api.Commands.PersonCommands.UpdateCommands;
-using CinemaDataService.Api.Commands.PersonCommands.DeleteCommands;
-using CinemaDataService.Api.Queries.CinemaQueries;
-using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
-using CinemaDataService.Infrastructure.Models.RecordDTO;
+using Shared.CinemaDataService.Models.Flags;
+using Shared.CinemaDataService.Models.PersonDTO;
+using Shared.CinemaDataService.Models.RecordDTO;
+using Shared.CinemaDataService.Models.SharedDTO;
 
-namespace CinemaDataService.Api.Controllers
+namespace GatewayAPIService.Api.Controllers
 {
     [ApiController]
     [Route("api/persons")]
-    public class PersonController : Controller
+    public class PersonsController : Controller
     {
 
         private readonly IMediator _mediator;
 
-        public PersonController(IMediator mediator)
+        public PersonsController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -266,18 +258,18 @@ namespace CinemaDataService.Api.Controllers
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio is not found</response>
-        [HttpPut("filmography/{filmographyId}")]
+        [HttpPut("filmography/{id}")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
-            [FromRoute] string filmographyId,
+            [FromRoute] string id,
             [FromBody] UpdateFilmographyRequest request
             )
         {
             var response = await _mediator.Send(
                 new UpdatePersonFilmographyCommand(
-                        filmographyId,
+                        id,
                         request.Name,
                         request.Year,
                         request.Picture
@@ -312,21 +304,21 @@ namespace CinemaDataService.Api.Controllers
         /// Delete single filmography entrance by optional person id
         /// </summary>
         /// <param name="personId">Id of person which filmography cinema to be deleted</param>
-        /// <param name="filmographyId">Id of filmography entrance</param>
+        /// <param name="id">Id of filmography entrance</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Person or cinema is not found</response>
-        [HttpDelete("filmography/{filmographyId}")]
-        [HttpDelete("{studioId}/filmography/{filmographyId}")]
+        [HttpDelete("filmography/{id}")]
+        [HttpDelete("{studioId}/filmography/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
             [FromRoute] string? personId,
-            [FromRoute] string filmographyId
+            [FromRoute] string id
             )
         {
-            await _mediator.Send(new DeletePersonFilmographyCommand(personId, filmographyId), ct);
+            await _mediator.Send(new DeletePersonFilmographyCommand(personId, id), ct);
 
             return Ok();
         }

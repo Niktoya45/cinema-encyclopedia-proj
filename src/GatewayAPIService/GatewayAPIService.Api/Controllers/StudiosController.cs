@@ -1,43 +1,35 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using CinemaDataService.Api.Queries.PersonQueries;
-using CinemaDataService.Infrastructure.Models.PersonDTO;
-using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Api.Commands.PersonCommands.CreateCommands;
-using CinemaDataService.Api.Commands.PersonCommands.UpdateCommands;
-using CinemaDataService.Api.Commands.PersonCommands.DeleteCommands;
-using CinemaDataService.Api.Queries.CinemaQueries;
-using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
-using CinemaDataService.Infrastructure.Models.RecordDTO;
+using Shared.CinemaDataService.Models.Flags;
+using Shared.CinemaDataService.Models.RecordDTO;
+using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.CinemaDataService.Models.StudioDTO;
 
-namespace CinemaDataService.Api.Controllers
+namespace GatewayAPIService.Api.Controllers
 {
     [ApiController]
-    [Route("api/persons")]
-    public class PersonController : Controller
+    [Route("api/studios")]
+    public class StudiosController : Controller
     {
 
         private readonly IMediator _mediator;
 
-        public PersonController(IMediator mediator)
+        public StudiosController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         /// <summary>
-        /// Get all persons by optional sort and pagination criteria
+        /// Get all studios by optional sort and pagination criteria
         /// </summary>
         /// <param name="st">sort parameters</param>
         /// <param name="pg">pagination parameters</param>
-        /// <returns>All persons list</returns>
+        /// <returns>All studios list</returns>
         /// <response code="200">Success</response>
-        /// <response code="400">No person was found</response>
+        /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet]
-        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
@@ -46,11 +38,18 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new PersonsQuery(st, pg), ct);
+            var response = await _mediator.Send(new StudiosQuery(st, pg), ct);
 
             return Ok(response);
         }
 
+        /// <summary>
+        /// Search by studio name
+        /// </summary>
+        /// <param name="search">string tokens to use</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">None instance is found</response>
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -61,23 +60,49 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
         )
         {
-            var response = await _mediator.Send(new PersonsSearchQuery(search, pg), ct);
+            var response = await _mediator.Send(new StudiosSearchQuery(search, pg), ct);
 
             return Ok(response);
         }
 
         /// <summary>
-        /// Get all persons by country with optional sort and pagination criteria
+        /// Get all studios by provided year with optional sort and pagination criteria
         /// </summary>
-        /// <param name="country">country of origin</param>
+        /// <param name="year">year of studio foundation</param>
         /// <param name="st">sort parameters</param>
         /// <param name="pg">pagination parameters</param>
-        /// <returns>All persons list</returns>
+        /// <returns>All studios list</returns>
         /// <response code="200">Success</response>
-        /// <response code="400">No person was found</response>
+        /// <response code="400">No studio was found for this user</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("year/{year:int}")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Year(
+            CancellationToken ct,
+            [FromRoute] int year,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(new StudiosYearQuery(year, st, pg), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all studios by provided country with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="country">country of studio foundation</param>
+        /// <param name="st">sort parameters</param>
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All studios list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found for this user</response>
         /// <response code="500">Something is wrong on a server</response>
         [HttpGet("country/{country}")]
-        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Country(
@@ -87,78 +112,54 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new PersonsCountryQuery(country, st, pg), ct);
+            var response = await _mediator.Send(new StudiosCountryQuery(country, st, pg), ct);
 
             return Ok(response);
         }
 
         /// <summary>
-        /// Get all persons by jobs with optional sort and pagination criteria
+        /// Get studio by its id
         /// </summary>
-        /// <param name="jobs">jobs of persons to search for</param>
-        /// <param name="st">sort parameters</param>
-        /// <param name="pg">pagination parameters</param>
-        /// <returns>All persons list</returns>
-        /// <response code="200">Success</response>
-        /// <response code="400">No person was found</response>
-        /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("jobs/{jobs}")]
-        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Jobs(
-            CancellationToken ct,
-            [FromRoute] Job jobs,
-            [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null
-            )
-        {
-            var response = await _mediator.Send(new PersonsJobsQuery(jobs, st, pg), ct);
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Get person by its id
-        /// </summary>
-        /// <param name="id">requested person id</param>
+        /// <param name="id">requested studio id</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
-        /// <response code="400">Person is not found</response>
+        /// <response code="400">Studio is not found</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAsync(
             CancellationToken ct,
             [FromRoute] string id
             )
         {
-            var response = await _mediator.Send(new PersonQuery(id), ct);
+            var response = await _mediator.Send(
+                new StudioQuery(id), ct
+                );
 
             return Ok(response);
         }
 
         /// <summary>
-        /// Post new person made of request parameter
+        /// Post new studio made of request parameter
         /// </summary>
         /// <param name="request">request body</param>
-        /// <returns>Newly created person instance</returns>
+        /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
         [HttpPost]
-        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> PostAsync(
             CancellationToken ct,
-            [FromBody] CreatePersonRequest request
+            [FromBody] CreateStudioRequest request
             )
         {
             var response = await _mediator.Send(
-                new CreatePersonCommand(
+                new CreateStudioCommand(
                         request.Name,
-                        request.BirthDate,
+                        request.FoundDate,
                         request.Country,
-                        request.Jobs,
                         request.Picture,
                         request.Filmography,
+                        request.PresidentName,
                         request.Description
                     ),
                 ct
@@ -168,23 +169,23 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Add cinema to person filmography made of request parameter
+        /// Add cinema to studio filmography made of request parameter
         /// </summary>
-        /// <param name="personId">person id</param>
+        /// <param name="studioId">studio id</param>
         /// <param name="request">request body</param>
-        /// <returns>Newly created filmography instance</returns>
+        /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
-        [HttpPost("{personId}/filmography")]
+        [HttpPost("{studioId}/filmography")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
-            [FromRoute] string personId,
+            [FromRoute] string studioId,
             [FromBody] CreateFilmographyRequest request
             )
         {
             var response = await _mediator.Send(
-                new CreatePersonFilmographyCommand(
-                        personId,
+                new CreateStudioFilmographyCommand(
+                        studioId,
                         request.Id,
                         request.Name,
                         request.Year,
@@ -197,31 +198,31 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Update single person with provided request parameters
+        /// Update single studio with provided request parameters
         /// </summary>
-        /// <param name="id">id of person to be updated</param>
+        /// <param name="id">id of studio to be updated</param>
         /// <param name="request">request body</param>
-        /// <returns>Updated person instance</returns>
+        /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
-        /// <response code="400">Person is not found</response>
+        /// <response code="400">Studio is not found</response>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
             CancellationToken ct,
-            [FromQuery] string id,
-            [FromBody] UpdatePersonRequest request
+            [FromRoute] string id,
+            [FromBody] UpdateStudioRequest request
             )
         {
             var response = await _mediator.Send(
-                new UpdatePersonCommand(
+                new UpdateStudioCommand(
                         id,
                         request.Name,
-                        request.BirthDate,
+                        request.FoundDate,
                         request.Country,
-                        request.Jobs,
                         request.Picture,
                         request.Filmography,
+                        request.PresidentName,
                         request.Description
                     ),
                 ct
@@ -230,10 +231,11 @@ namespace CinemaDataService.Api.Controllers
             return Ok(response);
         }
 
+
         /// <summary>
         /// Update picture
         /// </summary>
-        /// <param name="id">Id of person to be updated</param>
+        /// <param name="id">id of studio to be updated</param>
         /// <param name="request">request body with picture</param>
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
@@ -248,7 +250,7 @@ namespace CinemaDataService.Api.Controllers
             )
         {
             var response = await _mediator.Send(
-                new UpdatePersonPictureCommand(
+                new UpdateStudioPictureCommand(
                         id,
                         request.Picture
                     ),
@@ -259,25 +261,25 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Update filmography entrance for all persons
+        /// Update filmography entrance for all studios
         /// </summary>
         /// <param name="id">id of filmography entrance to be updated</param>
         /// <param name="request">request body</param>
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio is not found</response>
-        [HttpPut("filmography/{filmographyId}")]
+        [HttpPut("filmography/{id}")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
-            [FromRoute] string filmographyId,
+            [FromRoute] string id,
             [FromBody] UpdateFilmographyRequest request
             )
         {
             var response = await _mediator.Send(
-                new UpdatePersonFilmographyCommand(
-                        filmographyId,
+                new UpdateStudioFilmographyCommand(
+                        id,
                         request.Name,
                         request.Year,
                         request.Picture
@@ -289,12 +291,12 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Delete single person by its id
+        /// Delete single studio by its name
         /// </summary>
-        /// <param name="id">Id of person to be deleted</param>
+        /// <param name="id">Id of studio to be deleted</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
-        /// <response code="400">Person is not found</response>
+        /// <response code="400">Studio is not found</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -303,30 +305,30 @@ namespace CinemaDataService.Api.Controllers
             [FromRoute] string id
             )
         {
-            await _mediator.Send(new DeletePersonCommand(id), ct);
+            await _mediator.Send(new DeleteStudioCommand(id), ct);
 
             return Ok();
         }
 
         /// <summary>
-        /// Delete single filmography entrance by optional person id
+        /// Delete single cinema from filmography by optional studio id
         /// </summary>
-        /// <param name="personId">Id of person which filmography cinema to be deleted</param>
-        /// <param name="filmographyId">Id of filmography entrance</param>
+        /// <param name="studioId">Id of studio which filmography cinema to be deleted</param>
+        /// <param name="id">Id of filmography entrance</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
-        /// <response code="400">Person or cinema is not found</response>
-        [HttpDelete("filmography/{filmographyId}")]
-        [HttpDelete("{studioId}/filmography/{filmographyId}")]
+        /// <response code="400">Studio or cinema is not found</response>
+        [HttpDelete("filmography/{id}")]
+        [HttpDelete("{studioId}/filmography/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
-            [FromRoute] string? personId,
-            [FromRoute] string filmographyId
+            [FromRoute] string? studioId,
+            [FromRoute] string id
             )
         {
-            await _mediator.Send(new DeletePersonFilmographyCommand(personId, filmographyId), ct);
+            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, id), ct);
 
             return Ok();
         }

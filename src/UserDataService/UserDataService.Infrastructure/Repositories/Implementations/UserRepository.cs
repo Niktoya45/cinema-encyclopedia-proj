@@ -1,4 +1,5 @@
 ﻿
+using Amazon.Auth.AccessControlPolicy;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using UserDataService.Domain.Aggregates.UserAggregate;
@@ -81,12 +82,23 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return await FindOne(u => u.Id == id, ct);
         }
 
+        public async Task<RatingRecord?> FindRatingByUserIdCinemaId(string userId, string cinemaId, CancellationToken ct = default)
+        {
+            var condition = Builders<RatingRecord>.Filter.Where(r => r.UserId == userId && r.CinemaId == cinemaId);
+            var sort = Builders<RatingRecord>.Sort.Descending(r => r.AddedAt);
+
+            return await _db.RatingRecords.Find(condition).Sort(sort).FirstOrDefaultAsync(ct);
+        }
+
         public async Task<List<LabeledRecord>?> FindCinemasList(Pagination? pg = default, Expression<Func<LabeledRecord, bool>>? query = null, CancellationToken ct = default) {
             
             var condition = Builders<LabeledRecord>.Filter.Where(query??(r => true));
             var sort = Builders<LabeledRecord>.Sort.Descending(r => r.AddedAt);
 
-            return await _db.LabeledRecords.Find(condition).Sort(sort).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
+            int skip = pg == null ? 0 : pg.Skip;
+            int take = pg == null ? 0 : pg.Take;
+
+            return await _db.LabeledRecords.Find(condition).Sort(sort).Skip(skip).Limit(take).ToListAsync(ct);
         }
 
         public async Task<List<RatingRecord>?> FindRatingsList(Pagination? pg = default, Expression<Func<RatingRecord, bool>>? query = null, CancellationToken ct = default)
@@ -95,7 +107,10 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             var condition = Builders<RatingRecord>.Filter.Where(query ?? (r => true));
             var sort = Builders<RatingRecord>.Sort.Descending(r => r.AddedAt);
 
-            return await _db.RatingRecords.Find(condition).Sort(sort).Skip(pg.Skip).Limit(pg.Take).ToListAsync(ct);
+            int skip = pg == null ? 0 : pg.Skip;
+            int take = pg == null ? 0 : pg.Take;
+
+            return await _db.RatingRecords.Find(condition).Sort(sort).Skip(skip).Limit(take).ToListAsync(ct);
         }
 
         public async Task<List<LabeledRecord>?> FindCinemasByUserId(string userId, Pagination? pg = default, CancellationToken ct = default)
@@ -103,11 +118,11 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return await FindCinemasList(pg, r => (r.UserId == userId), ct);
         }
 
-        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label label, Pagination? pg = default, CancellationToken ct = default)
+        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label? label, Pagination? pg = default, CancellationToken ct = default)
         {
             return await FindCinemasList(
                                         pg,
-                                    r => (r.UserId == userId) && (r.Label & label) != 0,
+                                    r => (r.UserId == userId) && (label == null ? true : (r.Label & label) != 0),
                                         ct
                                         );
         }

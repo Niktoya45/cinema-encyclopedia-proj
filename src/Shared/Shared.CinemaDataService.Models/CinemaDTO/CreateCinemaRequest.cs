@@ -12,7 +12,7 @@ namespace Shared.CinemaDataService.Models.CinemaDTO
         public Language Language { get; set; }
         public string? Picture { get; set; }
         public StudioRecord[]? ProductionStudios { get; set; }
-        public Starring[]? StarringResponses { get; set; }
+        public Starring[]? Starrings { get; set; }
         public string? Description { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using Shared.CinemaDataService.Models.Flags;
 
 namespace Shared.CinemaDataService.Models.RecordDTO
 {
-    public class CreateStarringResponseRequest
+    public class CreateStarringRequest
     {
         public string Id { get; set; }
         public string Name { get; set; }

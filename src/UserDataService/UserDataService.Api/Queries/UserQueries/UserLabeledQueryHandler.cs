@@ -20,10 +20,10 @@ namespace UserDataService.Api.Queries.UserQueries
         }
         public async Task<IEnumerable<LabeledResponse>> Handle(UserLabeledQuery request, CancellationToken cancellationToken)
         {
-            IList<LabeledRecord>? labeled = await _repository.FindCinemasByUserId(request.Id, cancellationToken);
+            IList<LabeledRecord>? labeled = await _repository.FindCinemasByUserIdLabel(request.Id, request.Label, null, cancellationToken);
 
             if (labeled == null) {
-                new NotFoundException(request.Id, "Users");
+                throw new NotFoundException(request.Id, "Users");
             }
 
             return _mapper.Map<IEnumerable<LabeledRecord>, IEnumerable<LabeledResponse>>(labeled);

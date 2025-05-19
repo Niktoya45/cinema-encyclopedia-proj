@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Shared.CinemaDataService.Models" Version="1.0.0" />
+    <PackageReference Include="Shared.ImageService.Models" Version="1.0.0" />
+    <PackageReference Include="Shared.UserDataService.Models" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
