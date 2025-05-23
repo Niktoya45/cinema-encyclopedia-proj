@@ -9,28 +9,28 @@ namespace GatewayAPIService.Infrastructure.Services.UserService
     public interface IUserService
     {
         /* User Get Requests */
-        Task<UserResponse> Get(string id);
-        Task<UserResponse> GetLabelled(string userId, Label? label);
-        Task<UserResponse> GetRatingFor(string userId, string cinemaId);
+        Task<UserResponse?> Get(string id, CancellationToken ct);
+        Task<IEnumerable<LabeledResponse>?> GetLabelled(string userId, Label? label, CancellationToken ct);
+        Task<RatingResponse?> GetRatingFor(string userId, string cinemaId, CancellationToken ct);
 
         /******/
 
         /* User Post Requests */
-        Task<UserResponse> Create(CreateUserRequest user);
-        Task<LabeledResponse> CreateForLabeledList(CreateLabeledRequest labeled);
-        Task<RatingResponse> CreateForRatingList(CreateRatingRequest rating);
+        Task<UserResponse?> Create(CreateUserRequest user, CancellationToken ct);
+        Task<LabeledResponse?> CreateForLabeledList(string userId, CreateLabeledRequest labeled, CancellationToken ct);
+        Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct);
 
         /******/
 
         /* User Put Requests */
-        Task<UserResponse> Update(string id, UpdateUserRequest user);
+        Task<UserResponse?> Update(string id, UpdateUserRequest user, CancellationToken ct);
 
         /******/
 
         /* User Delete Requests */
-        Task Delete(string id);
-        Task DeleteFromLabeledList(string userId, string cinemaId);
-        Task DeleteFromRatingList(string userId, string cinemaId);
+        Task<bool> Delete(string id, CancellationToken ct);
+        Task<bool> DeleteFromLabeledList(string userId, string? cinemaId, CancellationToken ct);
+        Task<bool> DeleteFromRatingList(string userId, string? cinemaId, CancellationToken ct);
 
         /******/
 

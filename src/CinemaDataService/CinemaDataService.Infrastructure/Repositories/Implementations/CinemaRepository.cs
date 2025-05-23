@@ -14,7 +14,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         {
             _collection = db.Cinemas;
         }
-        public async Task<StudioRecord?> AddProductionStudio(string cinemaId, StudioRecord studio, CancellationToken ct = default)
+        public async Task<StudioRecord?> AddProductionStudio(string cinemaId, StudioRecord studio, CancellationToken ct)
         {
             return await AddRecord( c => c.Id == cinemaId,
                                     c => c.ProductionStudios,
@@ -23,7 +23,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                     ct
                                    );
         }
-        public async Task<Starring?> AddStarring(string? cinemaId, Starring starring, CancellationToken ct = default)
+        public async Task<Starring?> AddStarring(string? cinemaId, Starring starring, CancellationToken ct)
         {
             return await AddRecord(c => c.Id == cinemaId,
                                    c => c.Starrings,
@@ -63,7 +63,42 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
             return await Find(condition, pg, st, ct);
 
         }
-        public override async Task<Cinema?> Update(Cinema entity, CancellationToken ct = default)
+
+        public async Task<StudioRecord?> FindProductionStudioById(string? cinemaId, string studioId, CancellationToken ct) 
+        {
+            FilterDefinition<Cinema> elementMatch = cinemaId == null
+                                        ? Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studioId)
+                                        : Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studioId)
+                                          & Builders<Cinema>.Filter.Where(c => c.Id == cinemaId);
+           
+            Cinema? cinema = await FindOne(elementMatch, ct);
+
+            if (cinema is null)
+            {
+                return null;
+            }
+
+            return cinema.ProductionStudios!.FirstOrDefault(s => s.Id == studioId);
+
+        }
+        public async Task<Starring?> FindStarringById(string? cinemaId, string starringId, CancellationToken ct)
+        {
+            FilterDefinition<Cinema> elementMatch = cinemaId == null
+                                        ? Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starringId)
+                                        : Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starringId)
+                                          & Builders<Cinema>.Filter.Where(c => c.Id == cinemaId);
+
+            Cinema? cinema = await FindOne(elementMatch, ct);
+
+            if (cinema is null)
+            {
+                return null;
+            }
+
+            return cinema.Starrings!.FirstOrDefault(s => s.Id == starringId);
+        }
+
+        public override async Task<Cinema?> Update(Cinema entity, CancellationToken ct)
         {
             UpdateDefinitionBuilder<Cinema> builder = Builders<Cinema>.Update;
 
@@ -91,13 +126,27 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return entity;
         }
-        public async Task<StudioRecord?> UpdateProductionStudio(StudioRecord studio, CancellationToken ct = default)
+        public async Task<StudioRecord?> UpdateProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct)
         {
 
-            FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studio.Id);
+            FilterDefinition<Cinema> elementMatch = cinemaId == null 
+                                                    ? Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studio.Id)
+                                                    : Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studio.Id)
+                                                      & Builders<Cinema>.Filter.Where(c => c.Id == cinemaId);
+
             UpdateDefinition<Cinema> replace = Builders<Cinema>.Update.Set("ProductionStudios.$", studio);
 
-            var res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            UpdateResult? res;
+
+            if (cinemaId is null)
+            {
+                res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            }
+            else 
+            {
+                res = await _collection.UpdateOneAsync(elementMatch, replace, cancellationToken:ct);
+            }
+
 
             if (!res.IsAcknowledged)
             {
@@ -106,12 +155,26 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return studio;
         }
-        public async Task<Starring?> UpdateStarring(Starring starring, CancellationToken ct = default)
+        public async Task<Starring?> UpdateStarring(string? cinemaId, Starring starring, CancellationToken ct)
         {
-            FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == starring.Id);
+            FilterDefinition<Cinema> elementMatch = cinemaId == null
+                                        ? Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starring.Id)
+                                        : Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starring.Id)
+                                          & Builders<Cinema>.Filter.Where(c => c.Id == cinemaId);
+
             UpdateDefinition<Cinema> replace = Builders<Cinema>.Update.Set("Starrings.$", starring);
 
-            var res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            UpdateResult? res;
+
+            if (cinemaId is null)
+            {
+                res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            }
+            else 
+            {
+                res = await _collection.UpdateOneAsync(elementMatch, replace, cancellationToken: ct);
+            }
+
 
             if (!res.IsAcknowledged)
             {
@@ -120,7 +183,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return starring;
         }
-        public async Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct = default)
+        public async Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct)
         {
             Cinema? cinema = await FindById(id, ct);
 
@@ -153,7 +216,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return cinema;
         }
-        public async Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct = default) 
+        public async Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct) 
         {
             FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studio.Id);
             UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PopFirst("ProductionStudios.$");
@@ -178,7 +241,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return studio;
         }
-        public async Task<Starring?> DeleteStarring(string? cinemaId, Starring starring, CancellationToken ct = default)
+        public async Task<Starring?> DeleteStarring(string? cinemaId, Starring starring, CancellationToken ct)
         {
             FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starring.Id);
             UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PopFirst("Starrings.$");

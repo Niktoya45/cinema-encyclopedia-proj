@@ -8,6 +8,7 @@ using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
 using CinemaDataService.Infrastructure.Models.RecordDTO;
+using CinemaDataService.Api.Queries.RecordQueries;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -54,13 +55,13 @@ namespace CinemaDataService.Api.Controllers
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">None instance is found</response>
-        [HttpGet("search")]
+        [HttpGet("search/{search}")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Search(
             CancellationToken ct,
-            [FromQuery] string search,
+            [FromRoute] string search,
             [FromQuery] Pagination? pg = null
         )
         {
@@ -139,6 +140,28 @@ namespace CinemaDataService.Api.Controllers
             var response = await _mediator.Send(
                 new StudioQuery(id), ct
                 );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get filmography by its id and parent studio id
+        /// </summary>
+        /// <param name="studioId">requested studio id</param>
+        /// <param name="filmographyId">requested filmography id</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Person or filmography is not found</response>
+        [HttpGet("{studioId}/filmography/{filmographyId}")]
+        [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Filmography(
+            CancellationToken ct,
+            [FromRoute] string studioId,
+            [FromRoute] string filmographyId
+            )
+        {
+            var response = await _mediator.Send(new StudioFilmographyQuery(studioId, filmographyId), ct);
 
             return Ok(response);
         }
@@ -267,23 +290,27 @@ namespace CinemaDataService.Api.Controllers
         /// <summary>
         /// Update filmography entrance for all studios
         /// </summary>
-        /// <param name="id">id of filmography entrance to be updated</param>
+        /// <param name="studioId">id of studio which filmography entrance to be updated (optional)</param>
+        /// <param name="filmographyId">id of filmography entrance to be updated</param>
         /// <param name="request">request body</param>
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio is not found</response>
-        [HttpPut("filmography/{id}")]
+        [HttpPut("filmography/{filmographyId}")]
+        [HttpPut("{studioId}/filmography/{filmographyId}")]
         [ProducesResponseType(typeof(FilmographyResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmography(
             CancellationToken ct,
-            [FromRoute] string id,
+            [FromRoute] string? studioId,
+            [FromRoute] string filmographyId,
             [FromBody] UpdateFilmographyRequest request
             )
         {
             var response = await _mediator.Send(
                 new UpdateStudioFilmographyCommand(
-                        id,
+                        studioId,
+                        filmographyId,
                         request.Name,
                         request.Year,
                         request.Picture
@@ -326,7 +353,7 @@ namespace CinemaDataService.Api.Controllers
         [HttpDelete("{studioId}/filmography/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Filmography(
+        public async Task<IActionResult> Filmographys(
             CancellationToken ct,
             [FromRoute] string? studioId,
             [FromRoute] string id

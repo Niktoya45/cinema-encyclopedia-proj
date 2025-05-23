@@ -8,7 +8,7 @@ using UserDataService.Infrastructure.Repositories.Abstractions;
 
 namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
-    public class DeleteRatingCommandHandler : IRequestHandler<DeleteRatingCommand, RatingResponse>
+    public class DeleteRatingCommandHandler : IRequestHandler<DeleteRatingCommand, IEnumerable<RatingResponse>>
     {
         IUserRepository _repository;
         IMapper _mapper;
@@ -18,17 +18,17 @@ namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
             _repository = repository;
             _mapper = mapper;
         }
-        public async Task<RatingResponse> Handle(DeleteRatingCommand request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RatingResponse>> Handle(DeleteRatingCommand request, CancellationToken cancellationToken)
         {
             RatingRecord rating = _mapper.Map<DeleteRatingCommand, RatingRecord>(request);
-            RatingRecord? added = await _repository.AddToRatingList(rating, cancellationToken);
+            IEnumerable<RatingRecord>? deleted = await _repository.DeleteFromRatingList(rating, cancellationToken);
 
-            if (added is null)
+            if (deleted is null)
             {
                 throw new RecordNotFoundException(request.UserId, request.CinemaId, "rating_records");
             }
 
-            return _mapper.Map<RatingRecord, RatingResponse>(added);
+            return _mapper.Map<IEnumerable<RatingRecord>, IEnumerable<RatingResponse>>(deleted);
         }
     }
 }

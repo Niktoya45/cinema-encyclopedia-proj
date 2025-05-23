@@ -3,6 +3,7 @@ using MediatR;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Api.Queries.RecordQueries;
 using CinemaDataService.Api.Commands.CinemaCommands.CreateCommands;
 using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands;
@@ -37,9 +38,9 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(
+            CancellationToken ct,
             [FromQuery] SortBy? st = null,
-            [FromQuery] Pagination? pg = null, 
-            CancellationToken ct = default
+            [FromQuery] Pagination? pg = null
             )
         {
             var response = await _mediator.Send(new CinemasQuery(st, pg), ct);
@@ -62,9 +63,9 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PostAsync(
+            CancellationToken ct,
             [FromBody] string[] ids, 
-            [FromQuery] Pagination? pg = null,
-            CancellationToken ct = default
+            [FromQuery] Pagination? pg = null
             )
         {
             var response = await _mediator.Send(new CinemasIdQuery(ids, pg), ct);
@@ -79,13 +80,13 @@ namespace CinemaDataService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
-        [HttpGet("search")]
+        [HttpGet("search/{search}")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Search(
             CancellationToken ct,
-            [FromQuery] string search,
+            [FromRoute] string search,
             [FromQuery] Pagination? pg = null
         )
         {
@@ -214,6 +215,50 @@ namespace CinemaDataService.Api.Controllers
             )
         {
             var response = await _mediator.Send(new CinemaQuery(id), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get starring by its id and parent cinema id
+        /// </summary>
+        /// <param name="cinemaId">requested cinema id</param>
+        /// <param name="starringId">requested starring id</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Cinema or starring is not found</response>
+        [HttpGet("{cinemaId}/starrings/{starringId}")]
+        [ProducesResponseType(typeof(StarringResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Starring(
+            CancellationToken ct,
+            [FromRoute] string cinemaId,
+            [FromRoute] string starringId
+            )
+        {
+            var response = await _mediator.Send(new CinemaStarringQuery(cinemaId, starringId), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get production studio by its id and parent cinema id
+        /// </summary>
+        /// <param name="cinemaId">requested cinema id</param>
+        /// <param name="studioId">requested studio id</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Cinema or production studio is not found</response>
+        [HttpGet("{cinemaId}/production-studios/{studioId}")]
+        [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ProductionStudio(
+            CancellationToken ct,
+            [FromRoute] string cinemaId,
+            [FromRoute] string studioId
+            )
+        {
+            var response = await _mediator.Send(new CinemaProductionStudioQuery(cinemaId, studioId), ct);
 
             return Ok(response);
         }
@@ -400,22 +445,26 @@ namespace CinemaDataService.Api.Controllers
 
 
         /// <summary>
-        /// Update production studio for all cinemas
+        /// Update production studio for all cinemas or specific cinema
         /// </summary>
-        /// <param name="id">production studio id</param>
+        /// <param name="cinemaId">cinema id (optional)</param>
+        /// <param name="studioId">production studio id</param>
         /// <param name="request">request body</param>
         /// <returns>Newly created studio instance</returns>
         /// <response code="200">Success</response>
         [HttpPut("production-studios/{studioId}")]
+        [HttpPut("{cinemaId}/production-studios/{studioId}")]
         [ProducesResponseType(typeof(ProductionStudioResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> ProductionStudios(
             CancellationToken ct,
+            [FromRoute] string? cinemaId,
             [FromRoute] string studioId,
             [FromBody] UpdateProductionStudioRequest request
             )
         {
             var response = await _mediator.Send(
                 new UpdateCinemaProductionStudioCommand(
+                        cinemaId,
                         studioId,
                         request.Name,
                         request.Picture
@@ -431,7 +480,7 @@ namespace CinemaDataService.Api.Controllers
         /// </summary>
         /// <param name="cinemaId">cinema id (optional)</param>
         /// <param name="request">request body</param>
-        /// <returns>Newly created studio instance</returns>
+        /// <returns>Updated starring instance</returns>
         /// <response code="200">Success</response>
         [HttpPut("starrings/{starringId}")]
         [HttpPut("{cinemaId}/starrings/{starringId}")]

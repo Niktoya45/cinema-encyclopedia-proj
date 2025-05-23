@@ -11,7 +11,7 @@ namespace CinemaDataService.Api.Commands.SharedCommands.CreateCommands
                 string id,
                 string name,
                 Job jobs,
-                string roleName,
+                string? roleName,
                 RolePriority rolePriority,
                 string? picture
         )
@@ -26,7 +26,7 @@ namespace CinemaDataService.Api.Commands.SharedCommands.CreateCommands
         public string Id { get; }
         public string Name { get; }
         public Job Jobs { get; set; }
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; }
         public RolePriority RolePriority { get; set; }
         public string? Picture { get; }
     }

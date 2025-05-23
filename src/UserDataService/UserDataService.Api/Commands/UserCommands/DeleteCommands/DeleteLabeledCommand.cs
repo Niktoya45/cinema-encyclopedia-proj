@@ -4,17 +4,17 @@ using UserDataService.Infrastructure.Models.LabeledDTO;
 
 namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
-    public class DeleteLabeledCommand : IRequest<LabeledResponse>
+    public class DeleteLabeledCommand : IRequest<IEnumerable<LabeledResponse>>
     {
         public DeleteLabeledCommand(
             string userId,
-            string cinemaId
+            string? cinemaId
             )
         {
             CinemaId = cinemaId;
             UserId = userId;
         }
-        public string CinemaId { get; set; }
+        public string? CinemaId { get; set; }
         public string UserId { get; set; }
     }
 }

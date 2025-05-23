@@ -15,7 +15,7 @@ namespace UserDataService.Infrastructure.Repositories.Abstractions
         public Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label? label, Pagination? pg, CancellationToken ct);
         public Task<List<RatingRecord>?> FindRatingsByUserId(string userId, Pagination? pg, CancellationToken ct);
         public Task<User?> Delete(string id, CancellationToken ct);
-        public Task<LabeledRecord?> DeleteFromCinemaList(LabeledRecord cinema, CancellationToken ct);
-        public Task<RatingRecord?> DeleteFromRatingList(RatingRecord rating, CancellationToken ct);
+        public Task<IEnumerable<LabeledRecord>?> DeleteFromCinemaList(LabeledRecord cinema, CancellationToken ct);
+        public Task<IEnumerable<RatingRecord>?> DeleteFromRatingList(RatingRecord rating, CancellationToken ct);
     }
 }

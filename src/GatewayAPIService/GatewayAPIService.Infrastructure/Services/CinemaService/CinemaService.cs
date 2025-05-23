@@ -1,6 +1,6 @@
 ﻿
 
-using GatewayAPIService.Infrastructure.Services.CinemaDataService;
+using GatewayAPIService.Infrastructure.Services.CinemaService;
 using Shared.CinemaDataService.Models.CinemaDTO;
 using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.RecordDTO;
@@ -11,7 +11,7 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
 {
     public class CinemaService:ICinemaService
     {
-        const string Url = "https//localhost:7126/api/cinemas";
+        const string Url = "/api/cinemas";
 
         HttpClient _httpClient;
    
@@ -34,29 +34,29 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         }
         public async Task<Page<CinemasResponse>?> GetByIds(string[] ids, CancellationToken ct, Pagination? pg = null) 
         {
-            var response = await _httpClient.PostAsJsonAsync(Url + "/indexes" + "?" + SortPaginate(null, pg), ids, ct);
+            var response = await _httpClient.PostAsJsonAsync(Url + "/indexes?" + SortPaginate(null, pg), ids, ct);
 
             return await response.Content.ReadFromJsonAsync<Page<CinemasResponse>?>();
         }
         public async Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null) 
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<SearchResponse>>(Url + "/search" + $"?search={search}" + SortPaginate(null, pg), ct);
+            return await _httpClient.GetFromJsonAsync<IEnumerable<SearchResponse>>(Url + "/search" + $"/{search}?" + SortPaginate(null, pg), ct);
         }
         public async Task<Page<CinemasResponse>?> GetByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
-            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/year" + $"/{year}" + "?" + SortPaginate(st, pg), ct);
+            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/year" + $"/{year}?" + SortPaginate(st, pg), ct);
         }
         public async Task<Page<CinemasResponse>?> GetByGenre(Genre genre, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
-            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/genres" + $"/{genre}" + "?" + SortPaginate(st, pg), ct);
+            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/genres" + $"/{genre}?" + SortPaginate(st, pg), ct);
         }
         public async Task<Page<CinemasResponse>?> GetByLanguage(Language language, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
-            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/language" + $"/{language}" + "?" + SortPaginate(st, pg), ct);
+            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/language" + $"/{language}?" + SortPaginate(st, pg), ct);
         }
         public async Task<Page<CinemasResponse>?> GetByStudioId(string studioId, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
-            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/studio" + $"/{studioId}" + "?" + SortPaginate(st, pg), ct);
+            return await _httpClient.GetFromJsonAsync<Page<CinemasResponse>>(Url + "/studio" + $"/{studioId}?" + SortPaginate(st, pg), ct);
         }
 
         /******/

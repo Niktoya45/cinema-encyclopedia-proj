@@ -2,8 +2,8 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.PersonDTO;
 using CinemaDataService.Domain.Aggregates.PersonAggregate;
-//using CinemaDataService.Api.Exceptions.PersonExceptions;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
@@ -19,13 +19,15 @@ namespace CinemaDataService.Api.Queries.PersonQueries
         }
         public async Task<PersonResponse> Handle(PersonQuery request, CancellationToken cancellationToken)
         {
-            Person? Person = await _repository.FindById(request.Id, cancellationToken);
+            Person? person = await _repository.FindById(request.Id, cancellationToken);
 
-            //if (Person == null)
+            if (person == null)
+            {
                 // handle
+                throw new NotFoundException(request.Id, "Persons");
+            }
 
-
-            return _mapper.Map<PersonResponse>(Person);
+            return _mapper.Map<PersonResponse>(person);
         }
     }
 }

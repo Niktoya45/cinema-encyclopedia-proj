@@ -7,36 +7,36 @@ using Shared.CinemaDataService.Models.SharedDTO;
 
 namespace GatewayAPIService.Infrastructure.Services.StudioService
 {
-    internal interface IStudioService
+    public interface IStudioService
     {
         /* Get Requests For Studio */
-        Task<Page<StudiosResponse>> Get(SortBy? st = null, Pagination? pg = null);
-        Task<StudioResponse> GetById(string id);
-        Task<IEnumerable<SearchResponse>> GetBySearch(string search, SortBy? st = null, Pagination? pg = null);
-        Task<Page<StudiosResponse>> GetByYear(int year, SortBy? st = null, Pagination? pg = null);
-        Task<Page<StudiosResponse>> GetByCountry(Country country, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> Get(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<StudioResponse?> GetById(string id, CancellationToken ct);
+        Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
 
         /******/
 
         /* Post Requests For Studio */
 
-        Task<StudioResponse> Create(CreateStudioRequest studio);
-        Task<ProductionStudioResponse> CreateFilmographyFor(string studioId, CreateFilmographyRequest studio);
+        Task<StudioResponse?> Create(CreateStudioRequest studio, CancellationToken ct);
+        Task<FilmographyResponse?> CreateFilmographyFor(string studioId, CreateFilmographyRequest filmography, CancellationToken ct);
 
         /******/
 
         /* Put Requests For Studio */
 
-        Task<StudioResponse> Update(string id, UpdateStudioRequest studio);
-        Task<UpdatePictureResponse> UpdatePhoto(string studioId, UpdatePictureRequest picture);
-        Task<FilmographyResponse> UpdateFilmography(string? studioId, UpdateFilmographyRequest filmography);
+        Task<StudioResponse?> Update(string id, UpdateStudioRequest studio, CancellationToken ct);
+        Task<UpdatePictureResponse?> UpdatePhoto(string studioId, UpdatePictureRequest picture, CancellationToken ct);
+        Task<FilmographyResponse?> UpdateFilmography(string? studioId, string filmographyId, UpdateFilmographyRequest filmography, CancellationToken ct);
 
         /******/
 
         /* Delete Requests For Studio */
 
-        Task Delete(string id);
-        Task DeleteFilmography(string? studioId, string filmographyId);
+        Task<bool> Delete(string id, CancellationToken ct);
+        Task<bool> DeleteFilmography(string? studioId, string filmographyId, CancellationToken ct);
 
         /******/
     }

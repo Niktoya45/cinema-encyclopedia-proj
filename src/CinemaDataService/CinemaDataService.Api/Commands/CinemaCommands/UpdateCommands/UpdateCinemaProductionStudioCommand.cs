@@ -1,16 +1,21 @@
 ﻿using CinemaDataService.Api.Commands.SharedCommands.UpdateCommands;
-using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Domain.Aggregates.Shared;
-using System.Xml.Linq;
+
 
 namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
 {
     public class UpdateCinemaProductionStudioCommand:UpdateProductionStudioCommand
     {
         public UpdateCinemaProductionStudioCommand(
-            string id,
+            string? cinemaId,
+            string studioId,
             string name,
             string? picture
-        ):base(id, name, picture){}
+        ):base(studioId, name, picture)
+        {
+            CinemaId = cinemaId;
+        }
+        
+        public string? CinemaId { get; set; }
     }
+
 }

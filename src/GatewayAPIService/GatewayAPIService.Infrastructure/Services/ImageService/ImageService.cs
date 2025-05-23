@@ -13,9 +13,12 @@ namespace GatewayAPIService.Infrastructure.Services.ImageService
         public ImageService(HttpClient imageHttpClient) { 
             _imageHttpClient = imageHttpClient;
         }
+        public async Task<string?> GetImage(string id, ImageSize sizes) 
+        {
+            return await _imageHttpClient.GetFromJsonAsync<string>($"images?id={id}&sizes={sizes}");
+        }
         public async Task<string?> AddImage(string id, string imageBase64, ImageSize sizes) 
         {
-            //implement 
 
             AddImageRequest payload = new AddImageRequest { Id = id, FileBase64 = imageBase64, Size = sizes};
 
@@ -32,7 +35,6 @@ namespace GatewayAPIService.Infrastructure.Services.ImageService
         }
         public async Task<string?> ReplaceImage(string id, string newId, string imageBase64, ImageSize sizes) 
         {
-            //implement
 
             ReplaceImageRequest payload = new ReplaceImageRequest { Id = id, NewId = newId, FileBase64 = imageBase64, Size = sizes };
 
@@ -50,7 +52,6 @@ namespace GatewayAPIService.Infrastructure.Services.ImageService
         }
         public async Task<string?> DeleteImage(string id, ImageSize sizes)
         {
-            //implement
 
             DeleteImageRequest payload = new DeleteImageRequest { Id = id, Size = sizes };
 

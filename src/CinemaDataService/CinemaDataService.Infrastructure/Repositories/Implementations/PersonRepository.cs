@@ -1,5 +1,7 @@
-﻿using CinemaDataService.Domain.Aggregates.PersonAggregate;
+﻿using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Domain.Aggregates.PersonAggregate;
 using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Domain.Aggregates.StudioAggregate;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Models.SharedDTO;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
@@ -39,6 +41,24 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
                                 ct
                                 );
         }
+
+        public async Task<CinemaRecord?> FindFilmographyById(string? personId, string filmographyId, CancellationToken ct)
+        {
+            FilterDefinition<Person> elementMatch = personId == null
+                                        ? Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == filmographyId)
+                                        : Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == filmographyId)
+                                          & Builders<Person>.Filter.Where(p => p.Id == personId);
+
+            Person? person = await FindOne(elementMatch, ct);
+
+            if (person is null)
+            {
+                return null;
+            }
+
+            return person.Filmography!.FirstOrDefault(c => c.Id == filmographyId);
+        }
+
         public override async Task<Person?> Update(Person entity, CancellationToken ct = default)
         {
             UpdateDefinitionBuilder<Person> builder = Builders<Person>.Update;
@@ -66,12 +86,26 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return entity;
         }
-        public async Task<CinemaRecord?> UpdateFilmography(CinemaRecord cinema, CancellationToken ct = default)
+        public async Task<CinemaRecord?> UpdateFilmography(string? personId, CinemaRecord cinema, CancellationToken ct = default)
         {
-            FilterDefinition<Person> elementMatch = Builders<Person>.Filter.ElemMatch(c => c.Filmography, s => s.Id == cinema.Id);
-            UpdateDefinition<Person> replace = Builders<Person>.Update.Set("Starrings.$", cinema);
+            FilterDefinition<Person> elementMatch = personId == null
+                                                    ? Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == cinema.Id)
+                                                    : Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == cinema.Id)
+            & Builders<Person>.Filter.Where(p => p.Id == personId);
 
-            var res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            UpdateDefinition<Person> replace = Builders<Person>.Update.Set("Filmography.$", cinema);
+
+            UpdateResult? res;
+
+            if (personId is null)
+            {
+                res = await _collection.UpdateManyAsync(elementMatch, replace, cancellationToken: ct);
+            }
+            else
+            {
+                res = await _collection.UpdateOneAsync(elementMatch, replace, cancellationToken: ct);
+            }
+
 
             if (!res.IsAcknowledged)
             {

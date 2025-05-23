@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Shared.CinemaDataService.Models.StudioDTO;
 using Shared.UserDataService.Models.LabeledDTO;
 using Shared.UserDataService.Models.RatingDTO;
 using Shared.UserDataService.Models.UserDTO;
@@ -31,7 +32,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromRoute] string id,
             CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new UserQuery(id), ct);
+            var response = new UserResponse();
 
             return Ok(response);
         }
@@ -50,7 +51,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromRoute] string id,
             CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new UserLabeledQuery(id), ct);
+            var response = new List<LabeledResponse>();
 
             return Ok(response);
         }
@@ -68,11 +69,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new CreateUserCommand(
-                                            request.Username,
-                                            request.Birthdate,
-                                            request.Picture,
-                                            request.Description), ct);
+            var response = new CreateUserResponse();
 
             return Ok(response);
         }
@@ -92,10 +89,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new CreateLabeledCommand(
-                                        userId,
-                                        request.CinemaId,
-                                        request.Label), ct);
+            var response = new LabeledResponse();
 
             return Ok(response);
         }
@@ -115,10 +109,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = await _mediator.Send(new CreateRatingCommand(
-                                        userId,
-                                        request.CinemaId,
-                                        request.Rating), ct);
+            var response = new RatingResponse();
 
             return Ok(response);
         }
@@ -139,12 +130,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdateUserRequest request,
             CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new UpdateUserCommand(
-                                        userId,
-                                        request.Username,
-                                        request.Birthdate,
-                                        request.Picture,
-                                        request.Description), ct);
+            var response = new UpdateUserResponse();
 
             return Ok(response);
         }
@@ -164,7 +150,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteUserCommand(userId), ct);
+       
 
             return Ok();
         }
@@ -186,7 +172,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteLabeledCommand(userId, cinemaId), ct);
+            
 
             return Ok();
         }
@@ -208,7 +194,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteLabeledCommand(userId, cinemaId), ct);
+            
 
             return Ok();
         }

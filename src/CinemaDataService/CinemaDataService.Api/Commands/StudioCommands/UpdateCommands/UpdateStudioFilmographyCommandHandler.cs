@@ -24,7 +24,7 @@ namespace CinemaDataService.Api.Commands.StudioCommands.UpdateCommands
             //handle data validation
             CinemaRecord filmographyRecord = _mapper.Map<UpdateStudioFilmographyCommand, CinemaRecord>(request);
 
-            CinemaRecord? updated = await _repository.UpdateFilmography(filmographyRecord, cancellationToken);
+            CinemaRecord? updated = await _repository.UpdateFilmography(request.ParentId, filmographyRecord, cancellationToken);
 
             if (updated == null)
             {

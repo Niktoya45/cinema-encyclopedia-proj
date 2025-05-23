@@ -3,17 +3,17 @@ using UserDataService.Infrastructure.Models.RatingDTO;
 
 namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
-    public class DeleteRatingCommand : IRequest<RatingResponse>
+    public class DeleteRatingCommand : IRequest<IEnumerable<RatingResponse>>
     {
         public DeleteRatingCommand(
-            string cinemaId,
-            string userId
+            string userId,
+            string? cinemaId
             )
         {
             CinemaId = cinemaId;
             UserId = userId;
         }
-        public string CinemaId { get; set; }
+        public string? CinemaId { get; set; }
         public string UserId { get; set; }
     }
 }

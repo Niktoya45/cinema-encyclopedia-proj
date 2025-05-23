@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using GatewayAPIService.Infrastructure.Services.CinemaService;
+using GatewayAPIService.Infrastructure.Services.ImageService;
+using GatewayAPIService.Infrastructure.Services.PersonService;
+using GatewayAPIService.Infrastructure.Services.StudioService;
 using Microsoft.AspNetCore.Mvc;
 using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.RecordDTO;
@@ -12,11 +15,22 @@ namespace GatewayAPIService.Api.Controllers
     public class StudiosController : Controller
     {
 
-        private readonly IMediator _mediator;
+        public readonly ICinemaService _cinemaService;
+        public readonly IPersonService _personService;
+        public readonly IStudioService _studioService;
+        public readonly IImageService _imageService;
 
-        public StudiosController(IMediator mediator)
+        public StudiosController(
+            ICinemaService cinemaService,
+            IPersonService personService,
+            IStudioService studioService,
+            IImageService imageService
+            )
         {
-            _mediator = mediator;
+            _cinemaService = cinemaService;
+            _personService = personService;
+            _studioService = studioService;
+            _imageService = imageService;
         }
 
         /// <summary>
@@ -38,7 +52,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosQuery(st, pg), ct);
+            var response = new Page<StudiosResponse>();
 
             return Ok(response);
         }
@@ -60,7 +74,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromQuery] Pagination? pg = null
         )
         {
-            var response = await _mediator.Send(new StudiosSearchQuery(search, pg), ct);
+            var response = new List<SearchResponse>();
 
             return Ok(response);
         }
@@ -86,7 +100,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosYearQuery(year, st, pg), ct);
+            var response = new Page<StudiosResponse>();
 
             return Ok(response);
         }
@@ -112,7 +126,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosCountryQuery(country, st, pg), ct);
+            var response = new Page<StudiosResponse>();
 
             return Ok(response);
         }
@@ -132,9 +146,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromRoute] string id
             )
         {
-            var response = await _mediator.Send(
-                new StudioQuery(id), ct
-                );
+            var response = new StudioResponse();
 
             return Ok(response);
         }
@@ -152,18 +164,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateStudioRequest request
             )
         {
-            var response = await _mediator.Send(
-                new CreateStudioCommand(
-                        request.Name,
-                        request.FoundDate,
-                        request.Country,
-                        request.Picture,
-                        request.Filmography,
-                        request.PresidentName,
-                        request.Description
-                    ),
-                ct
-                );
+            var response = new StudioResponse();
 
             return Ok(response);
         }
@@ -183,16 +184,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateFilmographyRequest request
             )
         {
-            var response = await _mediator.Send(
-                new CreateStudioFilmographyCommand(
-                        studioId,
-                        request.Id,
-                        request.Name,
-                        request.Year,
-                        request.Picture
-                    ),
-                ct
-                );
+            var response = new FilmographyResponse();
 
             return Ok(response);
         }
@@ -214,19 +206,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdateStudioRequest request
             )
         {
-            var response = await _mediator.Send(
-                new UpdateStudioCommand(
-                        id,
-                        request.Name,
-                        request.FoundDate,
-                        request.Country,
-                        request.Picture,
-                        request.Filmography,
-                        request.PresidentName,
-                        request.Description
-                    ),
-                ct
-                );
+            var response = new StudioResponse();
 
             return Ok(response);
         }
@@ -249,13 +229,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdatePictureRequest request
             )
         {
-            var response = await _mediator.Send(
-                new UpdateStudioPictureCommand(
-                        id,
-                        request.Picture
-                    ),
-                ct
-                );
+            var response = new FilmographyResponse();
 
             return Ok(response);
         }
@@ -277,15 +251,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdateFilmographyRequest request
             )
         {
-            var response = await _mediator.Send(
-                new UpdateStudioFilmographyCommand(
-                        id,
-                        request.Name,
-                        request.Year,
-                        request.Picture
-                    ),
-                ct
-                );
+            var response = new FilmographyResponse();
 
             return Ok(response);
         }
@@ -305,7 +271,6 @@ namespace GatewayAPIService.Api.Controllers
             [FromRoute] string id
             )
         {
-            await _mediator.Send(new DeleteStudioCommand(id), ct);
 
             return Ok();
         }
@@ -328,7 +293,6 @@ namespace GatewayAPIService.Api.Controllers
             [FromRoute] string id
             )
         {
-            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, id), ct);
 
             return Ok();
         }

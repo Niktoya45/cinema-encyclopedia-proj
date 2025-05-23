@@ -4,7 +4,7 @@ using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
 using Shared.CinemaDataService.Models.Flags;
 
-namespace GatewayAPIService.Infrastructure.Services.CinemaDataService
+namespace GatewayAPIService.Infrastructure.Services.CinemaService
 {
     public interface ICinemaService
     {

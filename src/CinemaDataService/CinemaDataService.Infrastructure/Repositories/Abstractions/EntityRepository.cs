@@ -71,10 +71,14 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
             var condition = Builders<T>.Filter.Where(query ?? (e => true));
             var notDeleted = Builders<T>.Filter.Where(e => !e.IsDeleted);
 
-            var sortByTimeCreated = Builders<T>.Sort.Descending(e => e.CreatedAt);
-
-            return await _collection.Find(condition & notDeleted).Sort(sortByTimeCreated).FirstOrDefaultAsync(ct);
+            return await FindOne(condition & notDeleted, ct);
         }
+
+        public async Task<T?> FindOne(FilterDefinition<T> condition, CancellationToken ct = default)
+        {
+            return await _collection.Find(condition).FirstOrDefaultAsync(ct);
+        }
+
         public async Task<T?> FindById(string id, CancellationToken ct = default)
         {
             return await FindOne(e => e.Id == id, ct);

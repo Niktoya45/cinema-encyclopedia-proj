@@ -23,7 +23,7 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
             //handle data validation
             StudioRecord productionStudio = _mapper.Map<UpdateCinemaProductionStudioCommand, StudioRecord>(request);
 
-            StudioRecord? updated = await _repository.UpdateProductionStudio(productionStudio, cancellationToken);
+            StudioRecord? updated = await _repository.UpdateProductionStudio(request.CinemaId, productionStudio, cancellationToken);
 
             if (updated == null)
             {

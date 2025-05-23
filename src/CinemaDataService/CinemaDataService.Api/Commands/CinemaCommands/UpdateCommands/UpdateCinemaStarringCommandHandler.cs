@@ -23,7 +23,7 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
             //handle data validation
             Starring starring = _mapper.Map<UpdateCinemaStarringCommand, Starring>(request);
 
-            Starring? updated = await _repository.UpdateStarring(starring, cancellationToken);
+            Starring? updated = await _repository.UpdateStarring(request.CinemaId, starring, cancellationToken);
 
             if (updated == null)
             {

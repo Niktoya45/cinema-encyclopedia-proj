@@ -11,7 +11,7 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.CreateCommands
             string id,
             string name,
             Job jobs,
-            string roleName,
+            string? roleName,
             RolePriority rolePriority,
             string? picture
         ):base(id, name, jobs, roleName, rolePriority, picture)

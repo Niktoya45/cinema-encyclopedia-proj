@@ -204,7 +204,8 @@ namespace UserDataService.Api.Controllers
         /// <param name="cinemaId">existing cinema Id</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
-        /// <response code="400">User is not found</response>
+        /// <response code="400">User or user record is not found</response>
+        [HttpDelete("{userId}/label")]
         [HttpDelete("{userId}/label/{cinemaId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -226,7 +227,8 @@ namespace UserDataService.Api.Controllers
         /// <param name="cinemaId">existing cinema Id</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
-        /// <response code="400">User is not found</response>
+        /// <response code="400">User or user record is not found</response>
+        [HttpDelete("{userId}/rating")]
         [HttpDelete("{userId}/rating/{cinemaId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

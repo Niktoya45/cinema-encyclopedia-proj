@@ -19,8 +19,8 @@ namespace UserDataService.Api.Commands.UserCommands.CreateCommands
         }
         public async Task<LabeledResponse> Handle(CreateLabeledCommand request, CancellationToken cancellationToken)
         {
-            LabeledRecord rating = _mapper.Map<CreateLabeledCommand, LabeledRecord>(request);
-            LabeledRecord? added = await _repository.AddToLabeledList(rating, cancellationToken);
+            LabeledRecord labeled = _mapper.Map<CreateLabeledCommand, LabeledRecord>(request);
+            LabeledRecord? added = await _repository.AddToLabeledList(labeled, cancellationToken);
 
             if (added is null)
             {

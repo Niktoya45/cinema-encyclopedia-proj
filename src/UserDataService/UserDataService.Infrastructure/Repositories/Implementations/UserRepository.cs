@@ -1,5 +1,6 @@
 ﻿
 using Amazon.Auth.AccessControlPolicy;
+using DnsClient;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using UserDataService.Domain.Aggregates.UserAggregate;
@@ -172,14 +173,20 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return found;
         }
 
-        public async Task<LabeledRecord?> DeleteFromCinemaList(LabeledRecord cinema, CancellationToken ct = default)
+        public async Task<IEnumerable<LabeledRecord>?> DeleteFromCinemaList(LabeledRecord cinema, CancellationToken ct = default)
         {
-            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.CinemaId == cinema.CinemaId));
+            bool IsCinemaSpecified = cinema.CinemaId != null;
+
+            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (IsCinemaSpecified ? r.CinemaId == cinema.CinemaId : true));
             var sortByTimeAdded = Builders<LabeledRecord>.Sort.Descending(r => r.AddedAt);
 
-            LabeledRecord found = await _db.LabeledRecords.Find(findIfExists).Sort(sortByTimeAdded).FirstOrDefaultAsync(ct);
+            IEnumerable<LabeledRecord> found = await _db.LabeledRecords.Find(findIfExists).Sort(sortByTimeAdded).ToListAsync();
 
-            var res = await _db.LabeledRecords.DeleteOneAsync(findIfExists, ct);
+            DeleteResult res;
+
+            if (IsCinemaSpecified)
+                res = await _db.LabeledRecords.DeleteOneAsync(findIfExists, ct);
+            else res = await _db.LabeledRecords.DeleteManyAsync(findIfExists, ct);
 
             if (!res.IsAcknowledged)
             {
@@ -189,14 +196,21 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return found;
         }
 
-        public async Task<RatingRecord?> DeleteFromRatingList(RatingRecord rating, CancellationToken ct = default)
+        public async Task<IEnumerable<RatingRecord>?> DeleteFromRatingList(RatingRecord rating, CancellationToken ct = default)
         {
-            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.CinemaId == rating.CinemaId));
+            bool IsCinemaSpecified = rating.CinemaId != null;
+
+            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (IsCinemaSpecified ? r.CinemaId == rating.CinemaId : true));
             var sortByTimeAdded = Builders<RatingRecord>.Sort.Descending(r => r.AddedAt);
+            
 
-            RatingRecord found = await _db.RatingRecords.Find(findIfExists).Sort(sortByTimeAdded).FirstOrDefaultAsync(ct);
+            IEnumerable<RatingRecord> found = await _db.RatingRecords.Find(findIfExists).Sort(sortByTimeAdded).ToListAsync();
 
-            var res = await _db.RatingRecords.DeleteOneAsync(findIfExists, ct);
+            DeleteResult res;
+            
+            if(IsCinemaSpecified)
+                res = await _db.RatingRecords.DeleteOneAsync(findIfExists, ct);
+            else res = await _db.RatingRecords.DeleteManyAsync(findIfExists, ct);
 
             if (!res.IsAcknowledged)
             {

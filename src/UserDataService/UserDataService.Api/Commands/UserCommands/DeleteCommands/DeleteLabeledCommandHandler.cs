@@ -3,12 +3,11 @@ using MediatR;
 using UserDataService.Api.Exceptions.InfrastructureExceptions;
 using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Models.LabeledDTO;
-using UserDataService.Infrastructure.Models.RatingDTO;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 
 namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
 {
-    public class DeleteLabeledCommandHandler : IRequestHandler<DeleteLabeledCommand, LabeledResponse>
+    public class DeleteLabeledCommandHandler : IRequestHandler<DeleteLabeledCommand, IEnumerable<LabeledResponse>>
     {
         IUserRepository _repository;
         IMapper _mapper;
@@ -18,17 +17,17 @@ namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
             _repository = repository;
             _mapper = mapper;
         }
-        public async Task<LabeledResponse> Handle(DeleteLabeledCommand request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LabeledResponse>> Handle(DeleteLabeledCommand request, CancellationToken cancellationToken)
         {
-            LabeledRecord rating = _mapper.Map<DeleteLabeledCommand, LabeledRecord>(request);
-            LabeledRecord? added = await _repository.AddToLabeledList(rating, cancellationToken);
+            LabeledRecord labeled = _mapper.Map<DeleteLabeledCommand, LabeledRecord>(request);
+            IEnumerable<LabeledRecord>? deleted = await _repository.DeleteFromCinemaList(labeled, cancellationToken);
 
-            if (added is null)
+            if (deleted is null)
             {
                 throw new RecordNotFoundException(request.UserId, request.CinemaId, "labeled_records");
             }
 
-            return _mapper.Map<LabeledRecord, LabeledResponse>(added);
+            return _mapper.Map<IEnumerable<LabeledRecord>, IEnumerable<LabeledResponse>>(deleted);
         }
     }
 }
