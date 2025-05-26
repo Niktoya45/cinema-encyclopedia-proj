@@ -1,8 +1,9 @@
-﻿@model EncyclopediaService.Api.Models.Edit.EditMainPerson
+﻿@using EncyclopediaService.Api.Models.Display
+@model EncyclopediaService.Api.Models.Edit.EditMainPerson
 @{
 }
 <div class="container-fluid">
-    <form id="form-modal-edit-main" asp-page-handler="editPerson" method="post">
+    <form id="form-modal-edit-main" asp-page-handler="editPerson" class="trim-inputs" method="post">
         <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
@@ -21,7 +22,7 @@
 
             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
             <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <select asp-for="@Model.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
+                <select class="form-select" asp-for="@Model.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
                 <br>
                 <span asp-validation-for="@Model.Country" class="text-danger"></span>
             </li>

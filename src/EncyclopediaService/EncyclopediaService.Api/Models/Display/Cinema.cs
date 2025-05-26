@@ -1,4 +1,5 @@
-﻿using Humanizer.Localisation;
+﻿using EncyclopediaService.Api.Models.Display;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,13 +8,6 @@ namespace EncyclopediaService.Api.Models
     /*
      * vvv src/Shared/.. vvv
      */
-
-    /**/ public enum Entities
-    { 
-        Cinemas, 
-        Persons,
-        Studios
-    }
     /**/ public enum Genre
     {
         None = 0b_0000_0000_0000_0000,
@@ -42,18 +36,14 @@ namespace EncyclopediaService.Api.Models
         Italian
     }
 
-    /**/ public enum RolePriority { Main, Support, Episodic }
-    /**/ public record Starring { 
-
-        public string? ParentId { get; set; }
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string? Picture { get; set; } 
-
-        public Job Jobs; 
-        public string? RoleName { get; set; }
-        public RolePriority? RolePriority { get; set; }
-    };
+    /**/ public enum RolePriority 
+    {
+        [Display(Name=". . .")]
+        None,
+        Main,
+        Support, 
+        Episodic 
+    }
 
     public class Cinema
     {

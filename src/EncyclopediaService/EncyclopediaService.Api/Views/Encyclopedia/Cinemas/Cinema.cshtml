@@ -3,8 +3,6 @@
 @model EncyclopediaService.Api.Views.Encyclopedia.Cinemas.CinemaModel;
 @{
     ViewData["Title"] = "Cinema";
-
-    string _js_hardcode_trim = "onfocusout=\"this.value = this.value.trim()\"";
 }
 @functions{
     string Star(byte size, float x = 0.0f, float y = 0.0f)
@@ -25,28 +23,48 @@
 <body>
 
     <!-- Edit Main Information Popup -->
-    <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+    <form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
 		<partial name="_EditMain" model="Model.EditMain" />
     </form-popup>
 
     <!-- Edit Film Poster Popup -->
-    <form-popup id="modal-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
-        <partial name="_EditPoster" model="Model.EditPoster" />
+    <form-popup id="modal-edit-poster" form="form-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
+	    <form id="form-edit-poster" asp-page-handler="editPoster" class="trim-inputs" method="post" enctype="multipart/form-data">        
+            <partial name="_EditPoster" model="Model.EditPoster" />
+        </form>
     </form-popup>
 
     <!-- Edit Starring Popup -->
-    <form-popup id="modal-edit-starring" title="Edit starring" size="lg" lock="true" save-close="false" scroll="true">
-        <partial name="_EditStarring" model="Model.EditStarring" />
+    <form-popup id="modal-edit-starring" form="form-edit-starring" title="Edit starring" size="lg" lock="true" save-close="false" scroll="true">
+
+        <div class="container-fluid">
+            <form id="form-edit-starring" asp-page-handler="editStarring" class="trim-inputs" method="post">
+				<partial name="_AddStarring" model="Model.EditStarring" />
+            </form>
+        </div>
+
     </form-popup>
 
     <!-- Add Studio Popup -->
-    <form-popup id="modal-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
-        <partial name="_AddStudio" model="Model.NewProductionStudio" />
+    <form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+
+        <div class="container-fluid">
+	        <form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
+                <partial name="_AddStudio" model="Model.EditStudio" />
+            </form>
+        </div>
+
     </form-popup>
 
     <!-- Add Starring Popup -->
-    <form-popup id="modal-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
-        <partial name="_AddStarring" model="Model.EditStarring" />
+    <form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
+        
+        <div class="container-fluid">
+            <form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
+				<partial name="_AddStarring" model="Model.EditStarring" />
+			</form>
+        </div>
+
     </form-popup>
 
 
@@ -252,7 +270,7 @@
                             {
                                 @foreach (var studio in Model.Cinema.ProductionStudios)
                                 {
-									<div class="col-6 mb-2 position-relative">
+									<div id="@studio.Id" class="col-6 mb-2 position-relative">
                                         <a href="/encyclopedia/studios/@studio.Id">
 
                                             <img src=@(studio.Picture) class="img-fluid" style="width:fit-content;height:fit-content"
@@ -325,7 +343,7 @@
             </ul>
 
             <!-- Carousel Block -->
-            <div class="row" style="block-size:350px">
+            <div class="row carousel-row">
                 @if (Model.Cinema.Starrings != null)
                 {
                     <div id="carousel-starrings" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
@@ -335,7 +353,7 @@
                         <div class="col-10 offset-1">
                             <div class="carousel-inner">
                                 @{
-                                    int k = 6;
+                                    int k = 5;
                                     int m = Model.Cinema.Starrings.Length / k;
                                     int L = m * k;
                                 }
@@ -351,8 +369,10 @@
                                                     break;
                                                 }
 
-                                                <div class="col">
+                                                <div id="@Model.Cinema.Starrings[j].Id" class="col">
+		                    <form id="update-edit-starring-@Model.Cinema.Starrings[j].Id"  asp-page-handler="ReuseEditStarring"  method="post">
 							<partial name="_StarringCard" model="Model.Cinema.Starrings[j]" />
+                            </form>
                                                 </div>
                                             }
                                         </div>

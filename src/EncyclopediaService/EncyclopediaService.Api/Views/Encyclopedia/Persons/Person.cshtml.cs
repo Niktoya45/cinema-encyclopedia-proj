@@ -1,7 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using EncyclopediaService.Api.Extensions;
-using EncyclopediaService.Api.Models;
+using EncyclopediaService.Api.Models.Display;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;

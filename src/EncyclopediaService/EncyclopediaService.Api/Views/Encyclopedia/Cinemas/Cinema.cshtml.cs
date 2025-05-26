@@ -5,6 +5,7 @@ using EncyclopediaService.Api.Extensions;
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -19,14 +20,15 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         [BindProperty]
         public Cinema? Cinema { get; set; } = default!;
 
-        [BindProperty]
-        public StudioRecord NewProductionStudio { get; set; } = default!;
 
         [BindProperty]
         public EditMainCinema? EditMain { get; set; }
 
         [BindProperty]
         public EditStarring? EditStarring { get; set; } = default!;
+
+        [BindProperty]
+        public EditStudio EditStudio { get; set; } = default!;
 
         [BindProperty]
         public EditImage? EditPoster { get; set; }
@@ -86,7 +88,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             EditStarring = new EditStarring { Picture = _settings.DefaultSmallPersonPicture };
 
-            NewProductionStudio = new StudioRecord { ParentId = Cinema.Id, Id = "", Name = "", Picture = _settings.DefaultSmallLogoPicture };
+            EditStudio = new EditStudio { Id = "", Name = "", Picture = _settings.DefaultSmallLogoPicture };
 
             return Page();
         }
@@ -102,9 +104,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             if (EditMain != null) 
             {
                 Cinema.Id = id;
-                Cinema.Name = EditMain.Name.Trim();
                 Cinema.Genres = EditMain.GenresBind.Aggregate((acc, g) => acc | g);
-                Cinema.Description = EditMain.Description == null? null : EditMain.Description.Trim();
 
                 //var response = _gateway.UpdateCinema(Cinema); 
                 //return Ok(response);
@@ -141,7 +141,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
                 await _imageService.AddImage(HashName, EditPoster.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
-            else if(EditPoster.ImageId != HashName) {
+            else if(EditPoster.ImageId != HashName) 
+            {
                 // if cinema already has an image
 
                 await _imageService.ReplaceImage(EditPoster!.ImageId, HashName, EditPoster.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
@@ -186,10 +187,10 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             return await OnGet(id);
         }
 
-        public IActionResult OnPostReuseEditStarringPartial()
+        public IActionResult OnPostReuseEditStarring()
         {
             EditStarring!.JobsBind = new List<Job>();
-            return Partial("_EditStarring", EditStarring);
+            return Partial("_AddStarring", EditStarring);
 
         }
 

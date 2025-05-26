@@ -7,18 +7,22 @@
 <body>
 
     <!-- Edit Main Information Popup -->
-    <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+    <form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
         <partial name="_EditMain" model="Model.EditMain" />
     </form-popup>
 
     <!-- Edit Studio Picture Popup -->
-    <form-popup id="modal-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
-        <partial name="_EditPicture" model="Model.EditLogo" />
+    <form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
+        <form id="form-edit-picture" asp-page-handler="editLogo" class="trim-inputs" method="post" enctype="multipart/form-data">
+            <partial name="_EditPicture" model="Model.EditLogo" />
+        </form>
     </form-popup>
 
     <!-- Add Filmography Popup -->
-    <form-popup id="modal-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
-        <partial name="_AddFilm" model="Model.NewFilmography" />
+    <form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
+        <form id="form-add-filmography" asp-page-handler="addFilmography" class="trim-inputs" method="post">
+            <partial name="_AddFilm" model="Model.NewFilmography" />
+        </form>
     </form-popup>
 
 
@@ -147,7 +151,7 @@
             </ul>
 
             <!-- Carousel Block -->
-            <div class="row" style="block-size:350px">
+            <div class="row carousel-row">
                 @if (Model.Studio.Filmography != null)
                 {
                     <div id="carousel-filmography" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
@@ -158,7 +162,7 @@
                             <div class="carousel-inner">
                                 @{
                                     const int r = 2;
-                                    const int c = 6;
+                                    const int c = 5;
                                     int k = r * c;
                                     int m = Model.Studio.Filmography.Length / k;
                                     int L = m * k;
@@ -175,8 +179,10 @@
                                                 {
                                                     break;
                                                 }
-                                                <div class="col">
+                                                <div id="@Model.Studio.Filmography[j].Id" class="col">
+                                                    <form id="update-edit-filmography-@Model.Studio.Filmography[j].Id" method="post">
                                                     <partial name="_FilmCard" model="Model.Studio.Filmography[j]" />
+                                                    </form>
                                                 </div>
                                             }
                                         </div>

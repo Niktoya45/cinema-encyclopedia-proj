@@ -29,6 +29,10 @@ namespace GatewayAPIService.Infrastructure.Services.StudioService
         {
             return await _httpClient.GetFromJsonAsync<StudioResponse>(Url + $"/{id}");
         }
+        public async Task<FilmographyResponse?> GetFilmographyById(string studioId, string filmographyId, CancellationToken ct)
+        {
+            return await _httpClient.GetFromJsonAsync<FilmographyResponse>(Url + $"{studioId}/filmography/{filmographyId}");
+        }
         public async Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null)
         {
             return await _httpClient.GetFromJsonAsync<IEnumerable<SearchResponse>>(Url + $"/search/{search}?" + SortPaginate(null, pg));
@@ -77,7 +81,7 @@ namespace GatewayAPIService.Infrastructure.Services.StudioService
         }
         public async Task<FilmographyResponse?> UpdateFilmography(string? studioId, string filmographyId, UpdateFilmographyRequest filmography, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync<UpdateFilmographyRequest>(Url + $"/{studioId}/filmography/{filmographyId}", filmography, ct);
+            var response = await _httpClient.PutAsJsonAsync<UpdateFilmographyRequest>(Url + (studioId == null ? "" : $"/{studioId}") + $"/filmography/{filmographyId}", filmography, ct);
 
             return await response.Content.ReadFromJsonAsync<FilmographyResponse>();
         }

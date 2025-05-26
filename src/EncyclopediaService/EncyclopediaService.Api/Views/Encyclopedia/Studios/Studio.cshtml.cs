@@ -1,11 +1,11 @@
 using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
-using EncyclopediaService.Api.Models;
 using EncyclopediaService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using EncyclopediaService.Api.Extensions;
 using Shared.ImageService.Models.Flags;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
 {

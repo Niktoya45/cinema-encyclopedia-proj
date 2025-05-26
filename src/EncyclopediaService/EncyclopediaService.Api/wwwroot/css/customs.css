@@ -219,3 +219,72 @@
     stroke-width: 3;
     fill: none;
 }
+
+.starring-card,
+.studio-card,
+.film-card {
+    width: auto;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.studio-card{
+    border-radius: 1rem 1rem;
+}
+
+.starring-card a:has(img),
+.studio-card a:has(img),
+.film-card a:has(img) {
+    width: auto;
+    padding: 0.5rem;
+}
+
+.starring-card a img,
+.film-card a img,
+.studio-card a img {
+    border-radius: 0.5rem 1rem;
+}
+
+.starring-card .card-body > *,
+.film-card .card-body > *,
+.studio-card .card-body > *{
+    max-width: 15rem;
+    margin-right: -1rem;
+}
+
+.starring-card .dropdown,
+.film-card .dropdown,
+.studio-card .dropdown {
+    min-width: 1rem;
+    margin-left: 1rem;
+}
+
+.add-cinema-starrings,
+.add-cinema-filmography,
+.add-cinema-studios {
+    overflow-y: scroll;
+    background-color: #dddddd;
+    padding: 0rem 0.5rem;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+
+.add-cinema-starrings .add-starring,
+.add-cinema-studios .add-studio,
+.add-cinema-filmography .add-film
+{
+    margin: 0.5rem 0rem;
+}
+
+.add-cinema-starrings::-webkit-scrollbar,
+.add-cinema-studios::-webkit-scrollbar,
+.add-cinema-filmography::-webkit-scrollbar{ /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+.carousel-row {
+    padding:1rem 0.5rem;
+    min-block-size: 22rem;
+}

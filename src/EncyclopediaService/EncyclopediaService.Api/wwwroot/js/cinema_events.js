@@ -1,4 +1,60 @@
-﻿// show close buttons
+﻿
+updateFormEditStarring = function (ref) {
+
+    ref.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        var formElement = document.getElementById("update-" + e.currentTarget.id);
+        const formData = new URLSearchParams();
+
+        for (const kv of new FormData(formElement)) {
+            formData.append(kv[0], kv[1]);
+        }
+
+        fetch(formElement.action,
+            {
+                method: "POST",
+                body: formData
+            })
+            .then((response) => {
+
+                return response.text();
+            })
+            .then((result) => {
+
+                var content = document.getElementById('form-edit-starring');
+
+                content.innerHTML = result;
+
+                updateFormStarringDependency(content);
+            });
+
+    });
+
+}
+
+updateFormStarringDependency = function (form) {
+    var editJobsCheckbox = form.querySelector("#starring-jobs_8");
+
+    const isActor = editJobsCheckbox.checked;
+    var inputsJobsDependant = form.querySelectorAll(".jobs-dependant");
+
+    if (!isActor) {
+        inputsJobsDependant.forEach(function (input) {
+            input.disabled = true;
+        });
+    }
+
+    editJobsCheckbox.addEventListener('click', function (e) {
+        inputsJobsDependant.forEach(function (input) {
+            input.disabled = !jobsCheckbox.checked;
+        });
+    });
+}
+
+
+// show close buttons
 
 var refs = document.querySelectorAll(".dropdown-menu .show-close-buttons");
 
@@ -26,10 +82,10 @@ refs.forEach(ref => {
 
 // disable | enable fields which depend on jobs field
 
-var addJobsCheckbox = document.getElementById("add-starring-jobs_8");
+var addJobsCheckbox = document.querySelector("#form-add-starring #starring-jobs_8");
 
 addJobsCheckbox.addEventListener('click', function (e) {
-    var inputsJobsDependant = document.querySelectorAll("#inner-modal-add-starring .jobs-dependant");
+    var inputsJobsDependant = document.querySelectorAll("#form-add-starring .jobs-dependant");
 
     inputsJobsDependant.forEach(function (input) {
         input.disabled = !e.currentTarget.checked;
@@ -39,59 +95,11 @@ addJobsCheckbox.addEventListener('click', function (e) {
 
 // update content of starring edit partial
 
-var refsEditStarring = document.querySelectorAll(".dropdown-menu .dropdown-reuse-edit-starring");
+var refsEditStarring = document.querySelectorAll(".dropdown-menu .dropdown-edit-starring");
 
 refsEditStarring.forEach(function (ref) {
 
-    ref.addEventListener('click', function (e) {
-
-        e.preventDefault();
-
-        var formElement = document.getElementById("update-" + e.currentTarget.id);
-        const formData = new URLSearchParams();
-
-        for (const kv of new FormData(formElement)) {
-            formData.append(kv[0], kv[1]);
-        }
-
-        fetch(window.location.href + '?handler=ReuseEditStarringPartial',
-            {
-                method: "POST",
-                body: formData
-            })
-            .then((response) => {
-
-                return response.text();
-            })
-            .then((result) => {
-
-                var content = document.getElementById('inner-modal-edit-starring');
-
-                content.innerHTML = result;
-
-                var editJobsCheckbox = content.querySelector("#edit-starring-jobs_8");
-
-                const isActor = editJobsCheckbox.checked;
-
-                if (!isActor)
-                {
-                    var inputsJobsDependant = content.querySelectorAll(".jobs-dependant");
-
-                    inputsJobsDependant.forEach(function (input) {
-                        input.disabled = true;
-                    });
-                }
-
-                editJobsCheckbox.addEventListener('click', function (e) {
-                    var inputsJobsDependant = document.querySelectorAll("#inner-modal-edit-starring .jobs-dependant");
-
-                    inputsJobsDependant.forEach(function (input) {
-                        input.disabled = !e.currentTarget.checked;
-                    });
-                });
-            });
-
-    });
+    updateFormEditStarring(ref);
 });
 
 // display hint choices forcstarring search field
@@ -103,7 +111,7 @@ var searchStarring = document.getElementById("search-starring");
 searchStarring.addEventListener("input", function (e) {
     let inputValue = this.value.toLowerCase();
     let suggestionsList = document.getElementById("suggestions-starring");
-    var inputsNameDependant = document.querySelectorAll("#inner-modal-add-starring .name-dependant")
+    var inputsNameDependant = document.querySelectorAll("#form-add-starring .name-dependant")
 
     suggestionsList.innerHTML = "";
     suggestionsList.style.visibility = "visible";

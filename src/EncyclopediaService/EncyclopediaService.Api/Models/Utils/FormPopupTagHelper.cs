@@ -9,6 +9,7 @@ namespace EncyclopediaService.Api.Models.Utils
         public string Id { get; set; }
         public string? Title { get; set; }
         public string? Size { get; set; } 
+        public string? Form { get; set; }
         public bool Lock { get; set; }
         public bool Scroll { get; set; }
 
@@ -35,7 +36,7 @@ namespace EncyclopediaService.Api.Models.Utils
             output.PostContent.SetHtmlContent(
                 $@"</div>
                           <div class=""modal-footer"">
-                            <button type=""submit"" class=""btn btn-secondary"" form=""form-{Id}"" data-bs-target=""{Id}"" {(SaveClose ? @"data-bs-dismiss=""modal""" : "")}>
+                            <button {(Form != null ? $@"id=""submit-{Form}"" form={Form}" : "")} type=""submit"" class=""btn btn-secondary"" data-bs-target=""{Id}"" {(SaveClose ? @"data-bs-dismiss=""modal""" : "")}>
                                 Save
                             </button>
                           </div>

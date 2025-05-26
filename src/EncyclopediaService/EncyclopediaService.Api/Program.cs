@@ -3,6 +3,8 @@ using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;
 using EncyclopediaService.Api.Models.Sort;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Options;
 
 namespace EncyclopediaService.Api
 {
@@ -37,6 +39,11 @@ namespace EncyclopediaService.Api
                         opts.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
                     }
                 );
+
+            builder.Services.Configure<RazorViewEngineOptions>(opts =>
+            {
+                opts.PageViewLocationFormats.Add("/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+            });
 
             builder.Services.AddSingleton<UISettings>(provider => 
             {

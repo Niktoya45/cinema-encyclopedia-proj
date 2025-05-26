@@ -1,4 +1,4 @@
-﻿namespace EncyclopediaService.Api.Models
+﻿namespace EncyclopediaService.Api.Models.Display
 {
     public class PersonRecord
     {

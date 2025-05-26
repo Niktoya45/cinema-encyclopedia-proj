@@ -12,6 +12,7 @@ using GatewayAPIService.Infrastructure.Services.CinemaService;
 using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
 using GatewayAPIService.Infrastructure.Services.ImageService;
+using GatewayAPIService.Infrastructure.Extensions;
 
 namespace GatewayAPIService.Api.Controllers
 {
@@ -547,8 +548,6 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdateCinemaRequest request
             )
         {
-            CinemaResponse? responseCompare = await _cinemaService.GetById(id, ct);
-
             CinemaResponse? response = await _cinemaService.Update(id, request, ct);
 
             if (response is null)
@@ -561,26 +560,27 @@ namespace GatewayAPIService.Api.Controllers
                 response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
             }
 
+            UpdateFilmographyRequest? updateRecord = new UpdateFilmographyRequest
+            {
+                Name = response.Name,
+                Year = response.ReleaseDate.Year,
+                Picture = response.Picture
+            };
+
+            FilmographyResponse? compareRecord = null;
+
+            bool? filmographyCommonsEquals = null;
+
+
             if (response.Starrings != null)
             {
-                UpdateFilmographyRequest? updateRecord = new UpdateFilmographyRequest
-                {
-                    Name = response.Name,
-                    Year = response.ReleaseDate.Year,
-                    Picture = response.Picture
-                };
+                compareRecord ??= await _personService.GetFilmographyById(response.Starrings.FirstOrDefault().Id, id, ct);
 
-                bool filmographyHashEquals = new UpdateFilmographyRequest
-                {
-                    Name = responseCompare!.Name,
-                    Year = responseCompare!.ReleaseDate.Year,
-                    Picture = responseCompare!.Picture
-                }.GetHashCode() == updateRecord.GetHashCode();
+                filmographyCommonsEquals ??= updateRecord.SameCommons(compareRecord);
 
                 foreach (StarringResponse starring in response.Starrings)
                 {
-
-                    if (!filmographyHashEquals)
+                    if (!filmographyCommonsEquals.GetValueOrDefault())
                     {
                         await _personService.UpdateFilmography(
                             starring.Id,
@@ -599,24 +599,14 @@ namespace GatewayAPIService.Api.Controllers
             if (response.ProductionStudios != null)
             {
 
-                UpdateFilmographyRequest? updateRecord = new UpdateFilmographyRequest
-                {
-                    Name = response.Name,
-                    Year = response.ReleaseDate.Year,
-                    Picture = response.Picture
-                };
+                compareRecord ??= await _personService.GetFilmographyById(response.Starrings.FirstOrDefault().Id, id, ct);
 
-                bool filmographyHashEquals = new UpdateFilmographyRequest
-                {
-                    Name = responseCompare!.Name,
-                    Year = responseCompare!.ReleaseDate.Year,
-                    Picture = responseCompare!.Picture
-                }.GetHashCode() == updateRecord.GetHashCode();
+                filmographyCommonsEquals ??= updateRecord.SameCommons(compareRecord);
 
                 foreach (ProductionStudioResponse studio in response.ProductionStudios)
                 {
 
-                    if (!filmographyHashEquals)
+                    if (!filmographyCommonsEquals.GetValueOrDefault())
                     {
                         await _studioService.UpdateFilmography(
                         studio.Id,
@@ -631,6 +621,7 @@ namespace GatewayAPIService.Api.Controllers
                     }
                 }
             }
+
 
 
             return Ok(response);

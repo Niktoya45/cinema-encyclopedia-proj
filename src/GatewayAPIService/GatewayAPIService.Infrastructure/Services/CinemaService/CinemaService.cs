@@ -32,6 +32,14 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         {
             return await _httpClient.GetFromJsonAsync<CinemaResponse>(Url+$"/{id}", ct);
         }
+        public async Task<StarringResponse?> GetStarringById(string cinemaId, string starringId, CancellationToken ct) 
+        {
+            return await _httpClient.GetFromJsonAsync<StarringResponse>(Url+$"{cinemaId}/starrings/{starringId}");
+        }
+        public async Task<ProductionStudioResponse?> GetProductionStudioById(string cinemaId, string studioId, CancellationToken ct)
+        {
+            return await _httpClient.GetFromJsonAsync<ProductionStudioResponse>(Url + $"{cinemaId}/production-studios/{studioId}");
+        }
         public async Task<Page<CinemasResponse>?> GetByIds(string[] ids, CancellationToken ct, Pagination? pg = null) 
         {
             var response = await _httpClient.PostAsJsonAsync(Url + "/indexes?" + SortPaginate(null, pg), ids, ct);
@@ -105,9 +113,9 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
 
             return await response.Content.ReadFromJsonAsync<UpdateRatingResponse?>();
         }
-        public async Task<ProductionStudioResponse?> UpdateProductionStudio(string studioId, UpdateProductionStudioRequest studio, CancellationToken ct)
+        public async Task<ProductionStudioResponse?> UpdateProductionStudio(string? cinemaId, string studioId, UpdateProductionStudioRequest studio, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(Url + $"/production-studios/{studioId}", studio, ct);
+            var response = await _httpClient.PutAsJsonAsync(Url + (cinemaId == null ? "" : $"/{cinemaId}") + $"/production-studios/{studioId}", studio, ct);
 
             return await response.Content.ReadFromJsonAsync<ProductionStudioResponse?>();
         }

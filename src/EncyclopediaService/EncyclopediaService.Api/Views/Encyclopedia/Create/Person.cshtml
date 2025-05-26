@@ -1,0 +1,150 @@
+﻿@page
+@using EncyclopediaService.Api.Models.Display;
+@model EncyclopediaService.Api.Views.Encyclopedia.Create.CreatePersonModel
+@{
+}
+@section scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
+
+<body>
+
+	<!-- Add Filmography Popup -->
+	<form id="form-add-filmography" asp-page-handler="addFilm" class="trim-inputs" method="post">
+		<form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new filmography" size="lg" lock="true" save-close="false" scroll="false">
+			<div class="container-fluid">
+				<partial name="_AddFilm" model="Model.AddFilm" />
+			</div>
+		</form-popup>
+	</form>
+
+	<div class="container-fluid">
+		<form id="form-add-cinema" class="trim-inputs" asp-page-handler="addPerson" method="post">
+
+			<div class="row">
+
+				<div class="col-md-3 offset-1">
+					<div class="row">
+						<img src=@(Model.Person.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Picture Image">
+					</div>
+
+					<!-- Add Person Picture -->
+					<div class="row">
+						<partial name="_EditPicture" model="Model.AddPicture" />
+					</div>
+				</div>
+
+				<div class="col-md-7">
+
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
+						<li class="list-group-item mb-4  fs-6">
+							<input class="form-control" asp-for="@Model.Person.Name" value="@Model.Person.Name" type="text" />
+							<br>
+							<span asp-validation-for="@Model.Person.Name" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
+						<li class="list-group-item mb-4  fs-6">
+							<input type="date" class="form-control" asp-for="@Model.Person.BirthDate" value="@(DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"))" />
+							<br>
+							<span asp-validation-for="@Model.Person.BirthDate" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
+						<li class="list-group-item mb-4  fs-6">
+							<select class="form-select" asp-for="@Model.Person.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
+							<br>
+							<span asp-validation-for="@Model.Person.Country" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Occupations</li>
+						<li class="list-group-item mb-4  fs-6">
+
+							<div class="row row-cols-3">
+
+								@foreach (int job in Enum.GetValues(typeof(Job)))
+								{
+									@if (job == 0)
+									{
+										continue;
+									}
+									<div class="col-4 ps-0 pe-0">
+										<input id="jobs_@job" type="checkbox" name="Person.JobsBind" value="@job" @(((Model.Person.Jobs & (Job)job) != 0) ? "checked" : "") />
+										<label for="jobs_@job" class="fs-5">@((Job)job)</label>
+									</div>
+								}
+
+							</div>
+							<span asp-validation-for="@Model.Person.JobsBind" class="text-danger"></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="col-md-10 offset-1">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Biography</li>
+						<li class="list-group-item mb-4  fs-6">
+							<textarea class="form-control" asp-for="@Model.Person.Description" style="width:100%;margin-left:-1rem;margin-right:-2rem"></textarea>
+						</li>
+					</ul>
+
+					<!-- Add Filmography -->
+					<div class="row">
+						<div class="row">
+							<ul class="list-group list-group-flush pe-0">
+								<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
+									<div class="row">
+
+										<div class="col-md-11">
+											<span>Filmography</span>
+										</div>
+
+										<div class="col-md-1">
+											<button id="button-add-filmography" data-bs-target="#modal-add-filmography" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+												<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+													<line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
+													<line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
+												</svg>
+											</button>
+										</div>
+									</div>
+
+								</li>
+							</ul>
+						</div>
+
+
+						<div class="row">
+
+							<div class="col">
+
+								<div id="filmography" class="add-cinema-filmography row row-cols-5 mb-3">
+								</div>
+							</div>
+
+						</div>
+
+
+					</div>
+
+				</div>
+			</div>
+
+			<hr/>
+
+			<div class="d-flex justify-content-end">
+				<button type="submit" class="btn btn-secondary w-25"> Save </button>
+			</div>
+
+		</form>
+	</div>
+
+
+
+	<script src="~/js/cinema_create_events.js" asp-append-version="true"></script>
+
+</body>

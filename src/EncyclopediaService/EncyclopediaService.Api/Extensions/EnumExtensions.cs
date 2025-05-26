@@ -1,4 +1,5 @@
 ﻿using EncyclopediaService.Api.Models;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Extensions
 {

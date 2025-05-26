@@ -11,6 +11,7 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
         /* Get Requests For Person */
         Task<Page<PersonsResponse>?> Get(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<PersonResponse?> GetById(string id, CancellationToken ct);
+        Task<FilmographyResponse?> GetFilmographyById(string personId, string filmographyId, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetByJobs(Job jobs, CancellationToken ct, SortBy? st = null, Pagination? pg = null);

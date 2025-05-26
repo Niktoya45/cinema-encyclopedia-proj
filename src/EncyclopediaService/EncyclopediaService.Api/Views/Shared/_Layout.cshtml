@@ -19,14 +19,8 @@
                 </button>
                 <div class="navbar-collapse collapse hstack d-sm-inline-flex align-items-center">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/encyclopedia/cinemas/all/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/encyclopedia/cinemas/all/">Privacy</a>
-                        </li>
 
-						<li class="nav-item ms-4">
+						<li class="nav-item" style="margin-left:5rem;">
 							<div class="input-group">
 								<a class="input-group-text nav-link text-black-50" style="border-radius:10% 0 0 10%" href="#">Search</a>
 							</div>
@@ -49,18 +43,51 @@
                             <input id="search" class="form-control ms-2 rounded-2" type="text" style="width:40rem" placeholder=" . . . " />
                         </li>
 
-                        <li class="nav-item ms-auto">
-                            <a id="account" data-bs-toggle="offcanvas" href="#account-options" aria-controls="account-options">
-                                <div class="input-group">
-                                    <span id="account-name" class="nav-link fs-6"> Account </span>
-									<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
-										<circle cx="22" cy="43" r="21" />
-										<circle cx="21" cy="15" r="12" />
-										<line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
-									</svg>
-                                </div>
+                        <li class="nav-item ms-auto me-3">
+							<div class="dropdown d-flex vstack" style="width:12rem;height:auto">
+								<button id="account" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+									<div class="input-group">
+										<span id="account-name" class="nav-link fs-6"> Account </span>
+										<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
+											<circle cx="22" cy="43" r="21" />
+											<circle cx="21" cy="15" r="12" />
+											<line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
+										</svg>
+									</div>
 
-                            </a>
+								</button>
+
+
+                                <ul id="account-options" class="dropdown-menu dropdown-menu-end box-shadow bg-dark flex-grow-1 mb-2" aria-labelledby="account">
+									<li class="nav-item">
+										<a class="nav-link" href="https://localhost:7236/profiles/3">Profile</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link">Marked</a>
+									</li>
+                                    <li class="nav-item vstack d-flex align-items-start">
+										<a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" 
+                                           aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
+
+										<div class="collapse" id="account-options-page">
+                                            <ul class="vstack">
+                                                @foreach (Entity entity in Enum.GetValues(typeof(Entity)))
+                                                {
+                                                    <li class="nav-item">
+                                                        <a href="/encyclopedia/create/@(entity.ToString().ToLower())" class="nav-link">@(entity)</a>
+                                                    </li>
+                                                }
+                                            </ul>
+
+										</div>
+									</li>
+									<li><hr class="dropdown-divider"></li>
+									<li class="nav-item pt-5">
+										<a class="nav-link">Logout</a>
+									</li>
+								</ul>
+                            </div>
+
                         </li>
                     </ul>
 
@@ -72,47 +99,6 @@
         <main role="main" class="pb-2">
             @RenderBody()
         </main>
-
-		<div class="offcanvas offcanvas-end box-shadow bg-dark" tabindex="-1" id="account-options" aria-labelledby="account-optionsLabel" style="height:100%;width:15%;">
-            <div class="offcanvas-header bg-dark">
-                <h5 id="account-optionsLabel" class="text-muted">Options</h5>
-            </div>
-            <div class="offcanvas-body bg-dark mb-3">
-                <div class="navbar-dark bg-dark h-100">
-                    <div class="vstack align-items-center h-100">
-                        <ul class="navbar-nav flex-grow-1 w-100 mb-2" style="height:80%">
-                            <li class="nav-item">
-                                <a class="nav-link" href="https://localhost:7236/profiles/3">Profile</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link">Marked</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
-
-                                <div class="collapse" id="account-options-page">
-                                    <div class="card card-body bg-dark">
-                                        <ul class="navbar-nav">
-                                            @foreach (int entity in Enum.GetValues(typeof(Entities)))
-                                            { 
-                                                <li class="nav-item">
-                                                    <a class="nav-link">@((Entities)entity)</a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <ul class="navbar-nav flex-grow-1 mt-auto w-100 mb-2">
-                            <li class="nav-item">
-                                <a class="nav-link">Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <footer class="border-top footer text-muted">

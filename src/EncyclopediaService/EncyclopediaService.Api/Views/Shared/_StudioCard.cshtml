@@ -1,19 +1,22 @@
-﻿@using EncyclopediaService.Api.Models.Display
-@model CinemaRecord
+﻿@using EncyclopediaService.Api.Models.Display;
+@using EncyclopediaService.Api.Extensions;
+@model StudioRecord
 @{
 }
 
-<div class="card film-card mb-4">
+
+<div class="card studio-card mb-4">
 	<div class="row">
 		<div class="col-md-auto">
 
 			<div class="d-flex">
-				<a href="/encyclopedia/cinemas/@Model.Id">
-					<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+
+				<a href="/encyclopedia/persons/@Model.Id">
+					<img src=@(Model.Picture) style="width:130px;height:130px" alt="@(Model.Name)">
 				</a>
 
 				<div class="dropdown">
-					<button id="dropdown-filmography" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+					<button id="dropdown-studio" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
 						<svg width="7" height="20" xmlns="http://www.w3.org/2000/svg">
 							<circle cx="4" cy="4" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
 							<circle cx="4" cy="10" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
@@ -21,12 +24,13 @@
 						</svg>
 					</button>
 
-					<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-filmography">
+					<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-studio">
+
 						@if (Model.ParentId is null)
 						{
 							<li>
-								<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id"
-										data-bs-target="#modal-delete-filmography" data-bs-toggle="modal" href="#">
+								<button class="dropdown-item dropdown-delete-studio" value="@Model.Id"
+								data-bs-target="#modal-delete-studio" data-bs-toggle="modal" href="#">
 									Delete
 								</button>
 							</li>
@@ -35,25 +39,24 @@
 						else
 						{
 							<li>
-								<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id">
+								<button class="dropdown-item dropdown-delete-studio" value="@Model.Id">
 									Delete
 								</button>
 							</li>
 						}
+
+
 					</ul>
 				</div>
 
 			</div>
-
 		</div>
-
 	</div>
 
 	@if (Model.ParentId is null)
 	{
 		<input type="hidden" asp-for="Id" value="@Model.Id" />
 		<input type="hidden" asp-for="Name" value="@Model.Name" />
-		<input type="hidden" asp-for="Year" value="@Model.Year" />
 		<input type="hidden" asp-for="Picture" value="@Model.Picture" />
 	}
 	else
@@ -61,21 +64,19 @@
 		<input type="hidden" name="@(Model.ParentId).Index" value="@Model.Id" />
 		<input type="hidden" name="@(Model.ParentId)[@Model.Id].Id" value="@Model.Id" />
 		<input type="hidden" name="@(Model.ParentId)[@Model.Id].Name" value="@Model.Name" />
-		<input type="hidden" name="@(Model.ParentId)[@Model.Id].Year" value="@Model.Year" />
 		<input type="hidden" name="@(Model.ParentId)[@Model.Id].Picture" value="@Model.Picture" />
 	}
 
-		<div class="card-body border-bottom" style="padding-bottom:1rem;">
-			<div class="text-truncate">
-				<h6 class="card-text fw-normal text-truncate">
-					<a href="/encyclopedia/cinemas/@Model.Id" class="text-decoration-none link-dark">@Model.Name</a>
-				</h6>
-			</div>
-			<div class="text-wrap">
-				<div class="row">
-					<div class="col-6 offset-6">@Model.Year</div>
-				</div>
+	<div class="card-body border-bottom" style="padding-bottom:1rem;">
+		<div class="text-truncate">
+			<h6 class="card-text fw-normal text-truncate">
+				<a href="/encyclopedia/persons/@Model.Id" class="text-decoration-none link-dark">@Model.Name</a>
+			</h6>
+		</div>
+		<div class="text-wrap">
+			<div class="row">
+				<div class="col-9 offset-3">@Model.Name</div>
 			</div>
 		</div>
-
+	</div>
 </div>

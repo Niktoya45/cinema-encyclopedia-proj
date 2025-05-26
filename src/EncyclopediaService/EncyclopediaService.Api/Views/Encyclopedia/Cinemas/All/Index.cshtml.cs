@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using EncyclopediaService.Api.Models;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
 {

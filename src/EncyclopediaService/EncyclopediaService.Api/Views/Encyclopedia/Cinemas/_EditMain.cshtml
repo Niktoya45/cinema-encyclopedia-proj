@@ -3,8 +3,9 @@
 }
 
 <div class="container-fluid">
-    <form id="form-modal-edit-main" asp-page-handler="editCinema" method="post">
+    <form id="form-edit-main" asp-page-handler="editCinema" class="trim-inputs" method="post">
         <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
             <li class="list-group-item mb-4 border-bottom border-info fs-6">
@@ -22,7 +23,7 @@
 
             <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Language of origin</li>
             <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <select asp-for="@Model.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+                <select class="form-select" asp-for="@Model.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
                 <br>
                 <span asp-validation-for="@Model.Language" class="text-danger"></span>
             </li>

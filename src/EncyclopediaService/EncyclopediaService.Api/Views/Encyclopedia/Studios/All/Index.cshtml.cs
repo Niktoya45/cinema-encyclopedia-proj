@@ -1,10 +1,10 @@
-﻿using EncyclopediaService.Api.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
 {

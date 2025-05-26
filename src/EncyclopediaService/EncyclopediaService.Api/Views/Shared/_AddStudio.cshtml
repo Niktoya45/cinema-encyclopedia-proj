@@ -1,16 +1,17 @@
-﻿@model StudioRecord
+﻿@using EncyclopediaService.Api.Models.Edit
+@model EditStudio
 @{
 }
+
+<input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
+<input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
 
 <div class="row">
     <div class="col-6">
         <img src="@(Model.Picture)" style="width:fit-content"/>
     </div>
 	<div class="col-6">
-            <form id="form-modal-add-studio" asp-page-handler="addProductionStudio" method="post">
-            <input type="hidden" asp-for="@(Model.ParentId)" value="@(Model.ParentId)">
-            <input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
-            <input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
+
 			    <ul class="list-group list-group-flush">
 				<li class="list-group-item form-group">
 						<label asp-for="Name">Provide name</label>
@@ -21,6 +22,5 @@
 						<span asp-validation-for="Name" class="text-danger"></span>
 					</li>
 			    </ul>
-			</form>
     </div>
 </div>

@@ -11,6 +11,8 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         /* Get Requests For Cinema */
         Task<Page<CinemasResponse>?> Get(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<CinemaResponse?> GetById(string id, CancellationToken ct);
+        Task<StarringResponse?> GetStarringById(string cinemaId, string starringId, CancellationToken ct);
+        Task<ProductionStudioResponse?> GetProductionStudioById(string cinemaId, string studioId, CancellationToken ct);
         Task<Page<CinemasResponse>?> GetByIds(string[] ids, CancellationToken ct, Pagination? pg = null);
         Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<CinemasResponse>?> GetByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
@@ -33,7 +35,7 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         Task<CinemaResponse?> Update(string id, UpdateCinemaRequest cinema, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdatePhoto(string cinemaId, UpdatePictureRequest picture, CancellationToken ct);
         Task<UpdateRatingResponse?> UpdateRating(string cinemaId, UpdateRatingRequest rating, CancellationToken ct);
-        Task<ProductionStudioResponse?> UpdateProductionStudio(string studioId, UpdateProductionStudioRequest studio, CancellationToken ct);
+        Task<ProductionStudioResponse?> UpdateProductionStudio(string? cinemaId, string studioId, UpdateProductionStudioRequest studio, CancellationToken ct);
         Task<StarringResponse?> UpdateStarring(string? cinemaId, string starringId, UpdateStarringRequest starring, CancellationToken ct);
 
         /******/

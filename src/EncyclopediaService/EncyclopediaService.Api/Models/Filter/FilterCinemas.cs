@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EncyclopediaService.Api.Models.Display;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EncyclopediaService.Api.Models.Filter
 {

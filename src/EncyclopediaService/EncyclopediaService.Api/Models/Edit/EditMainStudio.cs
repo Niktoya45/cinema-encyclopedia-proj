@@ -1,4 +1,6 @@
-﻿namespace EncyclopediaService.Api.Models.Edit
+﻿using EncyclopediaService.Api.Models.Display;
+
+namespace EncyclopediaService.Api.Models.Edit
 {
     public class EditMainStudio
     {

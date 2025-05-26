@@ -18,13 +18,17 @@
     </form-popup>
 
     <!-- Edit Person Picture Popup -->
-    <form-popup id="modal-edit-picture" title="Choose person picture" lock="true" save-close="true" scroll="true">
-        <partial name="_EditPicture" model="Model.EditPicture" />
+    <form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose person picture" lock="true" save-close="true" scroll="true">
+	    <form id="form-edit-picture" asp-page-handler="editPicture" class="trim-inputs" method="post" enctype="multipart/form-data">
+            <partial name="_EditPicture" model="Model.EditPicture" />
+        </form>
     </form-popup>
 
     <!-- Add Filmography Popup -->
-    <form-popup id="modal-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
-        <partial name="_AddFilm" model="Model.NewFilmography" />
+    <form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
+        <form id="form-add-filmography" asp-page-handler="addFilmography" class="trim-inputs" method="post">
+            <partial name="_AddFilm" model="Model.NewFilmography" />
+        </form>
     </form-popup>
 
 
@@ -153,7 +157,7 @@
             </ul>
 
             <!-- Carousel Block -->
-            <div class="row" style="block-size:350px">
+            <div class="row carousel-row">
                 @if (Model.Person.Filmography != null)
                 {
                     <div id="carousel-filmography" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
@@ -164,7 +168,7 @@
                             <div class="carousel-inner">
                                 @{
                                     const int r = 2;
-                                    const int c = 6;
+                                    const int c = 5;
                                     int k = r*c;
                                     int m = Model.Person.Filmography.Length / k;
                                     int L = m * k;
@@ -180,8 +184,10 @@
                                                 @if(j == Model.Person.Filmography.Length){
                                                     break;
                                                 }
-                                                <div class="col">
-													<partial name="_FilmCard" model="Model.Person.Filmography[j]" />
+                                                <div id="@Model.Person.Filmography[j].Id" class="col">
+                                                    <form id="update-edit-filmography-@Model.Person.Filmography[j].Id" method="post">
+                                                        <partial name="_FilmCard" model="Model.Person.Filmography[j]" />
+                                                    </form>
                                                 </div>
                                             }
                                         </div>

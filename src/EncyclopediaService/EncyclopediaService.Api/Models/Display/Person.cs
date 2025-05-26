@@ -1,9 +1,13 @@
-﻿namespace EncyclopediaService.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EncyclopediaService.Api.Models.Display
 {
     /*
      * vvv src/Shared/.. vvv
      */
-    /**/ public enum Job {
+    /**/ public enum Job 
+    {
+        [Display(Name=". . .")]
         None = 0b_0000_0000,
         Director = 0b_0000_0001,
         Producer = 0b_0000_0010,

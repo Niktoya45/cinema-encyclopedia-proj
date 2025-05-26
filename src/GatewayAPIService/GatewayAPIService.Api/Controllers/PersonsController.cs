@@ -1,4 +1,5 @@
-﻿using GatewayAPIService.Infrastructure.Services.CinemaService;
+﻿using GatewayAPIService.Infrastructure.Extensions;
+using GatewayAPIService.Infrastructure.Services.CinemaService;
 using GatewayAPIService.Infrastructure.Services.ImageService;
 using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
@@ -97,6 +98,7 @@ namespace GatewayAPIService.Api.Controllers
                     person.PictureUri = await _imageService.GetImage(person.Picture, ImageSize.Tiny);
                 }
             }
+
             return Ok(response);
         }
 
@@ -341,7 +343,43 @@ namespace GatewayAPIService.Api.Controllers
                 return BadRequest(id);
             }
 
-            if(response.Picture != null)
+            UpdateStarringRequest? updateRecord = new UpdateStarringRequest { 
+                Name = response.Name,
+                Picture = response.Picture
+            };
+
+            StarringResponse? compareRecord = null;
+
+            bool? starringCommonsEquals = null;
+
+            if (response.Filmography != null)
+            {
+                foreach (FilmographyResponse filmography in response.Filmography)
+                {
+                    compareRecord = await _cinemaService.GetStarringById(filmography.Id, id, ct);
+
+                    updateRecord.RolePriority = compareRecord.RolePriority.GetValueOrDefault();
+                    updateRecord.RoleName = compareRecord.RoleName;
+
+                    starringCommonsEquals = updateRecord.SameCommons(compareRecord);
+
+                    if (!starringCommonsEquals.GetValueOrDefault())
+                    {
+                        await _cinemaService.UpdateStarring(
+                            filmography.Id,
+                            id,
+                            updateRecord,
+                            ct);
+                    }
+
+                    if (filmography.Picture != null)
+                    {
+                        filmography.PictureUri = await _imageService.GetImage(filmography.Picture, ImageSize.Small);
+                    }
+                }
+            }
+
+            if (response.Picture != null)
             {
                 response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
             }

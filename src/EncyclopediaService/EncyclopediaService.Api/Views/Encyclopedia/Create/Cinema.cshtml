@@ -1,0 +1,200 @@
+﻿@page
+@model EncyclopediaService.Api.Views.Encyclopedia.Create.CreateCinemaModel
+@{
+}
+@section scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
+
+<body>
+
+	<!-- Add Studio Popup -->
+	<form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
+		<form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+			<div class="container-fluid">
+				<partial name="_AddStudio" model="Model.AddStudio" />
+			</div>
+		</form-popup>
+	</form>
+
+
+	<!-- Add Starring Popup -->
+	<form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
+		<form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
+			<div class="container-fluid">
+				<partial name="_AddStarring" model="Model.AddStarring" />
+			</div>
+		</form-popup>
+	</form>
+
+
+	<div class="container-fluid">
+		<form id="form-add-cinema" class="trim-inputs" asp-page-handler="addCinema" method="post">
+
+			<div class="row">
+
+				<div class="col-md-3 offset-1">
+					<div class="row">
+						<img src=@(Model.Cinema.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Poster Image">
+					</div>
+
+					<!-- Add Cinema Poster -->
+					<div class="row">
+						<partial name="_EditPoster" model="Model.AddPoster" />
+					</div>
+				</div>
+
+				<div class="col-md-7">
+
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
+						<li class="list-group-item mb-4  fs-6">
+							<input class="form-control" asp-for="@Model.Cinema.Name" value="@Model.Cinema.Name" type="text" />
+							<br>
+							<span asp-validation-for="@Model.Cinema.Name" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Released on</li>
+						<li class="list-group-item mb-4  fs-6">
+							<input type="date" class="form-control" asp-for="@Model.Cinema.ReleaseDate" value="@(DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"))" />
+							<br>
+							<span asp-validation-for="@Model.Cinema.ReleaseDate" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Language of origin</li>
+						<li class="list-group-item mb-4  fs-6">
+							<select class="form-select" asp-for="@Model.Cinema.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+							<br>
+							<span asp-validation-for="@Model.Cinema.Language" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Genres</li>
+						<li class="list-group-item mb-4  fs-6">
+
+							<div class="row row-cols-3">
+
+								@foreach (int genre in Enum.GetValues(typeof(Genre)))
+								{
+									@if (genre == 0)
+									{
+										continue;
+									}
+									<div class="col-4 ps-0 pe-0">
+										<input id="genres_@genre" type="checkbox" name="Cinema.GenresBind" value="@genre" @(((Model.Cinema.Genres & (Genre)genre) != 0) ? "checked" : "") />
+										<label for="genres_@genre" class="fs-5">@((Genre)genre)</label>
+									</div>
+								}
+
+							</div>
+							<span asp-validation-for="@Model.Cinema.GenresBind" class="text-danger"></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="col-md-10 offset-1">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
+						<li class="list-group-item mb-4  fs-6">
+							<textarea class="form-control" asp-for="@Model.Cinema.Description" style="width:100%;margin-left:-1rem;margin-right:-2rem"></textarea>
+						</li>
+					</ul>
+
+
+					<!-- Add Studios -->
+					<div class="row">
+						<div class="row">
+							<ul class="list-group list-group-flush pe-0">
+								<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
+									<div class="row">
+
+										<div class="col-md-11">
+											<span>Studios</span>
+										</div>
+
+										<div class="col-md-1">
+											<button id="button-add-studio" data-bs-target="#modal-add-studio" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+												<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+													<line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
+													<line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
+												</svg>
+											</button>
+										</div>
+									</div>
+
+								</li>
+							</ul>
+						</div>
+
+
+						<div class="row">
+
+							<div class="col">
+
+								<div id="studios" class="add-cinema-studios row row-cols-5 mb-3">
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+
+					<!-- Add Starrings -->
+					<div class="row">
+						<div class="row">
+							<ul class="list-group list-group-flush pe-0">
+								<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
+									<div class="row">
+
+										<div class="col-md-11">
+											<span>Starring</span>
+										</div>
+
+										<div class="col-md-1">
+											<button id="button-add-starring" data-bs-target="#modal-add-starring" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+												<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+													<line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
+													<line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
+												</svg>
+											</button>
+										</div>
+									</div>
+
+								</li>
+							</ul>
+						</div>
+
+
+						<div class="row">
+
+							<div class="col">
+
+								<div id="starrings" class="add-cinema-starrings row row-cols-5 mb-3">
+								</div>
+							</div>
+
+						</div>
+
+
+					</div>
+
+				</div>
+			</div>
+
+			<hr/>
+
+			<div class="d-flex justify-content-end">
+				<button type="submit" class="btn btn-secondary w-25"> Save </button>
+			</div>
+
+		</form>
+	</div>
+
+
+
+	<script src="~/js/cinema_create_events.js" asp-append-version="true"></script>
+
+</body>
