@@ -10,7 +10,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3" style="z-index:2">
             <div class="container-fluid">
                 <a id="brand" class="navbar-brand" href="/encyclopedia/cinemas/all/">Cinema Encyclopedia</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -44,6 +44,7 @@
                         </li>
 
                         <li class="nav-item ms-auto me-3">
+
 							<div class="dropdown d-flex vstack" style="width:12rem;height:auto">
 								<button id="account" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
 									<div class="input-group">
@@ -95,17 +96,15 @@
             </div>
         </nav>
     </header>
+    <div class="h-100 position-absolute bg-black top-0 start-0" style="width:3%;z-index:0"></div>
+    <div class="h-100 position-absolute bg-black top-0 end-0" style="width:3%;z-index:0"></div>
+
     <div class="container">
         <main role="main" class="pb-2">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container pt-3 mt-4">
-            &copy; 2025 - EncyclopediaService.Api - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -13,6 +13,7 @@ using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
 using GatewayAPIService.Infrastructure.Services.ImageService;
 using GatewayAPIService.Infrastructure.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GatewayAPIService.Api.Controllers
 {
@@ -361,6 +362,8 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateCinemaRequest request
             )
         {
+            return Ok(new CinemaResponse());
+
             CinemaResponse? response = await _cinemaService.Create(request, ct);
 
             if (response is null)

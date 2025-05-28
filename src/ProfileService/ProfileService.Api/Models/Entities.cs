@@ -6,4 +6,12 @@
         Persons,
         Studios
     }
+
+    public enum Entity
+    {
+        Cinema,
+        Person,
+        Studio
+    }
+
 }

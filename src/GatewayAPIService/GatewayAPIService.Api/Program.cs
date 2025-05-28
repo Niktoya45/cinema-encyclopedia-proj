@@ -3,6 +3,13 @@ using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
 using GatewayAPIService.Infrastructure.Services.UserService;
 using GatewayAPIService.Infrastructure.Services.ImageService;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Logging;
 
 namespace GatewayAPIService.Api
 {
@@ -44,6 +51,76 @@ namespace GatewayAPIService.Api
                 client.BaseAddress = new Uri(ImageServiceUrl);
             });
 
+
+            builder.Services.AddAuthentication(options => {
+
+                options.DefaultScheme =  OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            })
+                .AddCookie()
+                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+                {
+                    var oidc = builder.Configuration.GetSection("AuthProviders:oidc");
+                    options.Authority = oidc.GetValue<string>("server");
+                    options.RequireHttpsMetadata = false;
+
+                    options.ClientId = oidc.GetValue<string>("clientId");
+                    options.ClientSecret = oidc.GetValue<string>("secret");
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.Scope.Add("profile");
+                    options.UsePkce = false;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+
+                    options.SaveTokens = true;
+
+                    options.DisableTelemetry = true;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        AuthenticationType = "at+jwt",
+                        SaveSigninToken = true,
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+
+                    };
+
+                    options.ClaimActions.MapJsonKey("role", "role");
+
+                    options.MapInboundClaims = false;
+                })
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.Authority = builder.Configuration.GetValue<string>("AuthProviders:jwt:issuer");
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        ValidateIssuerSigningKey = false,
+                        AuthenticationType = "at+jwt",
+                        SaveSigninToken = true,
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+
+                    };
+                })
+;
+
+            builder.Services.AddAuthorization(options => {
+                options.AddPolicy("Authenticated", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -51,10 +128,18 @@ namespace GatewayAPIService.Api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                IdentityModelEventSource.ShowPII = true;
             }
 
             app.UseHttpsRedirection();
 
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Lax,
+                Secure = CookieSecurePolicy.Always
+            });
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

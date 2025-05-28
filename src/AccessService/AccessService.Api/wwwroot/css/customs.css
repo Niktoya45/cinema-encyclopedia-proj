@@ -40,7 +40,6 @@
     visibility: hidden;
 }
 
-
 #brand {
     color: #aaaaaa;
     text-decoration: none;
@@ -49,7 +48,6 @@
 #brand:hover{
     color: white;
 }
-
 
 #account {
     padding: 0.5rem 1rem;
