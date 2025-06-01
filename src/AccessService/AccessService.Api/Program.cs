@@ -41,10 +41,18 @@ namespace AccessService.Api
             builder.Services.Configure<RouteOptions>(opts =>
             {
                 opts.LowercaseUrls = true;
-                opts.LowercaseQueryStrings = true;
+                opts.LowercaseQueryStrings = false;
                 opts.AppendTrailingSlash = false;
             }
             );
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Authenticated", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+            });
 
             builder.Services.AddControllers();
 
@@ -60,11 +68,17 @@ namespace AccessService.Api
                 app.UseHsts();
             }
 
+
             app.UseHttpsRedirection();
 
             app.MapControllers();
 
-            app.MapRazorPages();
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.None,
+                Secure = CookieSecurePolicy.Always
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();

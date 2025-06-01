@@ -1,9 +1,19 @@
 ﻿using AccessService.Api.Config;
+using Azure.Core;
+using Azure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using System.Net;
-using static System.Net.WebRequestMethods;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+using System.Text;
+using Mono.TextTemplating;
 
 namespace AccessService.Api.Controllers
 {
@@ -13,10 +23,61 @@ namespace AccessService.Api.Controllers
         const string _provider = "https://localhost:7156/oidc";
 
         JWKConfig _jwkConfig;
+        HttpClient _client;
 
         public OIDCController(JWKConfig jwkConfig)
         {
             _jwkConfig = jwkConfig;
+            _client = new HttpClient();
+        }
+
+        [Route("userinfo")]
+        public async Task<IActionResult> UserInfo()
+        {
+            Claim? Subject = User.Claims.FirstOrDefault(c => c.Type == "sub");
+
+            return new JsonResult(new {
+                sub = Subject is null ? "" : Subject.Value
+            });
+        }
+
+        [Route("token")]
+        public async Task<IActionResult> Token()
+        {
+            JsonWebTokenHandler tokenHandler = new JsonWebTokenHandler();
+
+            Dictionary<string, object> ClaimDictionary = new Dictionary<string, object>();
+
+            foreach(Claim c in User.Claims)
+            {
+                ClaimDictionary.Add(c.Type, c.Value);
+            }
+
+            IEnumerable<ClaimsIdentity> claimsi = User.Identities;
+
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new List<Claim>{ User.Claims.FirstOrDefault(c => c.Type == "sub")??new Claim("sub", "") }),
+                Claims = ClaimDictionary,
+                Issuer = _provider,
+                IssuedAt = DateTime.UtcNow,
+                Audience = "cinema_encyclopedia",
+                Expires = DateTime.Now.AddMinutes(45),
+                SigningCredentials = new SigningCredentials(_jwkConfig.Signature, SecurityAlgorithms.RsaSsaPssSha256)
+            };
+
+            string jwts = tokenHandler.CreateToken(descriptor);
+
+            var response = new
+            {
+                access_token = jwts,
+                id_token = jwts,
+                token_type = "Bearer",
+                expires_in = 300
+            };
+
+            return new JsonResult(response);
+
         }
 
         [Route("authorize")]
@@ -29,9 +90,12 @@ namespace AccessService.Api.Controllers
 
             string redirect = Request.Query["redirect_uri"];
 
-            string other = Request.Query.Aggregate("?", (acc, p) => acc + (p.Key == "redirect_uri" ? "" : $"&{p.Key}={p.Value}"));
+            string state = Request.Query["state"];
+            string nonce = Request.Query["nonce"];
 
-            return Redirect(redirect+other);
+            string code = Guid.NewGuid().ToString();
+
+            return Redirect(redirect+$"?code={code}&nonce={nonce}&state={state}");
         }
 
         [Route("jwk")]
@@ -93,10 +157,8 @@ namespace AccessService.Api.Controllers
                   "sub",
                   "iss",
                   "auth_time",
-                  "given_name",
-                  "address",
-                  "family_name",
-                  "middle_name",
+                  "name",
+                  "username",
                   "preferred_username",
                   "gender",
                   "birthdate",
@@ -104,8 +166,7 @@ namespace AccessService.Api.Controllers
                   "phone_number",
                   "phone_number_verified",
                   "email",
-                  "email_verified",
-                  "sid"
+                  "email_verified"
                 },
 
                     code_challenge_methods_supported = new string[] {

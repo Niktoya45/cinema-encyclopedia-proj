@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Logging;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace GatewayAPIService.Api
 {
@@ -52,9 +54,10 @@ namespace GatewayAPIService.Api
             });
 
 
-            builder.Services.AddAuthentication(options => {
+            builder.Services.AddAuthentication(options =>
+            {
 
-                options.DefaultScheme =  OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultScheme = OpenIdConnectDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
             })
@@ -63,7 +66,7 @@ namespace GatewayAPIService.Api
                 {
                     var oidc = builder.Configuration.GetSection("AuthProviders:oidc");
                     options.Authority = oidc.GetValue<string>("server");
-                    options.RequireHttpsMetadata = false;
+                    options.RequireHttpsMetadata = true;
 
                     options.ClientId = oidc.GetValue<string>("clientId");
                     options.ClientSecret = oidc.GetValue<string>("secret");
@@ -91,6 +94,8 @@ namespace GatewayAPIService.Api
                     options.ClaimActions.MapJsonKey("role", "role");
 
                     options.MapInboundClaims = false;
+                    options.ProtocolValidator.RequireNonce = false;
+
                 })
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
@@ -110,13 +115,23 @@ namespace GatewayAPIService.Api
                         RoleClaimType = "role"
 
                     };
-                })
-;
+
+                });
 
             builder.Services.AddAuthorization(options => {
                 options.AddPolicy("Authenticated", policy =>
                 {
                     policy.RequireAuthenticatedUser();
+                });
+
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAssertion(ctx => 
+                    {
+                        Claim? userRole = ctx.User.Claims.FirstOrDefault(c => c.Type == "role");
+                        return userRole != null && 
+                        (userRole.Value.Contains("Administrator") || userRole.Value.Contains("Superadministrator"));
+                    });
                 });
             });
 
@@ -135,7 +150,7 @@ namespace GatewayAPIService.Api
 
             app.UseCookiePolicy(new CookiePolicyOptions
             {
-                MinimumSameSitePolicy = SameSiteMode.Lax,
+                MinimumSameSitePolicy = SameSiteMode.None,
                 Secure = CookieSecurePolicy.Always
             });
 

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AccessService.Api.Areas.Identity.Pages.Account
 {
+    [Authorize(Policy="Authenticated")]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<AccessProfileUser> _signInManager;
