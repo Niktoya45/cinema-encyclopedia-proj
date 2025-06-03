@@ -1,6 +1,7 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
 {
@@ -15,8 +16,8 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
             Genre genres,
             Language language,
             string? picture,
-            StudioRecord[]? productionStudios,
-            Starring[]? starrings,
+            CreateProductionStudioRequest[]? productionStudios,
+            CreateStarringRequest[]? starrings,
             string? description
             )
         {
@@ -26,8 +27,26 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
             Genres = genres;
             Language = language;
             Picture = picture;
-            ProductionStudios = productionStudios;
-            Starrings = starrings;
+            ProductionStudios = productionStudios is null ? null
+                : productionStudios.Select(psr =>
+                        new StudioRecord
+                        {
+                            Id = psr.Id,
+                            Name = psr.Name,
+                            Picture = psr.Picture
+                        }
+                        ).ToArray();
+            Starrings = starrings is null ? null
+                : starrings.Select(sr =>
+                new Starring
+                {
+                    Id = sr.Id,
+                    Name = sr.Name,
+                    Jobs = sr.Jobs,
+                    ActorRole = sr.RoleName is null ? null : new ActorRole { Name = sr.RoleName, Priority = sr.RolePriority },
+                    Picture = sr.Picture
+                }
+                ).ToArray();
             Description = description;
         }
         public string Id { get; }

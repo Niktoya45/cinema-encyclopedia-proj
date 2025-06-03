@@ -9,6 +9,7 @@ using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
 using CinemaDataService.Infrastructure.Models.RecordDTO;
 using CinemaDataService.Api.Queries.RecordQueries;
+using CinemaDataService.Api.Queries.CinemaQueries;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -18,6 +19,7 @@ namespace CinemaDataService.Api.Controllers
     {
 
         private readonly IMediator _mediator;
+        private readonly Func<StudiosQuery, StudiosQueryCommonWrapper> _wrapStudiosQuery = (StudiosQuery query) => new StudiosQueryCommonWrapper(query);
 
         public StudioController(IMediator mediator)
         {
@@ -43,7 +45,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosQuery(st, pg), ct);
+            var response = await _mediator.Send(_wrapStudiosQuery( new StudiosQuery(st, pg)), ct);
 
             return Ok(response);
         }
@@ -91,7 +93,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosYearQuery(year, st, pg), ct);
+            var response = await _mediator.Send(_wrapStudiosQuery( new StudiosYearQuery(year, st, pg)), ct);
 
             return Ok(response);
         }
@@ -117,7 +119,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new StudiosCountryQuery(country, st, pg), ct);
+            var response = await _mediator.Send(_wrapStudiosQuery( new StudiosCountryQuery(country, st, pg)), ct);
 
             return Ok(response);
         }
@@ -249,6 +251,38 @@ namespace CinemaDataService.Api.Controllers
                         request.Country,
                         request.Picture,
                         request.Filmography,
+                        request.PresidentName,
+                        request.Description
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update main studio information with some of provided request parameters
+        /// </summary>
+        /// <param name="id">id of studio to be updated</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Studio is not found</response>
+        [HttpPut("{id}/main")]
+        [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutMainAsync(
+            CancellationToken ct,
+            [FromRoute] string id,
+            [FromBody] UpdateStudioRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdateStudioMainCommand(
+                        id,
+                        request.Name,
+                        request.FoundDate,
+                        request.Country,
                         request.PresidentName,
                         request.Description
                     ),

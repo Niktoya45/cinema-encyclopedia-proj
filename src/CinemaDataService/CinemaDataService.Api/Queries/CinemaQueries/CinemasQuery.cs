@@ -4,7 +4,7 @@ using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
-    public class CinemasQuery : IRequest<Page<CinemasResponse>>
+    public class CinemasQuery
     {
         public CinemasQuery(
             SortBy? sort = null,

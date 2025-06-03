@@ -85,6 +85,38 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return entity;
         }
+        public override async Task<Studio?> UpdateMain(Studio entity, CancellationToken ct = default)
+        {
+            UpdateDefinitionBuilder<Studio> builder = Builders<Studio>.Update;
+
+            UpdateDefinition<Studio> Set<TField>(Expression<Func<Studio, TField>> field, TField value) => builder.Set(field, value);
+
+            var update = Builders<Studio>.Update.Combine(
+                    Set(e => e.Name, entity.Name),
+                    Set(e => e.FoundDate, entity.FoundDate),
+                    Set(e => e.Country, entity.Country),
+                    Set(e => e.PresidentName, entity.PresidentName),
+                    Set(e => e.Description, entity.Description)
+                );
+
+            var find = Builders<Studio>.Filter.Where(e => e.Id == entity.Id);
+
+            Studio? studio = await FindOne(find, ct);
+
+            if (studio is null)
+            {
+                return null;
+            }
+
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return studio;
+        }
         public async Task<CinemaRecord?> UpdateFilmography(string? studioId, CinemaRecord cinema, CancellationToken ct = default)
         {
             FilterDefinition<Studio> elementMatch = studioId == null
@@ -116,7 +148,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         public async Task<CinemaRecord?> DeleteFromFilmography(string? studioId, CinemaRecord cinema, CancellationToken ct = default)
         {
             FilterDefinition<Studio> elementMatch = Builders<Studio>.Filter.ElemMatch(c => c.Filmography, s => s.Id == cinema.Id);
-            UpdateDefinition<Studio> delete = Builders<Studio>.Update.PopFirst("Filmography.$");
+            UpdateDefinition<Studio> delete = Builders<Studio>.Update.PullFilter(c => c.Filmography, s => s.Id == cinema.Id);
 
             UpdateResult res;
 

@@ -1,5 +1,6 @@
 
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Infrastructure.Models.CinemaDTO
 {
@@ -10,8 +11,8 @@ namespace CinemaDataService.Infrastructure.Models.CinemaDTO
         public Genre Genres { get; set; }
         public Language Language { get; set; }
         public string? Picture { get; set; }
-        public StudioRecord[]? ProductionStudios { get; set; }
-        public Starring[]? Starrings { get; set; }
+        public CreateProductionStudioRequest[]? ProductionStudios { get; set; }
+        public CreateStarringRequest[]? Starrings { get; set; }
         public string? Description { get; set; }
     }
 }

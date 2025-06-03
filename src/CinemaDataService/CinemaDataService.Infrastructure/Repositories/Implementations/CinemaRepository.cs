@@ -126,6 +126,38 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return entity;
         }
+        public override async Task<Cinema?> UpdateMain(Cinema entity, CancellationToken ct)
+        {
+            UpdateDefinitionBuilder<Cinema> builder = Builders<Cinema>.Update;
+
+            UpdateDefinition<Cinema> Set<TField>(Expression<Func<Cinema, TField>> field, TField value) => builder.Set(field, value);
+
+            var update = Builders<Cinema>.Update.Combine(
+                    Set(e => e.Name, entity.Name),
+                    Set(e => e.ReleaseDate, entity.ReleaseDate),
+                    Set(e => e.Genres, entity.Genres),
+                    Set(e => e.Language, entity.Language),
+                    Set(e => e.Description, entity.Description)
+                );
+
+            var find = Builders<Cinema>.Filter.Where(e => e.Id == entity.Id);
+
+            Cinema? cinema = await FindOne(find, ct);
+
+            if (cinema is null)
+            {
+                return null;
+            }
+
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return cinema;
+        }
         public async Task<StudioRecord?> UpdateProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct)
         {
 
@@ -219,7 +251,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         public async Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct) 
         {
             FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.ProductionStudios, s => s.Id == studio.Id);
-            UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PopFirst("ProductionStudios.$");
+            UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PullFilter(c=> c.ProductionStudios, s => s.Id == studio.Id);
 
             UpdateResult res;
 
@@ -244,7 +276,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         public async Task<Starring?> DeleteStarring(string? cinemaId, Starring starring, CancellationToken ct)
         {
             FilterDefinition<Cinema> elementMatch = Builders<Cinema>.Filter.ElemMatch(c => c.Starrings, s => s.Id == starring.Id);
-            UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PopFirst("Starrings.$");
+            UpdateDefinition<Cinema> delete = Builders<Cinema>.Update.PullFilter(c => c.Starrings, s => s.Id == starring.Id);
 
             UpdateResult res;
 

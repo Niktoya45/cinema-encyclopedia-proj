@@ -86,6 +86,38 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return entity;
         }
+        public override async Task<Person?> UpdateMain(Person entity, CancellationToken ct = default)
+        {
+            UpdateDefinitionBuilder<Person> builder = Builders<Person>.Update;
+
+            UpdateDefinition<Person> Set<TField>(Expression<Func<Person, TField>> field, TField value) => builder.Set(field, value);
+
+            var update = Builders<Person>.Update.Combine(
+                    Set(e => e.Name, entity.Name),
+                    Set(e => e.BirthDate, entity.BirthDate),
+                    Set(e => e.Country, entity.Country),
+                    Set(e => e.Jobs, entity.Jobs),
+                    Set(e => e.Description, entity.Description)
+                );
+
+            var find = Builders<Person>.Filter.Where(e => e.Id == entity.Id);
+
+            Person? person = await FindOne(find, ct);
+
+            if (person is null)
+            {
+                return null;
+            }
+
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return person;
+        }
         public async Task<CinemaRecord?> UpdateFilmography(string? personId, CinemaRecord cinema, CancellationToken ct = default)
         {
             FilterDefinition<Person> elementMatch = personId == null
@@ -117,7 +149,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         public async Task<CinemaRecord?> DeleteFromFilmography(string? personId, CinemaRecord cinema, CancellationToken ct = default)
         {
             FilterDefinition<Person> elementMatch = Builders<Person>.Filter.ElemMatch(p => p.Filmography, c => c.Id == cinema.Id);
-            UpdateDefinition<Person> delete = Builders<Person>.Update.PopFirst("Filmography.$");
+            UpdateDefinition<Person> delete = Builders<Person>.Update.PullFilter(p => p.Filmography, c => c.Id == cinema.Id);
 
             UpdateResult res;
 

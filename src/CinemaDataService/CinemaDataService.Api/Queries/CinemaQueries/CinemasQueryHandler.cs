@@ -9,7 +9,7 @@ using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.CinemaQueries
 {
-    public class CinemasQueryHandler : IRequestHandler<CinemasQuery, Page<CinemasResponse>>
+    public class CinemasQueryHandler : IRequestHandler<CinemasQueryCommonWrapper, Page<CinemasResponse>>
     {
         ICinemaRepository _repository;
         IMapper _mapper;
@@ -19,11 +19,11 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
             _mapper = mapper;
         }
 
-        public async Task<Page<CinemasResponse>> Handle(CinemasQuery request, CancellationToken cancellationToken)
+        public async Task<Page<CinemasResponse>> Handle(CinemasQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             IEnumerable<Cinema>? cinemas = null;
 
-            switch (request)
+            switch (request.Query)
             {
                 case CinemasIdQuery ciq:
 
@@ -55,7 +55,7 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
                     break;
 
                 default:
-                    cinemas = await _repository.Find(pg:request.Pg, sort:request.Sort, ct:cancellationToken);
+                    cinemas = await _repository.Find(pg:request.Query.Pg, sort:request.Query.Sort, ct:cancellationToken);
                     break;
             }
 
@@ -66,7 +66,7 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
 
             IEnumerable<CinemasResponse> response = _mapper.Map<IEnumerable<Cinema>, IEnumerable<CinemasResponse>>(cinemas);
 
-            int countRequested = request.Pg.Take - Pagination._add;
+            int countRequested = request.Query.Pg.Take - Pagination._add;
             bool isEnd = response.Count() <= countRequested;
 
             return new Page<CinemasResponse> { IsEnd =  isEnd, Response = (isEnd ? response : response.Take(countRequested)) };

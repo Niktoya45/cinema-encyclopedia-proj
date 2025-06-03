@@ -1,6 +1,8 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.PersonDTO;
 using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 
 namespace CinemaDataService.Api.Commands.PersonCommands.CreateCommands
 {
@@ -13,7 +15,7 @@ namespace CinemaDataService.Api.Commands.PersonCommands.CreateCommands
             Country country,
             Job jobs,
             string? picture,
-            CinemaRecord[]? filmography,
+            CreateFilmographyRequest[]? filmography,
             string? description
             )
 		{
@@ -22,8 +24,17 @@ namespace CinemaDataService.Api.Commands.PersonCommands.CreateCommands
 			Country = country;
 			Jobs = jobs;
             Picture = picture;
-			Filmography = filmography;
-			Description = description;
+            Filmography = filmography is null ? null
+                : filmography.Select(sr =>
+                new CinemaRecord
+                {
+                    Id = sr.Id,
+                    Name = sr.Name,
+                    Year = sr.Year,
+                    Picture = sr.Picture
+                }
+                ).ToArray();
+            Description = description;
 		}
 
         public string Name { get; }

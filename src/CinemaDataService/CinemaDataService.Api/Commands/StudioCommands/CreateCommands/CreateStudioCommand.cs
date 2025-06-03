@@ -1,6 +1,7 @@
 using MediatR;
 using CinemaDataService.Infrastructure.Models.StudioDTO;
 using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
 
 namespace CinemaDataService.Api.Commands.StudioCommands.CreateCommands
 {
@@ -12,7 +13,7 @@ namespace CinemaDataService.Api.Commands.StudioCommands.CreateCommands
             DateOnly foundDate,
             Country country,
             string? picture,
-            CinemaRecord[]? filmography,
+            CreateFilmographyRequest[]? filmography,
             string? presidentName,
             string? description
             )
@@ -21,7 +22,16 @@ namespace CinemaDataService.Api.Commands.StudioCommands.CreateCommands
             FoundDate = foundDate;
             Country = country;
             Picture = picture;
-            Filmography = filmography;
+            Filmography = filmography is null ? null
+                : filmography.Select(sr =>
+                new CinemaRecord
+                {
+                    Id = sr.Id,
+                    Name = sr.Name,
+                    Year = sr.Year,
+                    Picture = sr.Picture
+                }
+                ).ToArray();
             PresidentName = presidentName;
             Description = description;
         }

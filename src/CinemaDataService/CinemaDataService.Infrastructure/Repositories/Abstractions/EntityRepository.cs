@@ -104,6 +104,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
         }
 
         public abstract Task<T?> Update(T entity, CancellationToken ct = default);
+        public abstract Task<T?> UpdateMain(T entity, CancellationToken ct = default);
 
         public async Task<T?> UpdatePicture(string id, string? picture, CancellationToken ct = default)
         {

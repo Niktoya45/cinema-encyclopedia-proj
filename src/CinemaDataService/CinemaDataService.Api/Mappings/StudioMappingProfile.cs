@@ -17,7 +17,8 @@ namespace CinemaDataService.Api.Mappings
                 .ForMember(s => s.IsDeleted, opt => opt.Ignore());
 
             CreateMap<UpdateStudioCommand, Studio>()
-                .ForMember(s => s.Id, opt => opt.Ignore())
+                .ForMember(s => s.Filmography, opt => opt.Ignore())
+                .ForMember(s => s.Picture, opt => opt.Ignore())
                 .ForMember(s => s.CreatedAt, opt => opt.Ignore())
                 .ForMember(s => s.IsDeleted, opt => opt.Ignore());
 

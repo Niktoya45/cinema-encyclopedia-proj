@@ -22,6 +22,7 @@ namespace CinemaDataService.Api.Controllers
     {
 
         private readonly IMediator _mediator;
+        private readonly Func<PersonsQuery, PersonsQueryCommonWrapper> _wrapPersonsQuery = (PersonsQuery query) => new PersonsQueryCommonWrapper(query);
 
         public PersonController(IMediator mediator)
         {
@@ -47,7 +48,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new PersonsQuery(st, pg), ct);
+            var response = await _mediator.Send(_wrapPersonsQuery( new PersonsQuery(st, pg)), ct);
 
             return Ok(response);
         }
@@ -88,7 +89,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new PersonsCountryQuery(country, st, pg), ct);
+            var response = await _mediator.Send(_wrapPersonsQuery(new PersonsCountryQuery(country, st, pg)), ct);
 
             return Ok(response);
         }
@@ -114,7 +115,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new PersonsJobsQuery(jobs, st, pg), ct);
+            var response = await _mediator.Send(_wrapPersonsQuery( new PersonsJobsQuery(jobs, st, pg)), ct);
 
             return Ok(response);
         }
@@ -245,6 +246,37 @@ namespace CinemaDataService.Api.Controllers
                         request.Jobs,
                         request.Picture,
                         request.Filmography,
+                        request.Description
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
+        /// <summary>
+        /// Update main person information with some of provided request parameters
+        /// </summary>
+        /// <param name="id">id of person to be updated</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated person instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Person is not found</response>
+        [HttpPut("{id}/main")]
+        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutMainAsync(
+            CancellationToken ct,
+            [FromQuery] string id,
+            [FromBody] UpdatePersonRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdatePersonMainCommand(
+                        id,
+                        request.Name,
+                        request.BirthDate,
+                        request.Country,
+                        request.Jobs,
                         request.Description
                     ),
                 ct

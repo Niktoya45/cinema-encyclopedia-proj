@@ -8,7 +8,7 @@ using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
-    public class StudiosQueryHandler : IRequestHandler<StudiosQuery, Page<StudiosResponse>>
+    public class StudiosQueryHandler : IRequestHandler<StudiosQueryCommonWrapper, Page<StudiosResponse>>
     {
         IStudioRepository _repository;
         IMapper _mapper;
@@ -18,11 +18,11 @@ namespace CinemaDataService.Api.Queries.StudioQueries
             _mapper = mapper;
         }
 
-        public async Task<Page<StudiosResponse>> Handle(StudiosQuery request, CancellationToken cancellationToken)
+        public async Task<Page<StudiosResponse>> Handle(StudiosQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             IEnumerable<Studio>? studios;
 
-            switch (request) 
+            switch (request.Query) 
             {
                 case StudiosYearQuery syq:
                     studios = await _repository.FindByYear(syq.Year, syq.Pg, syq.Sort, cancellationToken);
@@ -31,7 +31,7 @@ namespace CinemaDataService.Api.Queries.StudioQueries
                     studios = await _repository.FindByCountry(scq.Country, scq.Pg, scq.Sort, cancellationToken);
                     break;
                 default:
-                    studios = await _repository.Find(pg:request.Pg, sort:request.Sort, ct:cancellationToken);
+                    studios = await _repository.Find(pg:request.Query.Pg, sort:request.Query.Sort, ct:cancellationToken);
                     break;
 
             }
@@ -43,7 +43,7 @@ namespace CinemaDataService.Api.Queries.StudioQueries
 
             IEnumerable<StudiosResponse> response = _mapper.Map<IEnumerable<Studio>, IEnumerable<StudiosResponse>>(studios);
 
-            int countRequested = request.Pg.Take - Pagination._add;
+            int countRequested = request.Query.Pg.Take - Pagination._add;
             bool isEnd = response.Count() <= countRequested;
 
             return new Page<StudiosResponse> { IsEnd = isEnd, Response = (isEnd ? response : response.Take(countRequested)) };

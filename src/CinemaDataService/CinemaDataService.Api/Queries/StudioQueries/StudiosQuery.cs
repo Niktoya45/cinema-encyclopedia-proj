@@ -4,7 +4,7 @@ using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
-    public class StudiosQuery : IRequest<Page<StudiosResponse>>
+    public class StudiosQuery
     {
         public StudiosQuery(SortBy? sort=null, Pagination? pagination=null)
         {

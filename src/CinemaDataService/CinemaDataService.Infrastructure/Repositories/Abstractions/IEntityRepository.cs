@@ -13,6 +13,7 @@ namespace CinemaDataService.Infrastructure.Repositories
         public Task<T?> FindOne(Expression<Func<T, bool>>? query = null, CancellationToken ct = default);
         public Task<T?> FindById(string id, CancellationToken ct = default);
         public Task<T?> Update(T entity, CancellationToken ct = default);
+        public Task<T?> UpdateMain(T entity, CancellationToken ct = default);
         public Task<T?> UpdatePicture(string id, string? picture, CancellationToken ct = default);
         public Task<T?> Delete(string id, CancellationToken ct = default);
 

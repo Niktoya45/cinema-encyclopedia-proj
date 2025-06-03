@@ -9,7 +9,7 @@ namespace Shared.CinemaDataService.Models.StudioDTO
         public DateOnly FoundDate { get; set; }
         public Country Country { get; set; }
         public string? Picture { get; set; }
-        public CinemaRecord[]? Filmography { get; set; }
+        public CreateFilmographyRequest[]? Filmography { get; set; }
         public string? PresidentName { get; set; }
         public string? Description { get; set; }
     }

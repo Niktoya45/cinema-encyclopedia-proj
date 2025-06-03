@@ -19,6 +19,8 @@ namespace CinemaDataService.Api.Controllers
 
         private readonly IMediator _mediator;
 
+        private readonly Func<CinemasQuery, CinemasQueryCommonWrapper> _wrapCinemasQuery = (CinemasQuery query) => new CinemasQueryCommonWrapper(query);
+
         public CinemaController(IMediator mediator)
         {
             _mediator = mediator;
@@ -43,7 +45,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasQuery(st, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasQuery(st, pg) ), ct);
 
             return Ok(response);
         }
@@ -68,7 +70,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasIdQuery(ids, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasIdQuery(ids, pg)), ct);
 
             return Ok(response);
         }
@@ -116,7 +118,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasYearQuery(year, st, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasYearQuery(year, st, pg)), ct);
 
             return Ok(response);
         }
@@ -142,7 +144,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasGenresQuery(genres, st, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasGenresQuery(genres, st, pg)), ct);
 
             return Ok(response);
         }
@@ -168,7 +170,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasLanguageQuery(language, st, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasLanguageQuery(language, st, pg)), ct);
 
             return Ok(response);
         }
@@ -194,7 +196,7 @@ namespace CinemaDataService.Api.Controllers
             [FromQuery] Pagination? pg = null
             )
         {
-            var response = await _mediator.Send(new CinemasStudioQuery(studioId, st, pg), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasStudioQuery(studioId, st, pg)), ct);
 
             return Ok(response);
         }
@@ -352,6 +354,37 @@ namespace CinemaDataService.Api.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Update cinema main information with some of provided request parameters
+        /// </summary>
+        /// <param name="id">id of cinema to be updated</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Cinema is not found</response>
+        [HttpPut("{id}/main")]
+        [ProducesResponseType(typeof(CinemaResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutMainAsync(
+            CancellationToken ct,
+            [FromRoute] string id,
+            [FromBody] UpdateCinemaRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdateCinemaMainCommand(
+                        id,
+                        request.Name,
+                        request.ReleaseDate,
+                        request.Genres,
+                        request.Language,
+                        request.Description
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
         /// <summary>
         /// Update single cinema with provided request parameters
         /// </summary>
@@ -532,7 +565,7 @@ namespace CinemaDataService.Api.Controllers
         /// Delete production studio by optional cinema id
         /// </summary>
         /// <param name="cinemaId">Id of cinema which studio is to be deleted</param>
-        /// <param name="id">Id of production studio entrance</param>
+        /// <param name="studioId">Id of production studio entrance</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Production studio or cinema is not found</response>
@@ -555,7 +588,7 @@ namespace CinemaDataService.Api.Controllers
         /// Delete starring by optional cinema id
         /// </summary>
         /// <param name="cinemaId">Id of cinema which starring is to be deleted</param>
-        /// <param name="id">Id of starrings entrance</param>
+        /// <param name="starringId">Id of starrings entrance</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Starring or cinema is not found</response>

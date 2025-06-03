@@ -4,7 +4,7 @@ using CinemaDataService.Infrastructure.Models.SharedDTO;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
-    public class PersonsQuery : IRequest<Page<PersonsResponse>>
+    public class PersonsQuery
     {
         public SortBy? Sort { get; }
         public Pagination Pg { get; }

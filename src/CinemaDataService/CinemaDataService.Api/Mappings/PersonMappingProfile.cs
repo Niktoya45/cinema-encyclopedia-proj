@@ -19,7 +19,12 @@ namespace CinemaDataService.Api.Mappings
                 .ForMember(p => p.IsDeleted, opt => opt.Ignore());
 
             CreateMap<UpdatePersonCommand, Person>()
-                .ForMember(p => p.Id, opt => opt.Ignore())
+                .ForMember(p => p.CreatedAt, opt => opt.Ignore())
+                .ForMember(p => p.IsDeleted, opt => opt.Ignore());
+
+            CreateMap<UpdatePersonMainCommand, Person>()
+                .ForMember(p => p.Filmography, opt => opt.Ignore())
+                .ForMember(p => p.Picture, opt => opt.Ignore())
                 .ForMember(p => p.CreatedAt, opt => opt.Ignore())
                 .ForMember(p => p.IsDeleted, opt => opt.Ignore());
 
