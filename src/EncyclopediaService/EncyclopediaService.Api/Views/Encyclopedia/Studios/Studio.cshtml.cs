@@ -47,18 +47,13 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
                 PresidentName = "Name Name Surname",
                 Picture = "/img/logo_placeholder.png",
                 Filmography = new CinemaRecord[] {
-                    new CinemaRecord { Id = "1", Name = "Cinema Title Long Long", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "2", Name = "Cinema Title Long", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "3", Name = "Cinema Title", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "4", Name = "Cinema Title", Year=2000, Picture="/img/grid_poster_placeholder.png"}
+                    new CinemaRecord { Id = "1", Name = "Cinema Title Long Long", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "2", Name = "Cinema Title Long", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "3", Name = "Cinema Title", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "4", Name = "Cinema Title", Year=2000, Picture=null}
                 },
                 Description = "Studio description goes here. A studio with a long history.."
             };
-
-            if (Studio.Picture is null)
-            {
-                Studio.Picture = _settings.DefaultLogoPicture;
-            }
 
             if (Studio.Description is null)
             {

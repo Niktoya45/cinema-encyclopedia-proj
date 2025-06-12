@@ -127,7 +127,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 
         public async Task<T?> Delete(string id, CancellationToken ct = default)
         {
-            T? found = await FindById(id);
+            T? found = await FindById(id, ct);
 
             if (found == null)
             {

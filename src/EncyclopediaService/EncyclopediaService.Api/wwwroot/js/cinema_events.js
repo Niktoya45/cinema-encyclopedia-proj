@@ -1,65 +1,77 @@
 ﻿
-updateFormEditStarring = function (ref) {
+import { fetchPostMVC, addDeleteEvents, approveDelete, removeFromCarousel } from './utils.js';
 
-    ref.addEventListener('click', function (e) {
+//** ELEMENTS USED **/
+
+const kpage = 5;
+const nrows = 1;
+const carouselStarringId = "carousel-starrings";
+
+const classDeleteCinema = 'label-cinema';
+const classDeleteStarring = 'label-starring';
+const classDeleteStudio = 'label-studio';
+
+const formDeleteId = 'form-delete-element';
+const deleteStudioAction = window.location.pathname + "?handler=deleteproductionstudio";
+
+var formDelete = document.getElementById(formDeleteId);
+
+var carouselStarring = document.getElementById(carouselStarringId);
+
+var starsCollapse = document.getElementById("collapse-stars");
+var starsRate = starsCollapse.querySelector("#rate-cinema");
+var starsClick = starsCollapse.querySelectorAll("button.rail");
+var stars = Array.from(starsClick).map(starClick => starClick.querySelector(".star"));
+
+
+//** ONLOAD ACTIONS **//
+
+// make user rating change
+
+for (let i = 0; i < stars.length; i++) {
+
+    starsClick.item(i).addEventListener('click', function (e) {
 
         e.preventDefault();
 
-        var formElement = document.getElementById("update-" + e.currentTarget.id);
-        const formData = new URLSearchParams();
-
-        for (const kv of new FormData(formElement)) {
-            formData.append(kv[0], kv[1]);
+        let rating = 0;
+        if (stars[i].classList.contains('rail')) {
+            rating = this.value;
+        } else {
+            if(i != 0)
+                rating = starsClick.item(i-1).value
         }
 
-        fetch(formElement.action,
-            {
-                method: "POST",
-                body: formData
-            })
-            .then((response) => {
-
-                return response.text();
-            })
-            .then((result) => {
-
-                var content = document.getElementById('form-edit-starring');
-
-                content.innerHTML = result;
-
-                updateFormStarringDependency(content);
-            });
+        fillStars(starIndex);
 
     });
-
 }
 
-updateFormStarringDependency = function (form) {
-    var editJobsCheckbox = form.querySelector("#starring-jobs_8");
 
-    const isActor = editJobsCheckbox.checked;
-    var inputsJobsDependant = form.querySelectorAll(".jobs-dependant");
+// add onlick event for delete popup 
 
-    if (!isActor) {
-        inputsJobsDependant.forEach(function (input) {
-            input.disabled = true;
-        });
+addDeleteEvents(formDelete, function (result, deleteTargetClass) {
+
+    if (deleteTargetClass == classDeleteCinema) {
+
     }
+    else if (deleteTargetClass == classDeleteStarring) {
+        removeFromCarousel(carouselStarring, result, nrows, kpage);
+    }
+    else if (deleteTargetClass == classDeleteStudio) {
 
-    editJobsCheckbox.addEventListener('click', function (e) {
-        inputsJobsDependant.forEach(function (input) {
-            input.disabled = !jobsCheckbox.checked;
-        });
-    });
-}
+    }
+});
 
 
-// show close buttons
+//** ONLOAD RECORD ACTIONS **//
 
-var refs = document.querySelectorAll(".dropdown-menu .show-close-buttons");
+// show close buttons for studio
 
-refs.forEach(ref => {
-    var closeButtons = document.querySelectorAll("div.position-relative button[id^='" + ref.id + "']");
+var refsShowClose = document.querySelectorAll(".dropdown-menu .show-close-buttons");
+
+refsShowClose.forEach(ref => {
+    var closeButtons = document.querySelectorAll(".hide-delete[toggled-by='" + ref.id + "'] .del-record");
     var cancel = document.getElementById(ref.id + "-cancel");
 
     ref.addEventListener('click', (e) => {
@@ -80,100 +92,40 @@ refs.forEach(ref => {
     });
 });
 
-// disable | enable fields which depend on jobs field
 
-var addJobsCheckbox = document.querySelector("#form-add-starring #starring-jobs_8");
+// add action after studio delete
 
-addJobsCheckbox.addEventListener('click', function (e) {
-    var inputsJobsDependant = document.querySelectorAll("#form-add-starring .jobs-dependant");
+var refsDeleteStudio = document.querySelectorAll(".hide-delete-studios");
 
-    inputsJobsDependant.forEach(function (input) {
-        input.disabled = !e.currentTarget.checked;
+refsDeleteStudio.forEach(ref => {
+    ref.addEventListener('click', (e) => {
+
+        approveDelete(ref.value, formDelete.closest('.container-fluid'), deleteStudioAction, classDeleteStudio);
     });
+
 });
 
 
-// update content of starring edit partial
+//** METHODS USED **//
 
-var refsEditStarring = document.querySelectorAll(".dropdown-menu .dropdown-edit-starring");
+function fillStars(starIndex) {
 
-refsEditStarring.forEach(function (ref) {
-
-    updateFormEditStarring(ref);
-});
-
-// display hint choices forcstarring search field
-
-const choices = ["Actor 1", "Actor 2", "Director 3", "Director 4", "Scenarist 5", "Scenarist 6", "Producer 7", "Producer 8"];
-
-var searchStarring = document.getElementById("search-starring");
-
-searchStarring.addEventListener("input", function (e) {
-    let inputValue = this.value.toLowerCase();
-    let suggestionsList = document.getElementById("suggestions-starring");
-    var inputsNameDependant = document.querySelectorAll("#form-add-starring .name-dependant")
-
-    suggestionsList.innerHTML = "";
-    suggestionsList.style.visibility = "visible";
-
-    if (inputValue) {
-
-        // handle data transfer instead of below
-        let filteredChoices = choices.filter(choice => choice.toLowerCase().includes(inputValue));
-
-        filteredChoices.forEach(choice => {
-            let listItem = document.createElement("li");
-            listItem.textContent = choice;
-            listItem.classList.add("list-group-item");
-            listItem.addEventListener("click", function (e) {
-                searchStarring.value = this.textContent;
-                suggestionsList.innerHTML = "";
-                suggestionsList.style.visibility = "hidden";
-
-                inputsNameDependant.forEach(function (input) {
-                    input.disabled = input.classList.contains("jobs-dependant");
-                });
-            });
-            suggestionsList.appendChild(listItem);
-        });
-    } else {
-        inputsNameDependant.forEach(function (input) {
-            input.disabled = true;
-        });
-    }
-});
-
-
-
-// make user rating change
-
-var starsCollapse = document.getElementById("collapse-stars");
-var starsClick = starsCollapse.querySelectorAll("button.rail");
-var stars = Array.from(starsClick).map(starClick => starClick.querySelector(".star"));
-
-
-for (let i = 0; i < stars.length; i++) {
-
-    starsClick.item(i).addEventListener('click', function (e) {
- 
-        for (let j = 0; j < stars.length; j++) {
-            if (j < i) {
-                stars[j].classList.remove('rail');
+    for (let j = 0; j < starIndex; j++) {
+        if (j < i) {
+            stars[j].classList.remove('rail');
+        }
+        else if (j > starIndex) {
+            if (stars[j].classList.contains('rail')) {
+                break;
             }
-            else if (j > i) {
-                if (stars[j].classList.contains('rail')) {
-                    break;
-                }
+            stars[j].classList.add('rail');
+        }
+        else {
+            if (stars[j].classList.contains('rail')) {
+                stars[j].classList.remove('rail');
+            } else {
                 stars[j].classList.add('rail');
             }
-            else {
-                if (stars[j].classList.contains('rail')) {
-                    stars[j].classList.remove('rail');
-                } else {
-                    stars[j].classList.add('rail');
-                }
-            }
         }
-
-    });
+    }
 }

@@ -3,6 +3,9 @@
 @model EncyclopediaService.Api.Views.Encyclopedia.Cinemas.CinemaModel;
 @{
     ViewData["Title"] = "Cinema";
+
+    var Role = User.FindFirst("role");
+    bool IsAdmin = User.IsAdmin();
 }
 @functions{
     string Star(byte size, float x = 0.0f, float y = 0.0f)
@@ -21,52 +24,75 @@
 }
 
 <body>
+    @if(IsAdmin)
+    {
+        <!-- Edit Main Information Popup -->
+        <form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+            <div class="container-fluid">
+                <form id="form-edit-main" asp-page-handler="editCinema" class="trim-inputs" method="post">
+                    <partial name="_EditMain" model="Model.EditMain" />
+                </form>
+            </div>
+        </form-popup>
 
-    <!-- Edit Main Information Popup -->
-    <form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
-		<partial name="_EditMain" model="Model.EditMain" />
-    </form-popup>
-
-    <!-- Edit Film Poster Popup -->
-    <form-popup id="modal-edit-poster" form="form-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
-	    <form id="form-edit-poster" asp-page-handler="editPoster" class="trim-inputs" method="post" enctype="multipart/form-data">        
-            <partial name="_EditPoster" model="Model.EditPoster" />
-        </form>
-    </form-popup>
-
-    <!-- Edit Starring Popup -->
-    <form-popup id="modal-edit-starring" form="form-edit-starring" title="Edit starring" size="lg" lock="true" save-close="false" scroll="true">
-
-        <div class="container-fluid">
-            <form id="form-edit-starring" asp-page-handler="editStarring" class="trim-inputs" method="post">
-				<partial name="_AddStarring" model="Model.EditStarring" />
+        <!-- Edit Film Poster Popup -->
+        <form-popup id="modal-edit-poster" form="form-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
+            <form id="form-edit-poster" asp-page-handler="editPoster" class="trim-inputs" method="post" enctype="multipart/form-data">        
+                <partial name="_EditPoster" model="Model.EditPoster" />
             </form>
-        </div>
+        </form-popup>
 
-    </form-popup>
+        <!-- Edit Starring Popup -->
+        <form-popup id="modal-edit-starring" form="form-edit-starring" title="Edit starring" size="lg" lock="true" save-close="false" scroll="true">
+            <div class="container-fluid">
+                <form id="form-edit-starring" asp-page-handler="editStarring" class="trim-inputs" method="post">
+                    <partial name="_AddStarring" model="Model.EditStarring" />
+                </form>
+            </div>
+        </form-popup>
 
-    <!-- Add Studio Popup -->
-    <form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+        <!-- Add Studio Popup -->
+        <form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+            <div class="container-fluid">
+                <form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
+                    <partial name="_AddStudio" model="Model.EditStudio" />
+                </form>
+            </div>
+        </form-popup>
 
-        <div class="container-fluid">
-	        <form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
-                <partial name="_AddStudio" model="Model.EditStudio" />
-            </form>
-        </div>
+        <!-- Add Starring Popup -->
+        <form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
+            <div class="container-fluid">
+                <form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
+                    <partial name="_AddStarring" model="Model.EditStarring" />
+                </form>
+            </div>
+        </form-popup>
 
-    </form-popup>
+        <form-popup id="modal-delete-element" form="form-delete-element" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
+            <div class="container-fluid">
+                <form id="form-delete-element" method="post">
+                    <input type="hidden" asp-for="RecordId"/>
 
-    <!-- Add Starring Popup -->
-    <form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
-        
-        <div class="container-fluid">
-            <form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
-				<partial name="_AddStarring" model="Model.EditStarring" />
-			</form>
-        </div>
+                    <div class="d-flex vstack w-100 justify-content-center align-items-center">
 
-    </form-popup>
+                        <p class="label-delete label-starring no-display fs-4 fw-bold">Delete starring record for this cinema page?</p>
+                        <p class="label-delete label-studio no-display fs-4 fw-bold">Delete studio record for this cinema page?</p>
 
+                        <div class="d-flex hstack gap-4 h-25 justify-content-center">
+                            <div class="d-flex hstack gap-4 h-25" style="width:80%">
+                                <button value="delete" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Delete</button>
+                                <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </form-popup>
+
+    }
 
     <h1>Cinema</h1>
     <div class="container mt-5" style="margin-bottom:6rem">
@@ -104,27 +130,27 @@
                     }
                 </svg>
                 <button id="rating" type="button" class="fs-3 fw-bold" data-bs-toggle="dropdown" data-bs-target="#collapse-stars" aria-expanded="false">
-					@Model.Cinema.RatingScore
+                    @Model.Cinema.RatingScore
                 </button>
                 <div class="dropdown-menu align-items-center" id="collapse-stars" aria-labelledby="rating">
-					<div>
+                    <div>
                         @{
                             starSize = 3;
                             starSpan = 0.6f;
                         }
 
-                        <div id="rate-cinema" method="post">
-                        @for (byte i = 0; i < starCount; i++)
-                        {
-                            <button class="rail" style="background:none;border:none;padding:0;width:auto;text-decoration:none">
-								<svg width="@((starSize+starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
-									<polygon class="star rail" points="@Star(starSize, 0)" ></polygon>
-									<polygon class="star-empty" points="@Star(starSize, 0)"></polygon>
-								</svg>
-                            </button>
+                        <form id="rate-cinema" asp-page-handler="Rate" method="post">
+                            @for (byte i = 0; i < starCount; i++)
+                            {
+                                <button class="rail" value="@(i+1)" style="background:none;border:none;padding:0;width:auto;text-decoration:none">
+                                    <svg width="@((starSize+starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
+                                        <polygon class="star rail" points="@Star(starSize, 0)" ></polygon>
+                                        <polygon class="star-empty" points="@Star(starSize, 0)"></polygon>
+                                    </svg>
+                                </button>
 
-                        }
-                        </div>
+                            }
+                        </form>
 
                     </div>
                 </div>
@@ -136,171 +162,196 @@
 
         <div class="row">
 
-            <!-- Film Poster -->
-            <div class="col-md-3 offset-1">
-                <div class="row">
-					<img src=@(Model.Cinema.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Poster Image">
-                </div>
-                <div class="row">
+            <!-- Film Poster Block -->
+            <div class="col-md-4 offset-1 position-relative">
 
-                    <div class="col mt-3 mb-1">
+                <!-- Film Poster -->
+                <div class="col-md-10 cinema-poster">
+                    <div class="row">
+                        @if (Model.Cinema.Picture != null)
+                        {
+                            <img src="@(Model.Cinema.Picture)" class="img img-fluid" alt="Poster Image">
+                        }
+                        else
+                        {
+                            <img class="img img-fluid img-placeholder ignore" alt="Poster Image">
+                        }
+                    </div>
+                    <div class="row">
 
-                        <button id="label-options-toggle" title="mark as.." type="button" data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
-                                                        
-                            <svg id="pencil" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                
-                                <line x1="1" x2="16" y1="31" y2="24"></line>
-                                <line x1="2" x2="2" y1="31" y2="32" stroke-width="3"></line>
-                                <line x1="1" x2="7" y1="31" y2="16"></line>
-                                <line x1="15" x2="8" y1="23" y2="16"></line>
-                                <line x1="15" x2="31" y1="24" y2="10"></line>
-                                <line x1="5" x2="24" y1="19" y2="2"></line>
-                                <line x1="31" x2="24" y1="10" y2="2"></line>
-                                <line x1="18" x2="26" y1="7" y2="16"></line>
-                                
-                            </svg>
+                        <div class="col mt-3 mb-1">
 
-                        </button>
+                            <button id="label-options-toggle" title="mark as.." type="button" data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
 
-                        <div id="collapse-labels-body">
-							<div id="collapse-labels" class="collapse collapse-horizontal">
-								<div id="labels" class="card card-body hstack">
-									<button title="favorite">
-                                        <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                            <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12"/>
-                                        </svg>
-                                    </button>
-									<button title="planned">
-                                        <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                            <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3"/>
-                                            <line class="thin" x1="17" x2="17" y1="17" y2="9"></line>
-                                            <line class="thin" x1="17" x2="22" y1="17" y2="22"></line>
-                                            <line x1="16" x2="18" y1="17" y2="17" stroke-width="3"></line>
-                                        </svg>
-                                    </button>
-									<button title="watching">
-                                        <svg id="monitor" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                            <polygon class="empty" points="7,4 4,7 4,23 7,26 28,26 31,23 31,7 28,4" />
-                                            <polygon points="12,10 10,12 10,18 12,20  23,20 25,18 25,12 23,10"/>
-                                            <line class="thin" x1="14" x2="21" y1="27" y2="27"/>
-                                            <line x1="10" x2="25" y1="30" y2="30"/>
-                                        </svg>
-                                    </button>
-									<button title="seen">
-                                        <svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                            <polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4"/>
-                                            <polygon points="17,7 20,12 21,13 23,14 27,14 27,16 27,17 25,9"/>
-                                            <polygon points="17,27 20,22 21,21 23,20 27,20 27,17 27,19 25,25"/>
-                                            <polygon points="17,27 14,22 13,21 11,20 7,20 7,17 7,19 10,25"/>
-                                            <polygon points="17,7 14,12 13,13 11,14 7,14 7,16 7,17 10,9"/>
-                                        </svg>
-                                    </button>
-								</div>
-							</div>
+                                <svg id="pencil" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+
+                                    <line x1="1" x2="16" y1="31" y2="24"></line>
+                                    <line x1="2" x2="2" y1="31" y2="32" stroke-width="3"></line>
+                                    <line x1="1" x2="7" y1="31" y2="16"></line>
+                                    <line x1="15" x2="8" y1="23" y2="16"></line>
+                                    <line x1="15" x2="31" y1="24" y2="10"></line>
+                                    <line x1="5" x2="24" y1="19" y2="2"></line>
+                                    <line x1="31" x2="24" y1="10" y2="2"></line>
+                                    <line x1="18" x2="26" y1="7" y2="16"></line>
+
+                                </svg>
+
+                            </button>
+
+                            <div id="collapse-labels-body">
+                                <div id="collapse-labels" class="collapse collapse-horizontal">
+                                    <div id="labels" class="card card-body hstack">
+                                        <button title="favorite">
+
+                                            <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12" />
+                                            </svg>
+
+                                        </button>
+                                        <button title="planned">
+                                            <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3" />
+                                                <line class="thin" x1="17" x2="17" y1="17" y2="9"></line>
+                                                <line class="thin" x1="17" x2="22" y1="17" y2="22"></line>
+                                                <line x1="16" x2="18" y1="17" y2="17" stroke-width="3"></line>
+                                            </svg>
+                                        </button>
+                                        <button title="watching">
+                                            <svg id="monitor" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon class="empty" points="7,4 4,7 4,23 7,26 28,26 31,23 31,7 28,4" />
+                                                <polygon points="12,10 10,12 10,18 12,20  23,20 25,18 25,12 23,10" />
+                                                <line class="thin" x1="14" x2="21" y1="27" y2="27" />
+                                                <line x1="10" x2="25" y1="30" y2="30" />
+                                            </svg>
+                                        </button>
+                                        <button title="seen">
+                                            <svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4" />
+                                                <polygon points="17,7 20,12 21,13 23,14 27,14 27,16 27,17 25,9" />
+                                                <polygon points="17,27 20,22 21,21 23,20 27,20 27,17 27,19 25,25" />
+                                                <polygon points="17,27 14,22 13,21 11,20 7,20 7,17 7,19 10,25" />
+                                                <polygon points="17,7 14,12 13,13 11,14 7,14 7,16 7,17 10,9" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-            </div>
 
-            <!-- Film Poster Options -->
-            <div class="col-md-1">
+                <!-- Film Poster Options -->
+                <div class="col-md-2 position-absolute end-0 top-0">
+                    @if (IsAdmin)
+                    {
+                        <div class="editor editor-toggle dropdown">
+                            <button id="dropdown-edit-poster" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="icon icon-md icon-options-dots"></span>
+                            </button>
 
-                <div class="dropdown">
-                    <button id="dropdown-edit-poster" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                            </svg>
-                    </button>
+                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-poster">
+                                <li>
+                                    <a class="dropdown-item" data-bs-target="#modal-edit-poster" data-bs-toggle="modal" href="#">Replace picture</a>
+                                </li>
+                            </ul>
 
-                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-poster">
-						<li>
-                            <a class="dropdown-item" data-bs-target="#modal-edit-poster" data-bs-toggle="modal" href="#">Replace picture</a>
-                        </li>
-                    </ul>
-
+                        </div>
+                    }
                 </div>
 
             </div>
+
+
 
             <div class="col-md-7">
                 <div class="row">
 
-                    <!-- Main Object Information -->
-                    <div class="col-md-5">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Released on</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString("dd-MMM-yyyy"))</li>
+                    <div class="col-md-6 position-relative">
 
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Language of origin</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language.ToString())</li>
+                        <!-- Main Object Information -->
+                        <div class="col-md-10">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Released on</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString("dd-MMM-yyyy"))</li>
 
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Genres</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Cinema.Genres.BreakGenresFlag())</li>
-                        </ul>
-                    </div>
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Language of origin</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language.ToString())</li>
 
-                    <!-- Main Object Information Options -->
-                    <div class="col-md-1">
-                        <div class="dropdown">
-                            <button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                    <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                    <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                </svg>
-                            </button>
-
-                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
-                                <li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Genres</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Cinema.Genres.BreakGenresFlag())</li>
                             </ul>
                         </div>
-                    </div>
 
-                    <!-- Present Studios -->
-                    <div class="col-md-5">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Studios</li>
-                        </ul>
-                        <div class="row row-cols-2">
-                            @if (Model.Cinema.ProductionStudios != null)
+                        <!-- Main Object Information Options -->
+                        <div class="col-md-2 position-absolute end-0 top-0">
+                            @if (IsAdmin)
                             {
-                                @foreach (var studio in Model.Cinema.ProductionStudios)
-                                {
-									<div id="@studio.Id" class="col-6 mb-2 position-relative">
-                                        <a href="/encyclopedia/studios/@studio.Id">
+                                <div class="editor editor-toggle dropdown">
+                                    <button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="icon icon-md icon-options-dots"></span>
+                                    </button>
 
-                                            <img src=@(studio.Picture) class="img-fluid" style="width:fit-content;height:fit-content"
-                                            alt="Studio Image" />
-										</a>
-                                        <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="btn-close position-absolute del-record" style="visibility:hidden;" aria-label="Close"></button>
-                                    </div>
-                                }
+                                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
+                                        <li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+                                    </ul>
+                                </div>
                             }
-                        </div>   
+                        </div>
+
                     </div>
 
-                    <!-- Present Studios Options -->
-                    <div class="col-md-1">
-							<div class="dropdown">
-								<button id="dropdown-edit-studios" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-									<svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
-										<circle cx="5" cy="6"  r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-										<circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-										<circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-									</svg>
-								</button>
 
-								<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-studios">
-                                    <li><a class="dropdown-item" data-bs-target="#modal-add-studio" data-bs-toggle="modal" href="#">Add</a></li>
-									<li><a id="delete-studio" class="dropdown-item show-close-buttons" href="#">Delete</a></li>
-								</ul>
+                    <div class="col-md-6 position-relative">
+
+                        <!-- Present Studios -->
+                        <div class="col-md-10">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Studios</li>
+                            </ul>
+                            <div class="row row-cols-2">
+                                @if (Model.Cinema.ProductionStudios != null)
+                                {
+                                    @foreach (var studio in Model.Cinema.ProductionStudios)
+                                    {
+                                        <div id="@studio.Id" class="col-6 mb-2 position-relative records hide-delete hide-delete-studios" toggled-by="delete-studio">
+                                            <a href="/encyclopedia/studios/@studio.Id">
+
+                                                <img src=@(studio.Picture) class="img-fluid" style="width:fit-content;height:fit-content"
+                                                alt="Studio Image" />
+                                            </a>
+                                            @if(IsAdmin)
+                                            {
+                                                <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="editor btn-close position-absolute del-record" aria-label="Close"></button>
+                                            }
+                                        </div>
+                                    }
+                                }
                             </div>
-                            <a id="delete-studio-cancel" class="btn hide-close-buttons" style="visibility:hidden">Cancel</a>
+                        </div>
+
+                        <!-- Present Studios Options -->
+                        <div class="col-md-2 position-absolute end-0 top-0">
+                            @if (IsAdmin)
+                            {
+                                <div class="editor editor-toggle dropdown">
+                                    <button id="dropdown-edit-studios" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="icon icon-md icon-options-dots"></span>
+                                    </button>
+
+                                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-studios">
+                                        <li><a class="dropdown-item" data-bs-target="#modal-add-studio" data-bs-toggle="modal" href="#">Add</a></li>
+                                        <li><a id="delete-studio" class="dropdown-item show-close-buttons">Delete</a></li>
+                                    </ul>
+                                </div>
+                                <a id="delete-studio-cancel" class="btn hide-close-buttons" style="visibility:hidden">Cancel</a>
+                            }
+                        </div>
+
                     </div>
+
+
 
                 </div>
             </div>
@@ -325,83 +376,92 @@
                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
                     <div class="row">
 
-						<div class="col-md-11">
+                        <div class="col-md-11">
                             <span>Starring</span>
                         </div>
-						
+
                         <div class="col-md-1">
-                            <button id="button-add-starring" data-bs-target="#modal-add-starring" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
-								<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                                    <line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
-                                    <line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
-								</svg>
-							</button>
+                            @if(IsAdmin)
+                            { 
+                                <button class="editor editor-toggle button-add-starring" data-bs-target="#modal-add-starring" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+                                    <p class="icon icon-md icon-plus"></p>
+                                </button> 
+                            }
+
                         </div>
                     </div>
-					
+
                 </li>
             </ul>
 
             <!-- Carousel Block -->
             <div class="row carousel-row">
-                @if (Model.Cinema.Starrings != null)
-                {
-                    <div id="carousel-starrings" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
 
-                        <div class="col-1 text-bg-dark"></div>
+                <div id="carousel-starrings" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
 
-                        <div class="col-10 offset-1">
-                            <div class="carousel-inner">
-                                @{
-                                    int k = 5;
-                                    int m = Model.Cinema.Starrings.Length / k;
-                                    int L = m * k;
-                                }
+                    <div class="col-1 text-bg-dark"></div>
 
+                    @{
+                        int k = 5;
+                        int l = (Model.Cinema.Starrings == null ? 0 : Model.Cinema.Starrings.Length );
+                        int m = l / k;
+                        int L = m * k;                    
+                    }
+
+                    <div class="col-10 offset-1">
+                        <div class="carousel-inner">
+
+                            @if (l != 0)
+                            {
                                 <!-- Carousel Items -->
-                                @for (int i = 0; i < L+k; i+=k)
+                                @for (int i = 0; i < L + k; i += k)
                                 {
                                     <div class="@(i==0? "carousel-item active" : "carousel-item")">
-                                        <div class="row row-cols-@k">
-                                            @for (int j = i; j < i+k; j++)
+                                        <div class="row row-cols-@k carousel-page">
+                                            @for (int j = i; j < i + k; j++)
                                             {
-                                                @if(j == Model.Cinema.Starrings.Length){
+                                                @if (j == l)
+                                                {
+                                                    i = L + k;
                                                     break;
-                                                }
+												}
 
-                                                <div id="@Model.Cinema.Starrings[j].Id" class="col">
-		                    <form id="update-edit-starring-@Model.Cinema.Starrings[j].Id"  asp-page-handler="ReuseEditStarring"  method="post">
-							<partial name="_StarringCard" model="Model.Cinema.Starrings[j]" />
-                            </form>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
+												<div id="@Model.Cinema.Starrings![j].Id" class="col carousel-card">
+													<form id="update-edit-starring-@Model.Cinema.Starrings[j].Id" asp-page-handler="ReuseEditStarring" method="post">
+														<partial name="_StarringCard" model="Model.Cinema.Starrings[j]" />
+													</form>
+												</div>
+											}
+										</div>
+									</div>
+								}
 
-                        <div class="col-1 text-bg-dark"></div>
+							}
+						</div>
+					</div>
 
-                        <!-- Slide Buttons -->
-                        @if (Model.Cinema.Starrings.Length > 4)
-                        {
-                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-starrings" style="background-color:lightgrey;width:40px" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-starrings" style="background-color:lightgrey;width:40px" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
+
+					<div class="col-1 text-bg-dark"></div>
+
+					<!-- Slide Buttons -->
+					<button class="carousel-button carousel-control-prev @(l > k-1 ? "" : "no-display")" type="button" data-bs-target="#carousel-starrings" style="background-color:lightgrey;width:40px" data-bs-slide="prev">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="visually-hidden">Previous</span>
+					</button>
+					<button class="carousel-button carousel-control-next @(l > k-1 ? "" : "no-display")" type="button" data-bs-target="#carousel-starrings" style="background-color:lightgrey;width:40px" data-bs-slide="next">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="visually-hidden">Next</span>
+					</button>
+
+				</div>
+
+			</div>
+		</div>
 
 	</div>
 
-	<script src="~/js/cinema_events.js" asp-append-version="true"></script>
+
+	<script src="~/js/cinema_events.js" asp-append-version="true" type="module"></script>
+	<script src="~/js/starring_events.js" asp-append-version="true" type="module"></script>
 
 </body>

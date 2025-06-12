@@ -4,9 +4,10 @@
 	bool NewStarring = Model.Id is null;
 }
 
-
-<input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
-<input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
+<input type="hidden" id="partial" name="partial" value="form"/>
+<input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)"/>
+<input type="hidden" asp-for="@(Model.Name)" value="@(Model.Name)"/>
+<input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)"/>
 
 
 <div class="row">
@@ -21,11 +22,11 @@
 			<ul class="list-group list-group-flush">
 				@if (NewStarring)
 				{
-					<li class="list-group-item form-group position-relative">
+					<li class="list-group-item form-group position-relative search-dropdown search-starring">
 						<label asp-for="Name">Provide name</label>
 						<br>
-						<input id="search-starring" class="form-control" asp-for="Name" autofocus>
-						<ul id="suggestions-starring" class="list-group search-suggestions"></ul>
+						<input class="form-control search-input " asp-for="Name" autofocus autocomplete="off">
+						<ul class="list-group search-suggestions suggestions-starring"></ul>
 						<br>
 						<span asp-validation-for="Name" class="text-danger"></span>
 					</li>
@@ -34,7 +35,7 @@
 				else
 				{
 					<li class="list-group-item form-group">
-						<input id="search-starring" class="form-control" placeholder="@Model.Name" asp-for="Name" value="@Model.Name" disabled>
+						<input class="form-control search-input search-starring" placeholder="@Model.Name" asp-for="Name" value="@Model.Name" disabled>
 					</li>
 				}
 			</ul>
@@ -61,7 +62,7 @@
 					}
 
 				</div>
-				<span asp-validation-for="@Model.Jobs" class="text-danger"></span>
+				<span asp-validation-for="@Model.JobsBind" class="text-danger"></span>
 			</li>
 			<li class="list-group-item form-group">
 				<label asp-for="RoleName">Provide actor's role name</label>

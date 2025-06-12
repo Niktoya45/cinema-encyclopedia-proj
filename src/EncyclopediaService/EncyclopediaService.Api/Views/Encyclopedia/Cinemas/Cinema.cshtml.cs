@@ -17,6 +17,9 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         [BindProperty(SupportsGet = true)]
         public string? Id { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? RecordId { get; set; }
+
         [BindProperty]
         public Cinema? Cinema { get; set; } = default!;
 
@@ -51,7 +54,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             {
                 Id = id,
                 Name = "Cinema Title With Additional Length for Test Purposes",
-                Picture = "/img/poster_placeholder.png",
+                Picture = null,
                 ReleaseDate = new DateOnly(2004, 12, 4),
                 Genres = Genre.Western | Genre.Mystery | Genre.Thriller,
                 Language = 0,
@@ -70,12 +73,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Description = "Cinema description goes here. This cinema is about.."
             };
             
-
-
-            if (Cinema.Picture is null) 
-            {
-                Cinema.Picture = _settings.DefaultPosterPicture;
-            }
 
             if (Cinema.Description is null) 
             {
@@ -167,62 +164,99 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         {
             // Implement: send delete request specifying ParentId and Id to mediatre proxy
 
-            if (!ModelState.IsValid)
-            {
-                return Redirect("/Error");
-            }
-
-            return await OnGet(id);
+            return new OkObjectResult(RecordId);
         }
 
         public async Task<IActionResult> OnPostAddStarring([FromRoute] string id)
         {
             // Implement: convert EditStarring object to Starring, set ParentId and send post request to mediatre proxy
 
+            ModelState.Remove("GenresBind"); // considered during validation, reason is unknown
+
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseAddStarring(true);
             }
 
-            return await OnGet(id);
-        }
+            EditStarring.Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j);
 
-        public IActionResult OnPostReuseEditStarring()
-        {
-            EditStarring!.JobsBind = new List<Job>();
-            return Partial("_AddStarring", EditStarring);
-
+            return Partial("_StarringCard", new Starring
+            {
+                ParentId = null,
+                Id = EditStarring.Id,
+                Name = EditStarring.Name,
+                Picture = EditStarring.Picture,
+                Jobs = EditStarring.Jobs,
+                RoleName = EditStarring.RoleName,
+                RolePriority = EditStarring.RolePriority
+            });
         }
 
         public async Task<IActionResult> OnPostEditStarring([FromRoute] string id)
         {
             // Implement: convert EditStarring object to Starring, set ParentId and send put request to mediatre proxy
 
+            ModelState.Remove("GenresBind"); // considered during validation, reason is unknown
+
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseEditStarring(true);
             }
 
-            return await OnGet(id);
+            EditStarring.Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j);
+
+            return Partial("_StarringCard", new Starring
+            {
+                ParentId = null,
+                Id = EditStarring.Id,
+                Name = EditStarring.Name,
+                Picture = EditStarring.Picture,
+                Jobs = EditStarring.Jobs,
+                RoleName = EditStarring.RoleName,
+                RolePriority = EditStarring.RolePriority
+            });
         }
 
         public async Task<IActionResult> OnPostDeleteStarring([FromRoute] string id)
         {
             // Implement: send delete request with ParentId and Id to mediatre proxy
 
-            if (!ModelState.IsValid)
-            {
-                return Redirect("/Error");
-            }
-
-            return await OnGet(id);
+            return new OkObjectResult(RecordId);
         }
 
-        public async Task OnPostRate([FromRoute] string id, [FromQuery] byte score)
+        public async Task OnPostRate([FromRoute] string id, [FromBody] byte score)
         {
             UserScore = score;
 
             //return Page();
+        }
+
+        public async Task OnPostLabel([FromRoute] string id, [FromBody] byte label)
+        {
+
+            //return Page();
+        }
+
+        public IActionResult OnPostReuseAddStarring(bool error = false)
+        {
+            //EditStarring!.JobsBind = new List<Job>();
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+
+            return Partial("_AddStarring", EditStarring);
+
+        }
+
+        public IActionResult OnPostReuseEditStarring(bool error = false)
+        {
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+            return Partial("_AddStarring", EditStarring);
+
         }
 
     }

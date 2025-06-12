@@ -16,6 +16,9 @@ namespace EncyclopediaService.Api.Models.Utils
         [HtmlAttributeName("save-close")]
         public bool SaveClose { get; set; }
 
+        [HtmlAttributeName("add-button")]
+        public bool AddButton { get; set; } = true;
+
         public override async void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "div";
@@ -35,11 +38,16 @@ namespace EncyclopediaService.Api.Models.Utils
 
             output.PostContent.SetHtmlContent(
                 $@"</div>
-                          <div class=""modal-footer"">
+                          { (AddButton ?
+
+                          $@"<div class=""modal-footer"">
                             <button {(Form != null ? $@"id=""submit-{Form}"" form={Form}" : "")} type=""submit"" class=""btn btn-secondary"" data-bs-target=""{Id}"" {(SaveClose ? @"data-bs-dismiss=""modal""" : "")}>
                                 Save
                             </button>
-                          </div>
+                          </div>"
+
+                          : " ")
+                          }
                         </div>
                     </div>
                 </div>"

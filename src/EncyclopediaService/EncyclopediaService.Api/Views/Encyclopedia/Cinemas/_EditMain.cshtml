@@ -2,58 +2,53 @@
 @{
 }
 
-<div class="container-fluid">
-    <form id="form-edit-main" asp-page-handler="editCinema" class="trim-inputs" method="post">
-        <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+<input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+<ul class="list-group list-group-flush">
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<input class="form-control" asp-for="@Model.Name" value="@Model.Name" type="text" />
+		<br>
+		<span asp-validation-for="@Model.Name" class="text-danger"></span>
+	</li>
 
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input class="form-control" asp-for="@Model.Name" value="@Model.Name" type="text" />
-                <br>
-                <span asp-validation-for="@Model.Name" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Released on</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<input type="date" class="form-control" asp-for="@Model.ReleaseDate" value="@(Model.ReleaseDate.ToString("yyyy-MM-dd"))" />
+		<br>
+		<span asp-validation-for="@Model.ReleaseDate" class="text-danger"></span>
+	</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Released on</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input type="date" class="form-control" asp-for="@Model.ReleaseDate" value="@(Model.ReleaseDate.ToString("yyyy-MM-dd"))" />
-                <br>
-                <span asp-validation-for="@Model.ReleaseDate" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Language of origin</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<select class="form-select" asp-for="@Model.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+		<br>
+		<span asp-validation-for="@Model.Language" class="text-danger"></span>
+	</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Language of origin</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <select class="form-select" asp-for="@Model.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
-                <br>
-                <span asp-validation-for="@Model.Language" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Genres</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Genres</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<div class="row row-cols-3">
 
-                <div class="row row-cols-3">
+			@foreach (int genre in Enum.GetValues(typeof(Genre)))
+			{
+				@if (genre == 0)
+				{
+					continue;
+				}
+				<div class="col-4 ps-0 pe-0">
+					<input id="genres_@genre" type="checkbox" name="GenresBind" value="@genre" @(((Model.Genres & (Genre)genre) != 0) ? "checked" : "") />
+					<label for="genres_@genre" class="fs-5">@((Genre)genre)</label>
+				</div>
+			}
 
-                    @foreach (int genre in Enum.GetValues(typeof(Genre)))
-                    {
-                        @if (genre == 0)
-                        {
-                            continue;
-                        }
-                        <div class="col-4 ps-0 pe-0">
-                            <input id="genres_@genre" type="checkbox" name="GenresBind" value="@genre" @(((Model.Genres & (Genre)genre) != 0) ? "checked" : "") />
-                            <label for="genres_@genre" class="fs-5">@((Genre)genre)</label>
-                        </div>
-                    }
+		</div>
+		<span asp-validation-for="@Model.GenresBind" class="text-danger"></span>
+	</li>
 
-                </div>
-                <span asp-validation-for="@Model.GenresBind" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
+	</li>
+</ul>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
-            </li>
-        </ul>
-
-    </form>
-</div>

@@ -4,6 +4,7 @@
 }
 
 <input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
+<input type="hidden" asp-for="@(Model.Name)" value="@(Model.Name)">
 <input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
 
 <div class="row">
@@ -13,11 +14,11 @@
 	<div class="col-6">
 
 			    <ul class="list-group list-group-flush">
-				<li class="list-group-item form-group">
+				<li class="list-group-item form-group search-dropdown search-studio">
 						<label asp-for="Name">Provide name</label>
 						<br>
-						<input id="search-studio" class="form-control" placeholder="Search.." asp-for="Name" autofocus>
-					    <ul id="suggestions-studio" class="list-group search-suggestions"></ul>
+						<input class=" search-input form-control" placeholder="Search.." asp-for="Name" autofocus autocomplete="off">
+					    <ul class="list-group suggestions-studio search-suggestions"></ul>
 						<br>
 						<span asp-validation-for="Name" class="text-danger"></span>
 					</li>

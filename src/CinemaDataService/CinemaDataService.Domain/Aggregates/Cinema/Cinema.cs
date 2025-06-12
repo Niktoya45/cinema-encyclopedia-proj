@@ -13,6 +13,8 @@ namespace CinemaDataService.Domain.Aggregates.CinemaAggregate
 
         [BsonRepresentation(BsonType.Int32)]
         public Language Language { get; set; }
+
+        [BsonElement("Rating")]
         public RatingScore Rating { get; set; } = new RatingScore();
 
         [BsonElement("ProductionStudios")]

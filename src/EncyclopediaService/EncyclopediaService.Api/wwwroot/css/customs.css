@@ -1,4 +1,23 @@
 ﻿
+.btn-refresh {
+    border: none;
+    background-color: transparent;
+    width: auto;
+    height: auto;
+}
+
+.no-display {
+    display:none;
+}
+
+.label-delete {
+    padding:2rem;
+}
+
+#modal-delete-element .container-fluid{
+    padding:4rem;
+}
+
 
 .link-black {
     color: black;
@@ -93,6 +112,10 @@
 #account #account-name {
     text-align: center;
     font-weight: 600;
+}
+
+.hide-delete .del-record {
+    visibility: hidden;
 }
 
 #rating {
@@ -229,6 +252,16 @@
     stroke: whitesmoke;
     stroke-width: 3;
     fill: none;
+}
+
+.search-suggestions li {
+    background-color:none;
+    transition: all ease-out 0.2s;
+}
+
+.search-suggestions li:hover {
+    background-color: #74808855;
+    transition: all ease-out 0.2s;    
 }
 
 .starring-card,

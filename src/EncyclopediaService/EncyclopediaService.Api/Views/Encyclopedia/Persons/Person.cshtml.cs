@@ -49,18 +49,13 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 Jobs = Job.Actor,
                 Picture = "/img/person_placeholder.png",
                 Filmography = new CinemaRecord[] {
-                    new CinemaRecord { Id = "1", Name = "Cinema Title Long Long", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "2", Name = "Cinema Title Long", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "3", Name = "Cinema Title", Year=2000, Picture="/img/grid_poster_placeholder.png"},
-                    new CinemaRecord { Id = "4", Name = "Cinema Title", Year=2000, Picture="/img/grid_poster_placeholder.png"}
+                    new CinemaRecord { Id = "1", Name = "Cinema Title Long Long", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "2", Name = "Cinema Title Long", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "3", Name = "Cinema Title", Year=2000, Picture=null},
+                    new CinemaRecord { Id = "4", Name = "Cinema Title", Year=2000, Picture=null}
                 },
                 Description = "Person description goes here. A prominent actor.."
             };
-
-            if (Person.Picture is null)
-            {
-                Person.Picture = _settings.DefaultPersonPicture;
-            }
 
             if (Person.Description is null)
             {

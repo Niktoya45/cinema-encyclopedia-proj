@@ -1,48 +1,55 @@
-﻿@using EncyclopediaService.Api.Models.Display
+﻿@using EncyclopediaService.Api.Extensions;
+@using EncyclopediaService.Api.Models.Display
 @model CinemaRecord
 @{
+	bool IsAdmin = User.IsAdmin();
 }
 
 <div class="card film-card mb-4">
 	<div class="row">
 		<div class="col-md-auto">
 
-			<div class="d-flex">
+			<div class="d-flex cinema-poster-grid">
 				<a href="/encyclopedia/cinemas/@Model.Id">
-					<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+					@if (Model.Picture != null)
+					{
+						<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+					}
+					else
+					{
+						<img class="img img-fluid img-placeholder" style="width:130px;" alt="@(Model.Name)">
+					}
 				</a>
 
-				<div class="dropdown">
-					<button id="dropdown-filmography" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-						<svg width="7" height="20" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="4" cy="4" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-							<circle cx="4" cy="10" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-							<circle cx="4" cy="16" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-						</svg>
-					</button>
+				@if (IsAdmin)
+				{
+					<div class="editor editor-toggle dropdown">
+						<button id="dropdown-filmography" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="icon icon-sm icon-options-dots mt-3"></span>
+						</button>
 
-					<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-filmography">
-						@if (Model.ParentId is null)
-						{
-							<li>
-								<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id"
-										data-bs-target="#modal-delete-filmography" data-bs-toggle="modal" href="#">
-									Delete
-								</button>
-							</li>
+						<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-filmography">
+							@if (Model.ParentId is null)
+							{
+								<li>
+									<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id"
+									data-bs-target="#modal-delete-filmography" data-bs-toggle="modal" href="#">
+										Delete
+									</button>
+								</li>
 
-						}
-						else
-						{
-							<li>
-								<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id">
-									Delete
-								</button>
-							</li>
-						}
-					</ul>
-				</div>
-
+							}
+							else
+							{
+								<li>
+									<button class="dropdown-item dropdown-delete-filmography" value="@Model.Id">
+										Delete
+									</button>
+								</li>
+							}
+						</ul>
+					</div>
+				}
 			</div>
 
 		</div>

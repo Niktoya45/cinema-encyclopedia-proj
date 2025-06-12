@@ -3,6 +3,9 @@
 @model EncyclopediaService.Api.Views.Encyclopedia.Persons.PersonModel;
 @{
     ViewData["Title"] = "Person";
+
+    var Role = User.FindFirst("role");
+    bool IsAdmin = User.IsAdmin();
 }
 
 
@@ -11,26 +14,33 @@
 }
 
 <body>
+    @if (IsAdmin)
+    {
+        <!-- Edit Main Information Popup -->
+        <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+            <div class="container-fluid">
+                <form id="form-edit-main" asp-page-handler="editPerson" class="trim-inputs" method="post">
+                    <partial name="_EditMain" model="Model.EditMain" />
+                </form>
+            </div>
+        </form-popup>
 
-    <!-- Edit Main Information Popup -->
-    <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
-        <partial name="_EditMain" model="Model.EditMain" />
-    </form-popup>
+        <!-- Edit Person Picture Popup -->
+        <form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose person picture" lock="true" save-close="true" scroll="true">
+            <form id="form-edit-picture" asp-page-handler="editPicture" class="trim-inputs" method="post" enctype="multipart/form-data">
+                <partial name="_EditPicture" model="Model.EditPicture" />
+            </form>
+        </form-popup>
 
-    <!-- Edit Person Picture Popup -->
-    <form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose person picture" lock="true" save-close="true" scroll="true">
-	    <form id="form-edit-picture" asp-page-handler="editPicture" class="trim-inputs" method="post" enctype="multipart/form-data">
-            <partial name="_EditPicture" model="Model.EditPicture" />
-        </form>
-    </form-popup>
-
-    <!-- Add Filmography Popup -->
-    <form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
-        <form id="form-add-filmography" asp-page-handler="addFilmography" class="trim-inputs" method="post">
-            <partial name="_AddFilm" model="Model.NewFilmography" />
-        </form>
-    </form-popup>
-
+        <!-- Add Filmography Popup -->
+        <form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
+            <div class="container-fluid">
+                <form id="form-add-filmography" asp-page-handler="addFilmography" class="trim-inputs" method="post">
+                    <partial name="_AddFilm" model="Model.NewFilmography" />
+                </form>
+            </div>
+        </form-popup>
+    }
 
     <h1>Person</h1>
     <div class="container mt-5" style="margin-bottom:6rem">
@@ -50,70 +60,84 @@
 
         <div class="row">
 
-            <!-- Person Picture -->
-            <div class="col-md-3 offset-1">
-                <img src=@(Model.Person.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Person Image">
-            </div>
+            <!-- Person Picture Block -->
+            <div class="col-md-4 offset-1 position-relative">
 
-            <!-- Person Picture Options -->
-            <div class="col-md-1">
+                <!-- Person Picture -->
+                <div class="col-md-10 person-picture">
+                    @if (Model.Person.Picture != null)
+                    {
+                        <img src="@(Model.Person.Picture)" class="img img-fluid" alt="Poster Image">
+                    }
+                    else
+                    {
+                        <img class="img img-fluid img-placeholder" alt="Poster Image">
+                    }
+                </div>
 
-                <div class="dropdown">
-                    <button id="dropdown-edit-picture" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-                        <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                            <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                            <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                        </svg>
-                    </button>
+                <!-- Person Picture Options -->
+                <div class="col-md-2 position-absolute end-0 top-0">
+                    @if (IsAdmin)
+                    {
+                        <div class="editor editor-toggle dropdown">
+                            <button id="dropdown-edit-picture" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="icon icon-md icon-options-dots"></span>
+                            </button>
 
-                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-picture">
-                        <li>
-                            <a class="dropdown-item" data-bs-target="#modal-edit-picture" data-bs-toggle="modal" href="#">Replace picture</a>
-                        </li>
-                    </ul>
+                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-picture">
+                                <li>
+                                    <a class="dropdown-item" data-bs-target="#modal-edit-picture" data-bs-toggle="modal" href="#">Replace picture</a>
+                                </li>
+                            </ul>
 
+                        </div>
+                    }
                 </div>
 
             </div>
 
+
             <div class="col-md-7">
                 <div class="row">
 
-                    <!-- Main Object Information Col-1 -->
-                    <div class="col-md-5">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.BirthDate.ToString("dd-MMM-yyyy"))</li>
+                    <!-- Main Object Information Block -->
+                    <div class="col position-relative">
 
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Occupations</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Person.Jobs.BreakJobsFlag())</li>
+                        <!-- Main Object Information Col-1 -->
+                        <div class="col-md-5">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.BirthDate.ToString("dd-MMM-yyyy"))</li>
 
-                            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Country of origin</li>
-                            <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country.ToString())</li>
-                        </ul>
-                    </div>
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Occupations</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Person.Jobs.BreakJobsFlag())</li>
 
-                    <div class="col-md-1"></div>
-
-                    <!-- Main Object Information Col-2 (Optional) -->
-                    <div class="col-md-5"></div>
-
-                    <!-- Main Object Information Options -->
-                    <div class="col-md-1">
-                        <div class="dropdown">
-                            <button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg width="9" height="30" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="5" cy="6" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                    <circle cx="5" cy="15" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                    <circle cx="5" cy="24" r="3" stroke="none" fill="#aaaaaa" stroke-width="0" />
-                                </svg>
-                            </button>
-
-                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
-                                <li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+                                <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Country of origin</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country.ToString())</li>
                             </ul>
                         </div>
+
+                        <div class="col-md-1"></div>
+
+                        <!-- Main Object Information Col-2 (Optional) -->
+                        <div class="col-md-5"></div>
+
+                        <!-- Main Object Information Options -->
+                        <div class="col-md-1 position-absolute end-0 top-0">
+                            @if (IsAdmin)
+                            {
+                                <div class="editor editor-toggle dropdown">
+                                    <button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="icon icon-md icon-options-dots"></span>
+                                    </button>
+
+                                    <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
+                                        <li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+
                     </div>
 
                 </div>
@@ -144,12 +168,12 @@
                         </div>
 
                         <div class="col-md-1">
-                            <button id="button-add-filmography" data-bs-target="#modal-add-filmography" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
-                                <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                                    <line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
-                                    <line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
-                                </svg>
-                            </button>
+                            @if (IsAdmin)
+                            {
+                                <button class="editor editor-toggle button-add-filmography" data-bs-target="#modal-add-filmography" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+                                    <span class="icon icon-md icon-plus"></span>
+                                </button>
+                            }
                         </div>
                     </div>
 
@@ -163,16 +187,17 @@
                     <div id="carousel-filmography" class="carousel slide" data-bs-interval="false" data-bs-touch="false">
 
                         <div class="col-1 text-bg-dark"></div>
+                        @{
+                            const int r = 2;
+                            const int c = 5;
+                            int k = r * c;
+                            int l = (Model.Person.Filmography == null ? 0 : Model.Person.Filmography.Length);
+                            int m = l / k;
+                            int L = m * k;
+                        }
 
                         <div class="col-10 offset-1">
                             <div class="carousel-inner">
-                                @{
-                                    const int r = 2;
-                                    const int c = 5;
-                                    int k = r*c;
-                                    int m = Model.Person.Filmography.Length / k;
-                                    int L = m * k;
-                                }
 
                                 <!-- Carousel Items -->
                                 @for (int i = 0; i < L+k; i+=k)
@@ -181,7 +206,8 @@
                                         <div class="row row-cols-@c">
                                             @for (int j = i; j < i+k; j++)
                                             {
-                                                @if(j == Model.Person.Filmography.Length){
+                                                @if(j == l){
+                                                    i = L + k;
                                                     break;
                                                 }
                                                 <div id="@Model.Person.Filmography[j].Id" class="col">
@@ -199,17 +225,15 @@
                         <div class="col-1 text-bg-dark"></div>
 
                         <!-- Slide Buttons -->
-                        @if (Model.Person.Filmography.Length > 4)
-                        {
-                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        }
+						<button class="carousel-button carousel-control-prev @(l > k-1 ? "" : "no-display")" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="prev">
+							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Previous</span>
+						</button>
+                        <button class="carousel-button carousel-control-next @(l > k-1 ? "" : "no-display")" type="button" data-bs-target="#carousel-filmography" style="background-color:lightgrey;width:40px" data-bs-slide="next">
+							<span class="carousel-control-next-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Next</span>
+						</button>
+
                     </div>
                 }
             </div>

@@ -1,4 +1,6 @@
 ﻿using EncyclopediaService.Api.Models.Display;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace EncyclopediaService.Api.Models.Edit
 {
@@ -9,6 +11,9 @@ namespace EncyclopediaService.Api.Models.Edit
         public string? Picture { get; set; }
 
         public Job Jobs { get; set; }
+
+        [DisplayName("Jobs")]
+        [Required(ErrorMessage="Choose at least one occupation")]
         public List<Job> JobsBind { get; set; } = default!;
         public string? RoleName { get; set; }
         public RolePriority? RolePriority { get; set; }

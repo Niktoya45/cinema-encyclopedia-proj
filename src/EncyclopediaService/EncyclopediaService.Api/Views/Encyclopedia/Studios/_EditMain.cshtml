@@ -2,43 +2,41 @@
 @model EncyclopediaService.Api.Models.Edit.EditMainStudio
 @{
 }
-<div class="container-fluid">
-    <form id="form-modal-edit-main" asp-page-handler="editStudio" class="trim-inputs" method="post">
-        <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input class="form-control" asp-for="@Model.Name" value="@Model.Name" type="text" />
-                <br>
-                <span asp-validation-for="@Model.Name" class="text-danger"></span>
-            </li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input type="date" class="form-control" asp-for="@Model.FoundDate" value="@(Model.FoundDate.ToString("yyyy-MM-dd"))" />
-                <br>
-                <span asp-validation-for="@Model.FoundDate" class="text-danger"></span>
-            </li>
+<input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+<ul class="list-group list-group-flush">
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<input class="form-control" asp-for="@Model.Name" value="@Model.Name" type="text" />
+		<br>
+		<span asp-validation-for="@Model.Name" class="text-danger"></span>
+	</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <select class="form-select" asp-for="@Model.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
-                <br>
-                <span asp-validation-for="@Model.Country" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<input type="date" class="form-control" asp-for="@Model.FoundDate" value="@(Model.FoundDate.ToString("yyyy-MM-dd"))" />
+		<br>
+		<span asp-validation-for="@Model.FoundDate" class="text-danger"></span>
+	</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">President name</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input class="form-control" asp-for="@Model.PresidentName" value="@Model.PresidentName" type="text" />
-                <br>
-                <span asp-validation-for="@Model.PresidentName" class="text-danger"></span>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<select class="form-select" asp-for="@Model.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
+		<br>
+		<span asp-validation-for="@Model.Country" class="text-danger"></span>
+	</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
-            </li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">President name</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<input class="form-control" asp-for="@Model.PresidentName" value="@Model.PresidentName" type="text" />
+		<br>
+		<span asp-validation-for="@Model.PresidentName" class="text-danger"></span>
+	</li>
 
-        </ul>
-    </form>
-</div>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
+	<li class="list-group-item mb-4 border-bottom border-info fs-6">
+		<textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
+	</li>
+
+</ul>
+

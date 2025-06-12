@@ -2,6 +2,7 @@
 @using EncyclopediaService.Api.Extensions;
 @model StudioRecord
 @{
+	bool IsAdmin = User.IsAdmin();
 }
 
 
@@ -9,46 +10,51 @@
 	<div class="row">
 		<div class="col-md-auto">
 
-			<div class="d-flex">
+			<div class="d-flex studio-logo-grid">
 
 				<a href="/encyclopedia/persons/@Model.Id">
-					<img src=@(Model.Picture) style="width:130px;height:130px" alt="@(Model.Name)">
+					@if (Model.Picture != null)
+					{
+						<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+					}
+					else
+					{
+						<img class="img img-fluid img-placeholder" style="width:130px;" alt="@(Model.Name)">
+					}
 				</a>
 
-				<div class="dropdown">
-					<button id="dropdown-studio" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-						<svg width="7" height="20" xmlns="http://www.w3.org/2000/svg">
-							<circle cx="4" cy="4" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-							<circle cx="4" cy="10" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-							<circle cx="4" cy="16" r="2" stroke="none" fill="#cccccc" stroke-width="0" />
-						</svg>
-					</button>
+				@if (IsAdmin)
+				{
+					<div class="editor editor-toggle dropdown">
+						<button id="dropdown-studio" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="icon icon-sm icon-options-dots mt-3"></span>
+						</button>
 
-					<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-studio">
+						<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-studio">
 
-						@if (Model.ParentId is null)
-						{
-							<li>
-								<button class="dropdown-item dropdown-delete-studio" value="@Model.Id"
-								data-bs-target="#modal-delete-studio" data-bs-toggle="modal" href="#">
-									Delete
-								</button>
-							</li>
+							@if (Model.ParentId is null)
+							{
+								<li>
+									<button class="dropdown-item dropdown-delete-studio" value="@Model.Id"
+									data-bs-target="#modal-delete-studio" data-bs-toggle="modal" href="#">
+										Delete
+									</button>
+								</li>
 
-						}
-						else
-						{
-							<li>
-								<button class="dropdown-item dropdown-delete-studio" value="@Model.Id">
-									Delete
-								</button>
-							</li>
-						}
+							}
+							else
+							{
+								<li>
+									<button class="dropdown-item dropdown-delete-studio" value="@Model.Id">
+										Delete
+									</button>
+								</li>
+							}
 
 
-					</ul>
-				</div>
-
+						</ul>
+					</div>
+				}
 			</div>
 		</div>
 	</div>
