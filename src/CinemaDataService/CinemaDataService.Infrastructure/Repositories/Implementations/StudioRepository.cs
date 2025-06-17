@@ -101,16 +101,18 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             var find = Builders<Studio>.Filter.Where(e => e.Id == entity.Id);
 
-            Studio? studio = await FindOne(find, ct);
 
-            if (studio is null)
-            {
-                return null;
-            }
 
             var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
 
             if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            Studio? studio = await FindOne(find, ct);
+
+            if (studio is null)
             {
                 return null;
             }

@@ -50,6 +50,7 @@ namespace EncyclopediaService.Api.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string? Picture { get; set; } = default(string);
+        public string? PictureUri { get; set; } = default(string);
         public DateOnly ReleaseDate { get; set; }
         public Genre Genres { get; set; }
         public Language? Language { get; set; }

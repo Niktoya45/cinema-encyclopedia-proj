@@ -20,7 +20,7 @@ namespace CinemaDataService.Api.Queries.PersonQueries
         public async Task<IEnumerable<SearchResponse>> Handle(PersonsSearchQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Person>? persons = await _repository.FindByName(tokens: request.Search, pg: request.Pg, ct: cancellationToken);
-
+            
 
             if (persons == null)
             {

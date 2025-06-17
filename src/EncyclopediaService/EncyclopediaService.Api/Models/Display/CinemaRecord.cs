@@ -7,5 +7,6 @@
         public int Year { get; set; }
         public double Rating { get; set; }
         public string? Picture { get; set; } = default;
+        public string? PictureUri { get; set; } = default;
     }
 }

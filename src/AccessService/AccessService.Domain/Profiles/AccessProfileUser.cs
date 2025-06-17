@@ -10,8 +10,13 @@ public class AccessProfileUser : IdentityUser
     public AccessProfileUser() : base()
     {
     }
-    public AccessProfileUser(string username) : base(username)
+    public AccessProfileUser(string email, string sub, string appUsername) : base(email)
     {
+        Sub = sub;
+        AppUsername = appUsername;
     }
+
+    public string Sub { get; set; }
+    public string AppUsername { get; set; }
 }
 

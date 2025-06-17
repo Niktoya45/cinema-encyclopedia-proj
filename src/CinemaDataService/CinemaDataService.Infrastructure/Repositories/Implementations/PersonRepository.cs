@@ -102,16 +102,16 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             var find = Builders<Person>.Filter.Where(e => e.Id == entity.Id);
 
-            Person? person = await FindOne(find, ct);
+            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
 
-            if (person is null)
+            if (!res.IsAcknowledged)
             {
                 return null;
             }
 
-            var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+            Person? person = await FindOne(find, ct);
 
-            if (!res.IsAcknowledged)
+            if (person is null)
             {
                 return null;
             }

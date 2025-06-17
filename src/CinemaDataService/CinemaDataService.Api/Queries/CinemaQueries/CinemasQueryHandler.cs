@@ -22,6 +22,7 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
         public async Task<Page<CinemasResponse>> Handle(CinemasQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             IEnumerable<Cinema>? cinemas = null;
+            request.Query.Pg.Take += Pagination._add;
 
             switch (request.Query)
             {

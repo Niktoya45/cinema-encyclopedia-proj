@@ -1,10 +1,12 @@
 ﻿
-import { fetchPostMVC, addSearchEvents, getPartialType, getHidden, bsElementClose, appendToCarousel, approveDelete } from './utils.js';
+import {
+    fetchPostMVC, fetchForm, addSearchEvents,
+    getHidden, approveDelete
+} from './utils.js';
 
 
 // ** DEFINED ELEMENTS ** //
-const kpage = 5;
-const nrows = 1;
+
 const modalFormAddId = 'modal-add-starring';
 const modalFormEditId = 'modal-edit-starring';
 const formAddId = 'form-add-starring';
@@ -12,7 +14,6 @@ const formEditId = 'form-edit-starring';
 const formDeleteId = 'form-delete-element'
 const optionEditSelector = ".dropdown-menu .dropdown-edit-starring";
 const optionDeleteSelector = ".dropdown-menu .dropdown-delete-starring";
-const carouselId = "carousel-starrings";
 
 const classDelete = 'label-starring';
 
@@ -28,12 +29,9 @@ var formEdit = document.getElementById(formEditId);
 var formEditSubmit = document.getElementById(formEditSubmitId);
 var formDelete = document.getElementById(formDeleteId);
 
-var carousel = document.getElementById(carouselId);
-
 const reuseAddAction = window.location.pathname + "?handler=reuseaddstarring";
 const reuseEditAction = window.location.pathname + "?handler=reuseeditstarring";
 const deleteAction = window.location.pathname + "?handler=deletestarring";
-
 
 //** ONLOAD ACTIONS ** //
 
@@ -57,55 +55,47 @@ refsDeleteStarring.forEach(function (ref) {
 
 refreshFormAdd(formAdd);
 
+
 // ** METHODS USED ** //
 
 
 // add onclick event to add submit
+export function addFormAddSubmitStarring(actionAddStarring) {
 
-formAddSubmit.addEventListener('click', function (e) {
+    formAddSubmit.addEventListener('click', function (e) {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    let form = formAdd;
+        let form = formAdd;
 
-    fetchFormAdd(form);
+        fetchFormAddStarring(form, actionAddStarring);
 
-});
+    });
+}
+
 
 // add onclick event to edit submit
+export function addFormEditSubmitStarring(actionEditStarring) {
 
-formEditSubmit.addEventListener('click', function (e) {
+    formEditSubmit.addEventListener('click', function (e) {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    let form = formEdit;
+        let form = formEdit;
 
-    fetchFormEdit(form);
+        fetchFormEditStarring(form, actionEditStarring);
 
-});
+    });
+}
 
 
 // send add form data
-function fetchFormAdd(form) {
 
-    fetchPostMVC(form, form.action, "TEXT")
-        .then((result) => {
+function fetchFormAddStarring(form, actionAddStarring) {
 
-            let placeholder = document.createElement("div");
-
-            placeholder.innerHTML = result;
-
-            if (getPartialType(placeholder) == "form") {
-
-                let form = formAdd;
-
-                form.innerHTML = result;
-                placeholder.remove();
-
-                refreshFormAdd(form);
-
-                return;
-            }
+    fetchForm(
+        form,
+        function (placeholder) {
 
             let formWrap = document.createElement("form");
 
@@ -125,49 +115,43 @@ function fetchFormAdd(form) {
             addFormEditStarringOption(div.querySelector(optionEditSelector));
             addFormDeleteStarringOption(div.querySelector(optionDeleteSelector));
 
-            // arrange elements in carousel
-            appendToCarousel(carousel, div, nrows, kpage);
+            // callback after starring addition
+            if (actionAddStarring) {
+                actionAddStarring(div);
+            }
 
-            let modal = modalFormAdd;
-            bsElementClose(modal);
-        });    
+        },
+        refreshFormAdd,
+        modalFormAdd
+    )    
 }
 
+
 // send edit form data
-function fetchFormEdit(form) {
+function fetchFormEditStarring(form, actionEditStarring) {
 
-    fetchPostMVC(form, form.action, "TEXT")
-        .then((result) => {
-
-            let placeholder = document.createElement("div");
-
-            placeholder.innerHTML = result;
-
-            if (getPartialType(placeholder) == "form") {
-
-                let form = formEdit;
-
-                form.innerHTML = placeholder.innerHTML;
-                placeholder.remove();
-
-                refreshFormEdit(form);
-
-                return;
-            }
+    fetchForm(
+        form,
+        function (placeholder) {
             let Id = getHidden(placeholder, "Id").value;
 
-            let div = document.querySelector("div[id='"+Id+"']");
-            let form = div.firstElementChild;
+            let div = document.querySelector("div[id='" + Id + "']");
+            let formElement = div.firstElementChild;
 
-            form.innerHTML = placeholder.innerHTML;
+            formElement.innerHTML = placeholder.innerHTML;
             placeholder.remove();
 
             addFormEditStarringOption(div.querySelector(optionEditSelector));
-            addFormDeleteStarringOption(div.querySelector(optionDeleteSelector))
+            addFormDeleteStarringOption(div.querySelector(optionDeleteSelector));
 
-            let modal = modalFormEdit;
-            bsElementClose(modal);
-        });    
+            // callback after starring edit
+            if (actionEditStarring) {
+                actionEditStarring(div);
+            }
+        },
+        refreshFormEdit,
+        modalFormEdit
+    )
 }
 
 

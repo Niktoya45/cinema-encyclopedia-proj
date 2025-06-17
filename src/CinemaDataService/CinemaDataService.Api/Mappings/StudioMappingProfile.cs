@@ -31,7 +31,6 @@ namespace CinemaDataService.Api.Mappings
 
             CreateMap<Studio, SearchResponse>()
                 .ForMember(csr => csr.PictureUri, opt => opt.Ignore());
-            CreateMap<IEnumerable<Studio>, IEnumerable<SearchResponse>>();
         }
     }
 }

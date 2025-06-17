@@ -28,8 +28,6 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
         private readonly SignInManager<AccessProfileUser> _signInManager;
         private readonly UserManager<AccessProfileUser> _userManager;
         private readonly IUserStore<AccessProfileUser> _userStore;
-        private readonly IUserClaimStore<AccessProfileUser> _userClaimStore;
-        private readonly IUserRoleStore<AccessProfileUser> _userRoleStore;
         private readonly IUserEmailStore<AccessProfileUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
@@ -37,7 +35,6 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
         public RegisterModel(
             UserManager<AccessProfileUser> userManager,
             IUserStore<AccessProfileUser> userStore,
-            IUserClaimStore<AccessProfileUser> userClaimStore,
             SignInManager<AccessProfileUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
@@ -45,7 +42,6 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
             _userManager = userManager;
             _userManager.Options.SignIn.RequireConfirmedAccount = false;
             _userStore = userStore;
-            _userClaimStore = userClaimStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
@@ -102,8 +98,10 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.AppUsername = Input.Username;
+                user.Sub = "2";
 
-                await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
@@ -113,18 +111,11 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
 
                     var userId = await _userManager.GetUserIdAsync(user);
 
-                    //await _userManager.AddClaimAsync(user, new Claim("sub", ""));
+                    await _userManager.AddClaimAsync(user, new Claim(JwtRegisteredClaimNames.Sub, "2"));
                     await _userManager.AddClaimAsync(user, new Claim("role", AccessUserRoles.User.ToString()));
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -134,65 +125,6 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
-
-        public async Task<IActionResult> OnPostAddRole([FromForm] string userSubjectId, [FromForm] string roleName, CancellationToken ct)
-        {
-            Claim? roleClaim = User.Claims.FirstOrDefault(c => c.Type == "role");
-
-            if (roleClaim is null 
-                || !(roleClaim.Value.Contains(AccessUserRoles.Administrator.ToString()) || roleClaim.Value.Contains(AccessUserRoles.Superadministrator.ToString()) ))
-            {
-                return new OkObjectResult(null);
-            }
-
-            AccessProfileUser? user = (await _userClaimStore.GetUsersForClaimAsync(new Claim("sub", userSubjectId), ct)).FirstOrDefault();
-
-            if (user is null)
-                return new OkObjectResult(null);
-
-            Claim? userRoles = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "role");
-            if (userRoles is null)
-            {
-                userRoles = new Claim("role", "," + roleName);
-                await _userManager.AddClaimAsync(user, userRoles);
-            }
-            else 
-            {
-                Claim newUserRoles = new Claim("role", userRoles.Value + "," + roleName);
-                await _userManager.ReplaceClaimAsync(user, userRoles, newUserRoles);
-            }
-
-            return new OkObjectResult(roleName);
-        }
-
-        public async Task<IActionResult> OnPostRemoveRole([FromForm] string userSubjectId, [FromForm] string roleName, CancellationToken ct)
-        {
-            Claim? roleClaim = User.Claims.FirstOrDefault(c => c.Type == "role");
-
-            if (roleClaim is null
-                || !(roleClaim.Value.Contains(AccessUserRoles.Administrator.ToString()) || roleClaim.Value.Contains(AccessUserRoles.Superadministrator.ToString())))
-            {
-                return new OkObjectResult(null);
-            }
-
-            AccessProfileUser? user = (await _userClaimStore.GetUsersForClaimAsync(new Claim("sub", userSubjectId), ct)).FirstOrDefault();
-
-            if (user is null)
-                return new OkObjectResult(null);
-
-            Claim? userRoles = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "role");
-            if (userRoles != null)
-            {
-                if (userRoles.Value.Contains(roleName))
-                {
-                    Claim newUserRoles = new Claim("role", userRoles.Value.Replace("," + roleName, ""));
-                    await _userManager.ReplaceClaimAsync(user, userRoles, newUserRoles);
-                }
-
-            }
-
-            return new OkObjectResult(roleName);
         }
 
         private AccessProfileUser CreateUser()

@@ -21,7 +21,6 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
         {
             IEnumerable<Cinema>? cinemas = await _repository.FindByName(tokens:request.Search, pg: request.Pg, ct: cancellationToken);
 
-
             if (cinemas == null)
             {
                 // handle

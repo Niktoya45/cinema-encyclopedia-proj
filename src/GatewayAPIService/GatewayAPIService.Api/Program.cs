@@ -91,9 +91,10 @@ namespace GatewayAPIService.Api
 
                     };
 
-                    options.ClaimActions.MapJsonKey("role", "role");
-
                     options.MapInboundClaims = false;
+
+                    options.ClaimActions.MapUniqueJsonKey("role", "role");
+
                     options.ProtocolValidator.RequireNonce = false;
 
                 })
@@ -113,9 +114,10 @@ namespace GatewayAPIService.Api
                         SaveSigninToken = true,
                         NameClaimType = "name",
                         RoleClaimType = "role"
-
+                        
                     };
 
+                    options.MapInboundClaims = false;
                 });
 
             builder.Services.AddAuthorization(options => {

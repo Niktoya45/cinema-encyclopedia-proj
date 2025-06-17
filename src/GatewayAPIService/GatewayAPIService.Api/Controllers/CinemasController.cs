@@ -67,7 +67,7 @@ namespace GatewayAPIService.Api.Controllers
 
             foreach (CinemasResponse cinema in response.Response)
             {
-                if(cinema.Picture != null) 
+                if(false && cinema.Picture != null) 
                 {
                     cinema.PictureUri = await _imageService.GetImage(cinema.Picture, ImageSize.Medium);  
                 }
@@ -77,11 +77,11 @@ namespace GatewayAPIService.Api.Controllers
         }
 
         /// <summary>
-        /// Get all cinemas by indices 
+        /// Get all cinemas by indexes 
         /// A method goes under POST variable for avoiding query path constraint
         /// </summary>
         /// <returns>All cinema list</returns>
-        /// <param name="ids">indices to search by</param> 
+        /// <param name="ids">indexes to search by</param> 
         /// <param name="pg">pagination parameters</param> 
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>

@@ -7,6 +7,7 @@ namespace GatewayAPIService.Api.Controllers
     {
         public string BaseUrl { get; init; } = "https://localhost:7116";
 
+        [HttpGet]
         public async Task<IActionResult> Index() 
         {
             var result = Redirect(BaseUrl + "/encyclopedia/index");
@@ -14,6 +15,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("cinemas")]
         public async Task<IActionResult> Cinemas()
         {
@@ -22,6 +24,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("cinemas/{id}")]
         public async Task<IActionResult> Cinema(string id)
         {
@@ -30,6 +33,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("persons")]
         public async Task<IActionResult> Persons()
         {
@@ -38,6 +42,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("persons/{id}")]
         public async Task<IActionResult> Person(string id)
         {
@@ -46,6 +51,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("studios")]
         public async Task<IActionResult> Studios()
         {
@@ -54,6 +60,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("studios/{id}")]
         public async Task<IActionResult> Studio(string id)
         {

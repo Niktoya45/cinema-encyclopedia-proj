@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using CinemaDataService.Domain.Aggregates.Base;
 using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Infrastructure.Models.SharedDTO;
@@ -86,16 +87,9 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
 
         public async Task<List<T>?> FindByName(string[] tokens, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default)
         {
-            List<BsonRegularExpression> exprs = new List<BsonRegularExpression>();
+            BsonRegularExpression expr = new BsonRegularExpression(tokens.Aggregate((acc, t) => acc + "|" + t), "i");
 
-            foreach (string token in tokens) 
-            {
-                exprs.Add(new BsonRegularExpression(token, "i"));
-            }
-
-            FilterDefinition<T> condition = Builders<T>.Filter.In(e => e.Name, exprs);
-
-            return await Find(condition, pg, sort, ct);
+            return await Find(Builders<T>.Filter.Regex(e => e.Name, expr), pg, sort, ct);
         }
 
         public async Task<T?> FindByName(string name, CancellationToken ct = default)

@@ -21,6 +21,7 @@ namespace CinemaDataService.Api.Queries.StudioQueries
         public async Task<Page<StudiosResponse>> Handle(StudiosQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             IEnumerable<Studio>? studios;
+            request.Query.Pg.Take += Pagination._add;
 
             switch (request.Query) 
             {

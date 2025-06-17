@@ -1,4 +1,15 @@
-﻿
+﻿:root {
+    --mark-favored: #d25a5a;
+    --mark-planned: #dca050; 
+    --mark-watching: #6495c8; 
+    --mark-seen: #aa78b4; 
+
+    --mark-favored-q: #d25a5a88;
+    --mark-planned-q: #dca05088; 
+    --mark-watching-q: #6495c888; 
+    --mark-seen-q: #aa78b488; 
+}
+
 .btn-refresh {
     border: none;
     background-color: transparent;
@@ -199,6 +210,7 @@
    position: absolute;
    padding: 0.1rem;
    top:-0.6rem;
+   left: -2.8rem;
    z-index:1;
 }
 
@@ -210,7 +222,8 @@
     z-index: 1;
 }
 
-#labels button{
+#labels button,
+.btn-label{
     background-color:#606e68;
     border-radius: 0.2rem;
     color: #aaaaaa; 
@@ -220,8 +233,12 @@
     transition: background-color ease-in 0.1s;
 }
 
-#labels button:hover{
-    background-color: #849098;
+#labels button:hover,
+.btn-label:hover,
+#labels button.active,
+.btn-label.active
+{
+    background-color: whitesmoke;
     transition: background-color ease-in 0.1s;
 }
 
@@ -251,6 +268,66 @@
 .label-icons .thin {
     stroke: whitesmoke;
     stroke-width: 3;
+    fill: none;
+}
+
+button.active > #heart polygon{
+    stroke: var(--mark-favored);
+    fill: var(--mark-favored);
+}
+button:hover > #heart polygon{
+    stroke: var(--mark-favored-q);
+    fill: var(--mark-favored-q);
+}
+
+button.active > #clock .empty,
+button.active > #clock line
+{
+    stroke:var(--mark-planned);
+}
+button:hover > #clock .empty,
+button:hover > #clock line
+{
+    stroke:var(--mark-planned-q);
+}
+
+button.active > #monitor polygon {
+    stroke: var(--mark-watching);
+    fill: var(--mark-watching);
+}
+button.active > #monitor .empty,
+button.active > #monitor line
+{
+    stroke: var(--mark-watching);
+    fill:none;
+}
+button:hover > #monitor polygon {
+    stroke: var(--mark-watching-q);
+    fill: var(--mark-watching-q);
+}
+button:hover > #monitor .empty,
+button:hover > #monitor line {
+    stroke: var(--mark-watching-q);
+    fill: none;
+}
+
+button.active > #eye polygon {
+    stroke: var(--mark-seen);
+    fill: var(--mark-seen);
+}
+button.active > #eye .empty,
+button.active > #eye line
+{
+    stroke: var(--mark-seen);
+    fill:none;
+}
+button:hover > #eye polygon {
+    stroke: var(--mark-seen-q);
+    fill: var(--mark-seen-q);
+}
+button:hover > #eye .empty,
+button:hover > #eye line {
+    stroke: var(--mark-seen-q);
     fill: none;
 }
 

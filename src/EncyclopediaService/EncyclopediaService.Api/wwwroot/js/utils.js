@@ -3,6 +3,35 @@
 const deleteAttribute = 'target-delete';
 const clickEvent = new Event("click");
 
+export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
+
+    fetchPostMVC(form, form.action, "TEXT")
+        .then((result) => {
+
+            let placeholder = document.createElement("div");
+
+            placeholder.innerHTML = result;
+
+            if (getPartialType(placeholder) == "form") {
+
+                form.innerHTML = result;
+                placeholder.remove();
+
+                actionRefreshForm(form);
+
+                return;
+            }
+
+            actionAdd(placeholder);
+
+            if (modalForm) {
+                let modal = modalForm;
+                bsElementClose(modal);
+            }
+
+        });
+}
+
 export function fetchPostMVC(form, action, responseType) {
 
     var formElement = form;
@@ -50,6 +79,7 @@ export function fetchGetMVC(action, responseType) {
             return null;
         })
 }
+
 
 export function bsElementClose(element) {
 

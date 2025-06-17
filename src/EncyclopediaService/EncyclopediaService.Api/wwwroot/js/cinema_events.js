@@ -1,5 +1,6 @@
 ﻿
-import { fetchPostMVC, addDeleteEvents, approveDelete, removeFromCarousel } from './utils.js';
+import { fetchPostMVC, addDeleteEvents, approveDelete, appendToCarousel, removeFromCarousel } from './utils.js';
+import { addFormAddSubmitStarring, addFormEditSubmitStarring } from './starring_events.js';
 
 //** ELEMENTS USED **/
 
@@ -42,8 +43,7 @@ for (let i = 0; i < stars.length; i++) {
                 rating = starsClick.item(i-1).value
         }
 
-        fillStars(starIndex);
-
+        fillStars(i);
     });
 }
 
@@ -53,18 +53,24 @@ for (let i = 0; i < stars.length; i++) {
 addDeleteEvents(formDelete, function (result, deleteTargetClass) {
 
     if (deleteTargetClass == classDeleteCinema) {
-
+        
     }
     else if (deleteTargetClass == classDeleteStarring) {
         removeFromCarousel(carouselStarring, result, nrows, kpage);
     }
     else if (deleteTargetClass == classDeleteStudio) {
-
+        document.querySelector(".studios-block div[id='" + result + "']").remove();
     }
 });
 
 
 //** ONLOAD RECORD ACTIONS **//
+
+addFormAddSubmitStarring(function (divStarring) {
+    appendToCarousel(carouselStarring, divStarring, nrows, kpage);
+});
+
+addFormEditSubmitStarring(null);
 
 // show close buttons for studio
 
@@ -95,7 +101,7 @@ refsShowClose.forEach(ref => {
 
 // add action after studio delete
 
-var refsDeleteStudio = document.querySelectorAll(".hide-delete-studios");
+var refsDeleteStudio = document.querySelectorAll(".hide-delete-studios .del-record");
 
 refsDeleteStudio.forEach(ref => {
     ref.addEventListener('click', (e) => {
@@ -110,8 +116,8 @@ refsDeleteStudio.forEach(ref => {
 
 function fillStars(starIndex) {
 
-    for (let j = 0; j < starIndex; j++) {
-        if (j < i) {
+    for (let j = 0; j < stars.length; j++) {
+        if (j < starIndex) {
             stars[j].classList.remove('rail');
         }
         else if (j > starIndex) {

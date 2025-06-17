@@ -180,6 +180,11 @@
                     <div class="row">
 
                         <div class="col mt-3 mb-1">
+                            <button title="favorite" class="btn-refresh btn-label">
+                                <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12" />
+                                </svg>
+                            </button>
 
                             <button id="label-options-toggle" title="mark as.." type="button" data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
 
@@ -201,13 +206,6 @@
                             <div id="collapse-labels-body">
                                 <div id="collapse-labels" class="collapse collapse-horizontal">
                                     <div id="labels" class="card card-body hstack">
-                                        <button title="favorite">
-
-                                            <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-                                                <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12" />
-                                            </svg>
-
-                                        </button>
                                         <button title="planned">
                                             <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3" />
@@ -310,7 +308,7 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Studios</li>
                             </ul>
-                            <div class="row row-cols-2">
+                            <div class="row row-cols-2 studios-block">
                                 @if (Model.Cinema.ProductionStudios != null)
                                 {
                                     @foreach (var studio in Model.Cinema.ProductionStudios)
@@ -323,7 +321,8 @@
                                             </a>
                                             @if(IsAdmin)
                                             {
-                                                <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="editor btn-close position-absolute del-record" aria-label="Close"></button>
+                                                <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="editor btn-close position-absolute del-record" 
+                                                data-bs-target="#modal-delete-element" data-bs-toggle="modal" aria-label="Close"></button>
                                             }
                                         </div>
                                     }

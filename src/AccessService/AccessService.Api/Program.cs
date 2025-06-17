@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using AccessService.Api.Extensions;
 using AccessService.Domain.Profiles;
 using AccessService.Infrastructure.Context;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using AccessService.Api.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccessService.Api
 {
@@ -21,10 +23,21 @@ namespace AccessService.Api
                             );
 
             builder.Services.AddDefaultIdentity<AccessProfileUser>(options =>
-                        options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<AccessDbContext>();
+                        options.SignIn.RequireConfirmedAccount = false)
+                .AddEntityFrameworkStores<AccessDbContext>()
+                .AddTokenProvider(nameof(AccessService), typeof(DataProtectorTokenProvider<AccessProfileUser>));
 
             builder.Services.AddJsonWebKeys("keys.jwks");
+
+            builder.Services.AddAuthentication(options =>
+            {
+
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            })
+            .AddCookie()
+            ; 
 
             builder.Services
                   .ConfigureApplicationCookie(options =>
@@ -83,6 +96,7 @@ namespace AccessService.Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

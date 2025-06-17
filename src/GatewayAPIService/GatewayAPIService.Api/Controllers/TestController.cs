@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace GatewayAPIService.Api.Controllers
 {
@@ -31,7 +33,11 @@ namespace GatewayAPIService.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> ProtectedData()
         {
-            return Ok(new { Message = "Api_Authorization_Succeeded" });
+            return Ok(new {
+                Sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub),
+                Sid = User.FindFirstValue(JwtRegisteredClaimNames.Sid),
+                Role = User.FindFirstValue("role"),
+                Message = "Api_Authorization_Succeeded" });
         }
     }
 }

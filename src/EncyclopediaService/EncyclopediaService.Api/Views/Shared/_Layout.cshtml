@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using EncyclopediaService.Api.Extensions;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -59,13 +60,18 @@
 
 								</button>
 
+                                @{
+                                    bool LoggedIn = User.IsLoggedIn();
+
+                                    string profileUrl = "https://localhost:7136/profiles/3";
+                                }
 
                                 <ul id="account-options" class="dropdown-menu dropdown-menu-end box-shadow bg-dark flex-grow-1 mb-2" aria-labelledby="account">
 									<li class="nav-item">
-										<a class="nav-link" href="https://localhost:7236/profiles/3">Profile</a>
+										<a class="nav-link" href="@(LoggedIn ? profileUrl : "")" >Profile</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link">Marked</a>
+                                        <a class="nav-link" href="@($"{profileUrl}/marked")">Marked</a>
 									</li>
                                     <li class="nav-item vstack d-flex align-items-start">
 										<a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" 

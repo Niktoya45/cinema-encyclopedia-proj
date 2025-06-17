@@ -7,6 +7,7 @@ namespace GatewayAPIService.Api.Controllers
     {
         public string BaseUrl { get; init; } = "https://localhost:7136";
 
+        [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> Profile(string id) 
         {
@@ -15,6 +16,7 @@ namespace GatewayAPIService.Api.Controllers
             return result;
         }
 
+        [HttpGet]
         [Route("{id}/marked")]
         public async Task<IActionResult> Marked(string id)
         {

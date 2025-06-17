@@ -24,6 +24,7 @@ namespace CinemaDataService.Api.Queries.PersonQueries
         public async Task<Page<PersonsResponse>> Handle(PersonsQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             IEnumerable<Person>? persons;
+            request.Query.Pg.Take += Pagination._add;
 
             switch (request.Query)
             {
