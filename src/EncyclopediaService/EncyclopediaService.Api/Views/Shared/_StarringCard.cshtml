@@ -14,9 +14,9 @@
 			<div class="d-flex person-picture-grid">
 
 				<a href="/encyclopedia/persons/@Model.Id">
-					@if (Model.Picture != null)
+					@if (Model.PictureUri != null)
 					{
-						<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+						<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
 					}
 					else
 					{

@@ -6,6 +6,7 @@ using EncyclopediaService.Api.Models.Edit;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.ImageService;
 using EncyclopediaService.Api.Models.Display;
+using Shared.CinemaDataService.Models.SharedDTO;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -31,7 +32,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         public EditStarring? EditStarring { get; set; } = default!;
 
         [BindProperty]
-        public EditStudio EditStudio { get; set; } = default!;
+        public EditStudio? EditStudio { get; set; } = default!;
 
         [BindProperty]
         public EditImage? EditPoster { get; set; }
@@ -55,6 +56,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Id = id,
                 Name = "Cinema Title With Additional Length for Test Purposes",
                 Picture = null,
+                PictureUri = null,
                 ReleaseDate = new DateOnly(2004, 12, 4),
                 Genres = Genre.Western | Genre.Mystery | Genre.Thriller,
                 Language = 0,
@@ -81,7 +83,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             EditMain = new EditMainCinema { Id = Cinema.Id, Name = Cinema.Name, ReleaseDate = Cinema.ReleaseDate, Language = Cinema.Language, Genres = Cinema.Genres, Description = Cinema.Description };
 
-            EditPoster = new EditImage {ImageId=null, ImageUri = Cinema.Picture};
+            EditPoster = new EditImage {ImageId=Cinema.Picture, ImageUri = Cinema.PictureUri};
 
             EditStarring = new EditStarring { Picture = _settings.DefaultSmallPersonPicture };
 
@@ -92,10 +94,11 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         public async Task<IActionResult> OnPostEditCinema([FromRoute] string id)
         {
             // Implement: convert EditCinema to Cinema and send put request to mediatre proxy
+            ModelState.Remove("JobsBind");
 
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseEditMain(true);
             }
 
             if (EditMain != null) 
@@ -107,13 +110,12 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 //return Ok(response);
             }
 
-            return await OnGet(id);
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostEditPoster([FromRoute] string id)
         {
             // Implement: after receiving image name send put request to mediatre proxy
-
 
             if (EditPoster.Image is null) 
             {
@@ -145,19 +147,27 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 await _imageService.ReplaceImage(EditPoster!.ImageId, HashName, EditPoster.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
             }
 
-            return await OnGet(id);
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostAddProductionStudio([FromRoute] string id)
         {
             // Implement: set ParentId and send NewProductionStudio to mediatre proxy 
+            ClearExtra();
 
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseAddProductionStudio(true);
             }
 
-            return await OnGet(id);
+            return Partial("_StudioLogoCard", new StudioRecord
+            {
+                ParentId = null,
+                Id = EditStarring.Id,
+                Name = EditStarring.Name,
+                Picture = EditStarring.Picture,
+                PictureUri = EditStarring.PictureUri
+            });
         }
 
         public async Task<IActionResult> OnPostDeleteProductionStudio([FromRoute] string id)
@@ -171,7 +181,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         {
             // Implement: convert EditStarring object to Starring, set ParentId and send post request to mediatre proxy
 
-            ModelState.Remove("GenresBind"); // considered during validation, reason is unknown
+            ModelState.Remove("GenresBind");
 
             if (!ModelState.IsValid)
             {
@@ -186,6 +196,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Id = EditStarring.Id,
                 Name = EditStarring.Name,
                 Picture = EditStarring.Picture,
+                PictureUri = EditStarring.PictureUri,
                 Jobs = EditStarring.Jobs,
                 RoleName = EditStarring.RoleName,
                 RolePriority = EditStarring.RolePriority
@@ -196,7 +207,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         {
             // Implement: convert EditStarring object to Starring, set ParentId and send put request to mediatre proxy
 
-            ModelState.Remove("GenresBind"); // considered during validation, reason is unknown
+            ModelState.Remove("GenresBind");
 
             if (!ModelState.IsValid)
             {
@@ -211,6 +222,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 Id = EditStarring.Id,
                 Name = EditStarring.Name,
                 Picture = EditStarring.Picture,
+                PictureUri = EditStarring.PictureUri,
                 Jobs = EditStarring.Jobs,
                 RoleName = EditStarring.RoleName,
                 RolePriority = EditStarring.RolePriority
@@ -224,28 +236,48 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             return new OkObjectResult(RecordId);
         }
 
-        public async Task OnPostRate([FromRoute] string id, [FromBody] byte score)
+        public async Task OnPostRate([FromRoute] string id, [FromForm] byte score)
         {
             UserScore = score;
 
             //return Page();
         }
 
-        public async Task OnPostLabel([FromRoute] string id, [FromBody] byte label)
+        public async Task OnPostLabel([FromRoute] string id, [FromForm] byte label)
         {
 
             //return Page();
         }
 
+        public IActionResult OnPostReuseAddProductionStudio(bool error = false)
+        {
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+
+            return Partial("_AddStudio", EditStudio);
+
+        }
+
         public IActionResult OnPostReuseAddStarring(bool error = false)
         {
-            //EditStarring!.JobsBind = new List<Job>();
             if (!error)
             {
                 ModelState.Clear();
             }
 
             return Partial("_AddStarring", EditStarring);
+
+        }
+
+        public IActionResult OnPostReuseEditMain(bool error = false)
+        {
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+            return Partial("_EditMain", EditMain);
 
         }
 
@@ -257,6 +289,65 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             }
             return Partial("_AddStarring", EditStarring);
 
+        }
+
+        public async Task<IActionResult> OnPostSearchProductionStudio(
+            CancellationToken ct,
+            [FromRoute] string id, [FromForm] string recordId, [FromForm] string search)
+        {
+            // transfer data instead of below
+
+            if (recordId == "" || recordId is null)
+            {
+                IEnumerable<SearchResponse> response = new List<SearchResponse>();
+
+                response = new List<SearchResponse> { 
+                    new SearchResponse { Id = "12", Name = search + " Search Name 12"},
+                    new SearchResponse { Id = "13", Name = search + " Search Name 13"},
+                    new SearchResponse { Id = "14", Name = search + " Search Name 14"},
+                    new SearchResponse { Id = "15", Name = search + " Search Name 15"},
+                };
+
+                return new OkObjectResult(response);
+            }
+
+            else
+            {
+                return new OkObjectResult(new SearchResponse { Id ="12", Name = "Search Name 12", Picture = _settings.DefaultSmallPersonPicture, PictureUri = _settings.DefaultSmallPersonPicture });
+            }
+
+        }
+
+        public async Task<IActionResult> OnPostSearchStarring(
+            CancellationToken ct,
+            [FromRoute] string id, [FromForm] string recordId, [FromForm] string search)
+        {
+            // transfer data instead of below
+
+            if (recordId == "" || recordId is null)
+            {
+                IEnumerable<SearchResponse> response = new List<SearchResponse>();
+
+                response = new List<SearchResponse> {
+                    new SearchResponse { Id = "12", Name = search + "Search Name 12"},
+                    new SearchResponse { Id = "13", Name = search + "Search Name 13"},
+                    new SearchResponse { Id = "14", Name = search + "Search Name 14"},
+                    new SearchResponse { Id = "15", Name = search + "Search Name 15"},
+                };
+
+                return new OkObjectResult(response);
+            }
+            else
+            {
+                return new OkObjectResult(new SearchResponse { Id = "12", Name = "Search Name 12", Picture = _settings.DefaultSmallPersonPicture, PictureUri = _settings.DefaultSmallPersonPicture });
+            }
+
+        }
+
+        private void ClearExtra()
+        {
+            ModelState.Remove("GenresBind"); 
+            ModelState.Remove("JobsBind"); 
         }
 
     }

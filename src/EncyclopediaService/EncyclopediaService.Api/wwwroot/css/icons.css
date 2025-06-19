@@ -16,6 +16,10 @@
     content: url("../img/grid_poster_placeholder.png");
 }
 
+.cinema-poster-search .img-placeholder {
+    content: url("../img/search_poster_placeholder.png");
+}
+
 .person-picture .img-placeholder {
     content: url("../img/person_placeholder.png");
 }
@@ -24,12 +28,20 @@
     content: url("../img/grid_person_placeholder.png");
 }
 
+.person-picture-search .img-placeholder {
+    content: url("../img/search_person_placeholder.png");
+}
+
 .studio-logo .img-placeholder {
     content: url("../img/logo_placeholder.png");
 }
 
 .studio-logo-grid .img-placeholder {
     content: url("../img/grid_logo_placeholder.png");
+}
+
+.studio-logo-search .img-placeholder {
+    content: url("../img/search_logo_placeholder.png");
 }
 
 .template-url {

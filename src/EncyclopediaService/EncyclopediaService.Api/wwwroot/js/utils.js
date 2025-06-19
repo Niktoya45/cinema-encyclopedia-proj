@@ -3,10 +3,19 @@
 const deleteAttribute = 'target-delete';
 const clickEvent = new Event("click");
 
+var controllerCancel = new AbortController();
+var signalCancel = controllerCancel.signal;
+
+export function refreshRequestCancel() {
+    controllerCancel = new AbortController();
+    signalCancel = controllerCancel.signal;
+}
+
 export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
 
     fetchPostMVC(form, form.action, "TEXT")
         .then((result) => {
+            if (!result) return null;
 
             let placeholder = document.createElement("div");
 
@@ -29,22 +38,25 @@ export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
                 bsElementClose(modal);
             }
 
+        })
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                console.log('request cancelled');
+            }
+            return null;
         });
 }
 
 export function fetchPostMVC(form, action, responseType) {
 
     var formElement = form;
-    const formData = new URLSearchParams();
-
-    for (const kv of new FormData(formElement)) {
-        formData.append(kv[0], kv[1]);
-    }
+    const formData = formElement instanceof HTMLFormElement ? new FormData(formElement) : formElement;
 
     return fetch(action,
         {
             method: "POST",
-            body: formData
+            body: formData,
+            signal: signalCancel
         })
         .then((response) => {
 
@@ -58,13 +70,20 @@ export function fetchPostMVC(form, action, responseType) {
 
             return null;
         })
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                console.log('request cancelled');
+                return null;
+            }
+        });
 }
 
 export function fetchGetMVC(action, responseType) {
 
     return fetch(action,
         {
-            method: "GET"
+            method: "GET",
+            signal: signalCancel
         })
         .then((response) => {
 
@@ -78,6 +97,12 @@ export function fetchGetMVC(action, responseType) {
 
             return null;
         })
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                console.log('request cancelled');
+                return null;
+            }
+        });
 }
 
 
@@ -93,6 +118,88 @@ export function getHidden(element, selectorId) {
 export function getPartialType(partialResultPlaceholder) {
     return partialResultPlaceholder.querySelector("input[type='hidden']#partial").value;
 }
+
+export function addShowCloseEvents() {
+
+    var classCloseToggler = "show-close-buttons";
+    var classCloseTogglerArea = "hide-delete";
+    var classCloseToggledElement = "del-record";
+    var classCloseToggledHide = "hide-close-buttons";
+
+    addShowToggle(
+        classCloseToggler,
+        classCloseTogglerArea,
+        classCloseToggledElement,
+        classCloseToggledHide
+    );
+    
+}
+
+export function addShowEditorEvents() {
+
+    var classEditorToggler = "show-editor-options";
+    var classEditorTogglerArea = null;
+    var classEditorToggledElement = "editor-toggle";
+    var classEditorToggledHide = "hide-editor-options";
+
+    addShowToggle(
+        classEditorToggler,
+        classEditorTogglerArea,
+        classEditorToggledElement,
+        classEditorToggledHide
+    );
+    
+}
+
+export function addShowToggle(classToggler, classToggledArea, classToggledElement, classToggledHide) {
+
+    var refTogglers = document.querySelectorAll('.' + classToggler);
+
+    let showTogglerAttribute = "show-toggled-by";
+    let hideTogglerAttribute = "hide-show-toggled-by";
+    
+    refTogglers.forEach(ref => {
+
+        let showTogglerSelector = ref.id ? `[${showTogglerAttribute}='${ref.id}']` : "";
+        let hideTogglerSelector = ref.id ? `[${hideTogglerAttribute}='${ref.id}']` : "";
+
+        var closeButtons = document.querySelectorAll(
+            classToggledArea ?
+            '.' + classToggledArea + showTogglerSelector + " ."  + classToggledElement
+            : '.' + classToggledElement + showTogglerSelector
+
+        );
+        var cancels = document.querySelectorAll(
+            classToggledHide ?
+            '.' + classToggledHide + hideTogglerSelector
+            : hideTogglerSelector
+        );
+
+        ref.addEventListener('click', (e) => {
+            
+            closeButtons.forEach((b) => {
+                b.style.visibility = 'visible';
+            });
+            cancels.forEach((c) => {
+                c.style.visibility = 'visible';
+            })
+        });
+
+        cancels.forEach((c) => {
+
+            c.addEventListener('click', (e) => {
+
+                closeButtons.forEach((b) => {
+                    b.style.visibility = 'hidden';
+                });
+                cancels.forEach((c) => {
+                    c.style.visibility = 'hidden';
+                })
+            });
+        })
+    });
+}
+
 
 export function addDeleteEvents(formDelete, resultAction) {
     let formDeleteSubmits = formDelete.querySelectorAll("button");
@@ -110,7 +217,15 @@ export function addDeleteEvents(formDelete, resultAction) {
 
             fetchPostMVC(form, form.action, "TEXT")
                 .then((result) => {
+                    if (!result) return null;
+
                     resultAction(result, button.getAttribute(deleteAttribute));
+                })
+                .catch(error => {
+                    if (error.name === 'AbortError') {
+                        console.log('request cancelled');
+                        return null;
+                    }
                 });
 
         });
@@ -141,6 +256,46 @@ export function approveDelete(targetId, modalContainer, deleteActionPath, delete
     getHidden(form, "RecordId").value = targetId;
 }
 
+export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, choice, afterSetAction) {
+
+    fetchPostMVC(new URLSearchParams({ recordId : choice.id }), actionSearch, "JSON")
+    .then((result) => {
+        if (!result) return;
+
+        let choiceRes = result;
+
+        getHidden(formAdd, "Id").value = choiceRes.id;
+        getHidden(formAdd, "Name").value = choiceRes.name;
+        getHidden(formAdd, "Picture").value = choiceRes.picture;
+        getHidden(formAdd, "PictureUri").value = choiceRes.pictureUri;
+        let img = formAdd.querySelector("img");
+
+        if (choiceRes.pictureUri) {
+            img.classList.remove('img-placeholder');
+            img.src = choiceRes.pictureUri;
+        }
+
+        if (afterSetAction) {
+            afterSetAction();
+        }
+    });
+
+}
+
+export function addSearchClose(formAdd, searchInput, afterCloseAction) {
+    getHidden(formAdd, "Id").value = null;
+    getHidden(formAdd, "Name").value = null;
+    getHidden(formAdd, "Picture").value = null;
+    getHidden(formAdd, "PictureUri").value = null;
+    let img = formAdd.querySelector("img");
+    img.src = null;
+    img.classList.add('img-placeholder');
+
+    if (afterCloseAction) {
+        afterCloseAction();
+    }
+}
+
 export function addSearchEvents(searchDropdown, action, chooseAction, closeAction) {
 
     let searchInput = searchDropdown.querySelector(".search-input");
@@ -150,45 +305,70 @@ export function addSearchEvents(searchDropdown, action, chooseAction, closeActio
         let suggestionsList = searchDropdown.querySelector(".search-suggestions");
 
         console.log(inputValue);
+        controllerCancel.abort();
+        refreshRequestCancel();
 
         if (inputValue.length < 3) {
             if (closeAction) {
                 closeAction(searchInput);
             }
-
             suggestionsList.style.visibility = "hidden";
-
             return;
         }
 
-        suggestionsList.innerHTML = "";
-        suggestionsList.style.visibility = "visible";
-
         if (inputValue) {
 
-            // handle data transfer using 'action' parameter instead of below
+            fetchPostMVC(new URLSearchParams({ search: inputValue }), action, "JSON")
+                .then((result) => {
+                    console.log(result);
 
-            const choices = ["Actor 1", "Actor 2", "Director 3", "Director 4", "Scenarist 5", "Scenarist 6", "Producer 7", "Producer 8"];
+                    let filteredChoices = result;
 
-            let filteredChoices = choices.filter(choice => choice.toLowerCase().includes(inputValue));
-
-            filteredChoices.forEach(choice => {
-                let listItem = document.createElement("li");
-                listItem.textContent = choice;
-                listItem.classList.add("list-group-item");
-                listItem.addEventListener("click", function (e) {
-
-                    if (chooseAction) {
-                        chooseAction(searchInput, listItem);
-                    }
-
-                    searchInput.value = listItem.textContent;
                     suggestionsList.innerHTML = "";
-                    suggestionsList.style.visibility = "hidden";
+                    if (!filteredChoices || filteredChoices.length == 0) {
+                        suggestionsList.style.visibility = "hidden";
+                        return;
+                    }
+                    suggestionsList.style.visibility = "visible";
 
+                    filteredChoices.forEach(choice => {
+                        console.log(choice);
+
+                        let listItem = document.createElement("li");
+                        let listItemImg = document.createElement("img");
+                        let listItemSpan = document.createElement("span");
+
+                        listItemImg.src = choice.pictureUri;
+                        if (!choice.pictureUri) {
+                            listItemImg.classList.add("img-placeholder");
+                        }
+                        listItemSpan.textContent = choice.name;
+
+                        listItem.append(listItemImg);
+                        listItem.append(listItemSpan);
+                        listItem.classList.add("list-group-item");
+                        listItem.addEventListener("click", function (e) {
+
+                            searchInput.value = choice.name;
+                            suggestionsList.innerHTML = "";
+                            suggestionsList.style.visibility = "hidden";
+
+                            if (chooseAction) {
+                                console.log("choice action");
+                                chooseAction(searchInput, listItem, choice);
+                            }
+
+                        });
+                        suggestionsList.appendChild(listItem);
+                    });
+
+                })
+                .catch(error => {
+                    if (error.name === 'AbortError') {
+                        console.log('request cancelled');
+                    }
                 });
-                suggestionsList.appendChild(listItem);
-            });
+
         } else {
             inputsNameDependant.forEach(function (input) {
                 input.disabled = true;

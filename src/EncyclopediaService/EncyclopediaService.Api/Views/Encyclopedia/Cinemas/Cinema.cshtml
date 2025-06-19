@@ -54,7 +54,7 @@
         <!-- Add Studio Popup -->
         <form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
             <div class="container-fluid">
-                <form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
+                <form id="form-add-studio" asp-page-handler="addProductionStudio" class="trim-inputs" method="post">
                     <partial name="_AddStudio" model="Model.EditStudio" />
                 </form>
             </div>
@@ -170,7 +170,7 @@
                     <div class="row">
                         @if (Model.Cinema.Picture != null)
                         {
-                            <img src="@(Model.Cinema.Picture)" class="img img-fluid" alt="Poster Image">
+                            <img src="@(Model.Cinema.PictureUri)" class="img img-fluid" alt="Poster Image">
                         }
                         else
                         {
@@ -313,18 +313,7 @@
                                 {
                                     @foreach (var studio in Model.Cinema.ProductionStudios)
                                     {
-                                        <div id="@studio.Id" class="col-6 mb-2 position-relative records hide-delete hide-delete-studios" toggled-by="delete-studio">
-                                            <a href="/encyclopedia/studios/@studio.Id">
-
-                                                <img src=@(studio.Picture) class="img-fluid" style="width:fit-content;height:fit-content"
-                                                alt="Studio Image" />
-                                            </a>
-                                            @if(IsAdmin)
-                                            {
-                                                <button id="delete-studio-@studio.Id" value="@studio.Id" type="button" class="editor btn-close position-absolute del-record" 
-                                                data-bs-target="#modal-delete-element" data-bs-toggle="modal" aria-label="Close"></button>
-                                            }
-                                        </div>
+                                        <partial name="_StudioLogoCard" model="studio" />
                                     }
                                 }
                             </div>
@@ -344,7 +333,7 @@
                                         <li><a id="delete-studio" class="dropdown-item show-close-buttons">Delete</a></li>
                                     </ul>
                                 </div>
-                                <a id="delete-studio-cancel" class="btn hide-close-buttons" style="visibility:hidden">Cancel</a>
+                                <a id="delete-studio-cancel" class="btn hide-close-buttons" hide-show-toggled-by="delete-studio">Cancel</a>
                             }
                         </div>
 

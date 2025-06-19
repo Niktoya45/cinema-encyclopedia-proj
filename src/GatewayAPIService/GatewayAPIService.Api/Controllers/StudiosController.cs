@@ -89,7 +89,7 @@ namespace GatewayAPIService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Search(
             CancellationToken ct,
-            [FromQuery] string search,
+            [FromRoute] string search,
             [FromQuery] Pagination? pg = null
         )
         {

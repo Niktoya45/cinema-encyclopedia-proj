@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Shared.CinemaDataService.Models" Version="1.0.0" />
     <PackageReference Include="Shared.ImageService.Models" Version="1.0.0" />
   </ItemGroup>
 

@@ -119,11 +119,11 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return await FindCinemasList(pg, r => (r.UserId == userId), ct);
         }
 
-        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label? label, Pagination? pg = default, CancellationToken ct = default)
+        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label? label, string? cinemaId = null, Pagination? pg = default, CancellationToken ct = default)
         {
             return await FindCinemasList(
                                         pg,
-                                    r => (r.UserId == userId) && (label == null ? true : (r.Label & label) != 0),
+                                    r => (r.UserId == userId) && (label == null ? true : (r.Label & label) != 0) && (cinemaId == null ? true : (r.CinemaId == cinemaId)),
                                         ct
                                         );
         }

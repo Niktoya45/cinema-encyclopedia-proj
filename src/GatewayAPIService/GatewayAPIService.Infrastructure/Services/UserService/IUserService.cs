@@ -11,6 +11,7 @@ namespace GatewayAPIService.Infrastructure.Services.UserService
         /* User Get Requests */
         Task<UserResponse?> Get(string id, CancellationToken ct);
         Task<IEnumerable<LabeledResponse>?> GetLabelled(string userId, Label? label, CancellationToken ct);
+        Task<IEnumerable<LabeledResponse>?> GetLabelFor(string userId, string cinemaId, CancellationToken ct);
         Task<RatingResponse?> GetRatingFor(string userId, string cinemaId, CancellationToken ct);
 
         /******/

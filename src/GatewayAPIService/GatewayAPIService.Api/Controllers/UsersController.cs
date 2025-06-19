@@ -1,6 +1,10 @@
-﻿using MediatR;
+﻿using GatewayAPIService.Infrastructure.Services.CinemaService;
+using GatewayAPIService.Infrastructure.Services.UserService;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Shared.CinemaDataService.Models.StudioDTO;
+using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.CinemaDataService.Models.CinemaDTO;
+using Shared.UserDataService.Models.Flags;
 using Shared.UserDataService.Models.LabeledDTO;
 using Shared.UserDataService.Models.RatingDTO;
 using Shared.UserDataService.Models.UserDTO;
@@ -11,11 +15,16 @@ namespace GatewayAPIService.Api.Controllers
     [Route("api/users")]
     public class UserController : Controller
     {
-        private readonly IMediator _mediator;
+        public readonly ICinemaService _cinemaService;
+        public readonly IUserService _userService;
 
-        public UserController(IMediator mediator)
+        public UserController(
+            ICinemaService cinemaService,
+            IUserService userService
+            )
         {
-            _mediator = mediator;
+            _cinemaService = cinemaService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -25,33 +34,76 @@ namespace GatewayAPIService.Api.Controllers
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
-        [HttpGet("{id}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAsync(
-            [FromRoute] string id,
+            [FromRoute] string userId,
             CancellationToken ct = default)
         {
-            var response = new UserResponse();
+            var response = await _userService.Get(userId, ct);
+
+            if (response is null)
+            {
+                return BadRequest();
+            }
 
             return Ok(response);
         }
 
         /// <summary>
-        /// Get user by its id
+        /// Get labeled records by user id and optionally label 
+        /// </summary>
+        /// <param name="userId">authorized user Id</param>
+        /// <param name="label">label to search list for</param>
+        /// <param name="cinemaId">id of searched cinema (optional)</param>
+        /// <param name="ct">cancellation token</param>
+        /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">User is not found</response>
+        [HttpGet("{userId}/label")]
+        [HttpGet("{userId}/label/{label}")]
+        [ProducesResponseType(typeof(Page<CinemasResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Labeled(
+            [FromRoute] string userId,
+            [FromRoute] Label? label = null,
+            [FromQuery] string? cinemaId = null,
+            CancellationToken ct = default)
+        {
+            var responseLabelled = cinemaId is null ?
+                await _userService.GetLabelled(userId, label, ct)
+              : await _userService.GetLabelFor(userId, cinemaId, ct);
+
+            if (responseLabelled is null)
+            {
+                return BadRequest();
+            }
+
+            var responseCinemas = await _cinemaService.GetByIds(
+                responseLabelled.Select(l => l.CinemaId).ToArray(),
+                ct, 
+                null);
+
+            return Ok(responseCinemas);
+        }
+
+        /// <summary>
+        /// Get rating for certain cinema 
         /// </summary>
         /// <param name="id">authorized user Id</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
-        [HttpGet("{id}/label")]
-        [ProducesResponseType(typeof(IEnumerable<LabeledResponse>), StatusCodes.Status200OK)]
+        [HttpGet("{userId}/rating/{cinemaId}")]
+        [ProducesResponseType(typeof(RatingResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Labeled(
-            [FromRoute] string id,
+        public async Task<IActionResult> Rating(
+            [FromRoute] string userId,
+            [FromRoute] string cinemaId,
             CancellationToken ct = default)
         {
-            var response = new List<LabeledResponse>();
+            var response = await _userService.GetRatingFor(userId, cinemaId, ct);
 
             return Ok(response);
         }
@@ -69,7 +121,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = new CreateUserResponse();
+            var response = await _userService.Create(request, ct);
 
             return Ok(response);
         }
@@ -89,7 +141,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = new LabeledResponse();
+            var response = await _userService.CreateForLabeledList(userId, request, ct);
 
             return Ok(response);
         }
@@ -109,7 +161,7 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            var response = new RatingResponse();
+            var response = await _userService.CreateForRatingList(userId, request, ct);
 
             return Ok(response);
         }
@@ -122,7 +174,7 @@ namespace GatewayAPIService.Api.Controllers
         /// <returns>Updated user instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
-        [HttpPut]
+        [HttpPut("{userId}")]
         [ProducesResponseType(typeof(UpdateUserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
@@ -130,7 +182,7 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] UpdateUserRequest request,
             CancellationToken ct = default)
         {
-            var response = new UpdateUserResponse();
+            var response = await _userService.Update(userId, request, ct);
 
             return Ok(response);
         }
@@ -150,9 +202,16 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-       
+            var response = await _userService.Delete(userId, ct);
 
-            return Ok();
+            if (!response)
+            {
+                return BadRequest();
+            }
+
+            await _userService.DeleteFromLabeledList(userId, null, ct);
+
+            return Ok(userId);
         }
 
         /// <summary>
@@ -172,31 +231,14 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
-            
+            var response = await _userService.DeleteFromLabeledList(userId, cinemaId, ct);
 
-            return Ok();
-        }
+            if (!response)
+            {
+                return BadRequest();
+            }    
 
-        /// <summary>
-        /// Delete single user by its name
-        /// </summary>
-        /// <param name="userId">authorized user Id</param>
-        /// <param name="cinemaId">existing cinema Id</param>
-        /// <returns></returns>
-        /// <response code="200">Success</response>
-        /// <response code="400">User is not found</response>
-        [HttpDelete("{userId}/rating/{cinemaId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Rating(
-            [FromRoute] string userId,
-            [FromRoute] string cinemaId,
-            CancellationToken ct = default
-            )
-        {
-            
-
-            return Ok();
+            return Ok(cinemaId);
         }
 
     }

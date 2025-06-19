@@ -11,9 +11,9 @@
 
 			<div class="d-flex cinema-poster-grid">
 				<a href="/encyclopedia/cinemas/@Model.Id">
-					@if (Model.Picture != null)
+					@if (Model.PictureUri != null)
 					{
-						<img src=@(Model.Picture) style="width:130px;" alt="@(Model.Name)">
+						<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
 					}
 					else
 					{

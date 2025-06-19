@@ -55,9 +55,10 @@ namespace UserDataService.Api.Controllers
         public async Task<IActionResult> Labeled(
             [FromRoute] string id,
             [FromRoute] Label? label,
+            [FromQuery] string? cinemaId = null,
             CancellationToken ct = default)
         {
-            var response = await _mediator.Send(new UserLabeledQuery(id, label), ct);
+            var response = await _mediator.Send(new UserLabeledQuery(id, label, cinemaId), ct);
 
             return Ok(response);
         }

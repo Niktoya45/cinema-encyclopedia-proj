@@ -8,14 +8,22 @@
 <input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)"/>
 <input type="hidden" asp-for="@(Model.Name)" value="@(Model.Name)"/>
 <input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)"/>
+<input type="hidden" asp-for="@(Model.PictureUri)" value="@(Model.PictureUri)"/>
 
 
 <div class="row">
 
-	<div class="col-6">
+	<div class="col-6 person-picture-grid">
 		<div class="row">
 
-			<img src="@(Model.Picture)" style="width:fit-content" />
+			@if (Model.PictureUri != null)
+			{
+				<img src="@(Model.PictureUri)" class="img img-fluid" alt="Starring Image">
+			}
+			else
+			{
+				<img class="img img-fluid img-placeholder ignore" alt="Starring Image">
+			}
 
 		</div>
 		<div class="row">
@@ -26,7 +34,7 @@
 						<label asp-for="Name">Provide name</label>
 						<br>
 						<input class="form-control search-input " asp-for="Name" autofocus autocomplete="off">
-						<ul class="list-group search-suggestions suggestions-starring"></ul>
+						<ul class="list-group search-suggestions suggestions-starring person-picture-search"></ul>
 						<br>
 						<span asp-validation-for="Name" class="text-danger"></span>
 					</li>

@@ -1,6 +1,6 @@
 ﻿
 import {
-    fetchPostMVC, fetchForm, addSearchEvents,
+    fetchPostMVC, fetchForm, addSearchEvents, addSearchChoice, addSearchClose,
     getHidden, approveDelete
 } from './utils.js';
 
@@ -30,10 +30,13 @@ var formEditSubmit = document.getElementById(formEditSubmitId);
 var formDelete = document.getElementById(formDeleteId);
 
 const reuseAddAction = window.location.pathname + "?handler=reuseaddstarring";
+const searchAddAction = window.location.pathname + "?handler=searchstarring";
 const reuseEditAction = window.location.pathname + "?handler=reuseeditstarring";
 const deleteAction = window.location.pathname + "?handler=deletestarring";
 
 //** ONLOAD ACTIONS ** //
+
+formAddSubmit.disabled = true;
 
 // add option event to display edit form
 
@@ -52,7 +55,6 @@ refsDeleteStarring.forEach(function (ref) {
 });
 
 // add events to starring add form
-
 refreshFormAdd(formAdd);
 
 
@@ -65,7 +67,7 @@ export function addFormAddSubmitStarring(actionAddStarring) {
     formAddSubmit.addEventListener('click', function (e) {
 
         e.preventDefault();
-
+        formAddSubmit.disabled = true;
         let form = formAdd;
 
         fetchFormAddStarring(form, actionAddStarring);
@@ -81,6 +83,7 @@ export function addFormEditSubmitStarring(actionEditStarring) {
 
         e.preventDefault();
 
+        formEditSubmit.disabled = true;
         let form = formEdit;
 
         fetchFormEditStarring(form, actionEditStarring);
@@ -90,7 +93,6 @@ export function addFormEditSubmitStarring(actionEditStarring) {
 
 
 // send add form data
-
 function fetchFormAddStarring(form, actionAddStarring) {
 
     fetchForm(
@@ -197,9 +199,10 @@ function addFormDeleteStarringOption(ref) {
 function refreshFormAdd(form) {
 
     updateFormStarringDependency(form);
+    formAddSubmit.disabled = true;
 
     var searchStarringDropdown = form.querySelector(".search-starring");
-    addSearchEvents(searchStarringDropdown, null, searchStarringChoice, searchStarringClose)
+    addSearchEvents(searchStarringDropdown, searchAddAction, searchStarringChoice, searchStarringClose)
 }
 
 // refresh events for add form
@@ -229,24 +232,44 @@ function updateFormStarringDependency(form) {
 
 
 // event on clicking the hinted starring option
-function searchStarringChoice(searchInput, listItem) {
-    var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
-    getHidden(formAdd, "Id").value = Date.now();
-    getHidden(formAdd, "Name").value = listItem.textContent;
+function searchStarringChoice(searchInput, listItem, choice) {
 
-    inputsNameDependant.forEach(function (input) {
-        input.disabled = input.classList.contains("jobs-dependant");
-    });
+    addSearchChoice(
+        formAdd,
+        searchAddAction,
+        searchInput,
+        listItem,
+        choice,
+        function () {
+            formAddSubmit.disabled = false;
+
+            var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
+
+            inputsNameDependant.forEach(function (input) {
+                input.disabled = input.classList.contains("jobs-dependant");
+            });
+        }
+    );
+
+
 }
 
 // event on closing starring options
 function searchStarringClose(searchInput) {
-    var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
-    getHidden(formAdd, "Id").value = null;
-    getHidden(formAdd, "Name").value = null;
 
-    inputsNameDependant.forEach(function (input) {
-        input.checked = false;
-        input.disabled = true;
-    });
+    addSearchClose(
+        formAdd,
+        searchInput,
+        function () {
+            formAddSubmit.disabled = true;
+            var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
+
+
+            inputsNameDependant.forEach(function (input) {
+                input.checked = false;
+                input.disabled = true;
+            });
+        }
+    );
+
 }

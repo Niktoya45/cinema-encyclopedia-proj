@@ -1,0 +1,24 @@
+﻿@using EncyclopediaService.Api.Models.Display;
+@using EncyclopediaService.Api.Extensions;
+@model StudioRecord
+@{
+    bool IsAdmin = User.IsAdmin();
+}
+
+<div id="@Model.Id" class="col-6 mb-2 position-relative records hide-delete hide-delete-studios" show-toggled-by="delete-studio">
+    <a href="/encyclopedia/studios/@Model.Id" class="studio-logo-grid">
+		@if (Model.PictureUri != null)
+		{
+			<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
+		}
+		else
+		{
+			<img class="img-placeholder" style="width:130px;" alt="@(Model.Name)">
+		}
+    </a>
+    @if (IsAdmin)
+    {
+        <button id="delete-studio-@Model.Id" value="@Model.Id" type="button" class="editor btn-close position-absolute del-record"
+                data-bs-target="#modal-delete-element" data-bs-toggle="modal" aria-label="Close"></button>
+    }
+</div>

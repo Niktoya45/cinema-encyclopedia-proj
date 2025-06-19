@@ -70,6 +70,34 @@
     visibility: hidden;
 }
 
+.search-suggestions::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+.search-suggestions .list-group-item {
+    background-color: none;
+    transition: all ease-out 0.2s;  
+    display: flex;
+    align-items: center;
+    height: 4rem;
+    width:100%;
+}
+.search-suggestions .list-group-item:hover {
+    background-color: #74808855;
+    transition: all ease-out 0.2s;   
+}
+.search-suggestions .list-group-item > span{
+    margin: 0 1rem;
+    font-size: large;
+}
+
+.search-suggestions .list-group-item > img{
+    object-fit: contain;
+    height: 80%;
+    border-radius: 0.5rem;
+    margin: 0 0.2rem;
+}
 
 #brand {
     color: #aaaaaa;
@@ -127,6 +155,14 @@
 
 .hide-delete .del-record {
     visibility: hidden;
+}
+
+.show-close-buttons {
+    cursor:pointer;
+}
+
+.hide-close-buttons {
+    visibility:hidden;
 }
 
 #rating {
@@ -329,16 +365,6 @@ button:hover > #eye .empty,
 button:hover > #eye line {
     stroke: var(--mark-seen-q);
     fill: none;
-}
-
-.search-suggestions li {
-    background-color:none;
-    transition: all ease-out 0.2s;
-}
-
-.search-suggestions li:hover {
-    background-color: #74808855;
-    transition: all ease-out 0.2s;    
 }
 
 .starring-card,
