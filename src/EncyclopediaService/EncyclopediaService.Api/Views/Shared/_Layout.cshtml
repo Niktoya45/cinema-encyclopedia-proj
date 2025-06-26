@@ -13,114 +13,109 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3" style="z-index:2">
-            <div class="container-fluid">
+		<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3 px-3" style="z-index:2;width:100%">
+            <div class="w-100 d-flex hstack">
                 <a id="brand" class="navbar-brand" href="/encyclopedia/cinemas/all/">Cinema Encyclopedia</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse hstack d-sm-inline-flex align-items-center">
-                    <ul class="navbar-nav flex-grow-1">
-
-						<li class="nav-item" style="margin-left:5rem;">
-							<div class="input-group">
-								<a id="layout-search-submit" class="input-group-text nav-link text-black-50" style="border-radius:10% 0 0 10%" href="#">Search</a>
-							</div>
-                        </li>
+                <div class="navbar-collapse collapse d-flex hstack d-sm-inline-flex align-items-center">
+					<ul class="navbar-nav justify-content-center" style="width:80%">
+						<li class="nav-item w-auto">
+						<form id="layout-search" class="hstack" method="get">
 						
-                        <li class="nav-item">
-                            <div class="input-group">
-                                <select id="layout-search-select" class="form-select bg-dark nav-link" style="width:10rem;border-top-left-radius:0;border-bottom-left-radius:0">
+							<div class="input-group w-100">
+								<button id="layout-search-submit" class="input-group-text nav-link border-light">
+                                    Search
+                                </button>
+
+								<select id="layout-search-select" class="form-select bg-dark nav-link">
 									@foreach (Entities entity in Enum.GetValues(typeof(Entities)))
 									{
-										<option class="nav-link">
-											<a href="/encyclopedia/@(entity.ToString().ToLower())/all/">@(entity)</a>
-                                        </option>
+										<option class="nav-link" value="@(entity.ToString().ToLower())">
+											<a href="/encyclopedia/@(entity.ToString().ToLower())/all/search">@(entity)</a>
+										</option>
 									}
 								</select>
-							</div>
-                        </li>
 
-                        <li class="nav-item">
-                            <input id="layout-search-input" name="layout-search-input" class="form-control ms-2 rounded-2" type="text" style="width:40rem" placeholder=" . . . " />
-                        </li>
-
-                        <li class="nav-item ms-auto me-3">
-
-							<div class="dropdown d-flex vstack" style="width:12rem;height:auto">
-								<button id="account" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-									<div class="input-group">
-										<span id="account-name" class="nav-link fs-6"> Account </span>
-										<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
-											<circle cx="22" cy="43" r="21" />
-											<circle cx="21" cy="15" r="12" />
-											<line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
-										</svg>
-									</div>
-
-								</button>
-
-                                @{
-                                    bool LoggedIn = User.IsLoggedIn();
-                                    bool IsAdmin = LoggedIn && User.IsAdmin();
-                                }
-
-                                <ul id="account-options" class="dropdown-menu dropdown-menu-end box-shadow bg-dark flex-grow-1 mb-2" aria-labelledby="account">
-                                    @if (LoggedIn)
-                                    {
-                                        string profileUrl = Url.PageLink("/Index", "Login", new { redirect = Url.PageLink("/Index", "Profile", new { id = User.FindFirst(JwtRegisteredClaimNames.Sub) }) });
-
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="@profileUrl" >Profile</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="@profileUrl">Marked</a>
-                                        </li>
-
-                                        @if(IsAdmin)
-                                        {
-                                            
-                                        <li class="nav-item vstack d-flex align-items-start">
-                                            <a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button" 
-                                            aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
-
-                                            <div class="collapse" id="account-options-page">
-                                                <ul class="vstack">
-                                                    @foreach (Entity entity in Enum.GetValues(typeof(Entity)))
-                                                    {
-                                                        <li class="nav-item">
-                                                            <a href="/encyclopedia/create/@(entity.ToString().ToLower())" class="nav-link">@(entity)</a>
-                                                        </li>
-                                                    }
-                                                </ul>
-
-                                            </div>
-                                        </li>                                        
-                                        }
-
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li class="nav-item pt-5">
-                                            <a class="nav-link">Logout</a>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        string loginUrl = Url.PageLink("/Index", "Login", new { redirect = Url.PageLink("/Index", "Profile", new {id = ""}) });
-
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li class="nav-item pt-5">
-                                            <a class="nav-link" href="@loginUrl">Login</a>
-                                        </li>
-                                    }
-
-								</ul>
+								<input id="layout-search-input" name="q" class="form-control ms-2 rounded-2" type="search" placeholder="| . . ."/>
                             </div>
+					        
+						</form>
+						</li>
+					</ul>
+					
+					<div class="dropdown d-flex vstack ms-auto navbar-nav justify-content-end" style="height:auto;width:20%">
+						<button id="account" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+							<div class="input-group">
+								<span id="account-name" class="nav-link fs-6"> Account </span>
+								<svg id="account-icon" width="45" height="45" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="22" cy="43" r="21" />
+									<circle cx="21" cy="15" r="12" />
+									<line x1="1" x2="44" y1="45" y2="45" stroke="#aaaaaa" stroke-width="2" />
+								</svg>
+							</div>
+						</button>
 
-                        </li>
-                    </ul>
+						@{
+							bool LoggedIn = User.IsLoggedIn();
+							bool IsAdmin = LoggedIn && User.IsAdmin();
+						}
 
+						<ul id="account-options" class="dropdown-menu dropdown-menu-end box-shadow bg-dark flex-grow-1 mb-2" aria-labelledby="account">
+							@if (LoggedIn)
+							{
+								string profileUrl = Url.PageLink("/Index", "Profile", new { id = User.FindFirst(JwtRegisteredClaimNames.Sub) });
+
+								<li class="nav-item">
+									<a class="nav-link" href="@profileUrl">Profile</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="@profileUrl">Marked</a>
+								</li>
+
+								@if (IsAdmin)
+								{
+
+									<li class="nav-item vstack d-flex align-items-start">
+										<a class="nav-link" data-bs-toggle="collapse" href="#account-options-page" role="button"
+										   aria-expanded="false" aria-controls="account-options-page">Create page for..</a>
+
+										<div class="collapse" id="account-options-page">
+											<ul class="vstack">
+												@foreach (Entity entity in Enum.GetValues(typeof(Entity)))
+												{
+													<li class="nav-item">
+														<a href="/encyclopedia/create/@(entity.ToString().ToLower())" class="nav-link">@(entity)</a>
+													</li>
+												}
+											</ul>
+
+										</div>
+									</li>
+								}
+
+								<li><hr class="dropdown-divider"></li>
+								<li class="nav-item pt-5">
+									<a class="nav-link">Logout</a>
+								</li>
+							}
+							else
+							{
+								string loginUrl = Url.PageLink("/Index", "Login", new { redirect = Url.PageLink("/Index", "Profile", new { id = "" }) });
+
+								<li><hr class="dropdown-divider"></li>
+								<li class="nav-item pt-5">
+									<a class="nav-link" href="@loginUrl">Login</a>
+								</li>
+							}
+
+						</ul>
+					</div>
                 </div>
+
+
             </div>
         </nav>
     </header>

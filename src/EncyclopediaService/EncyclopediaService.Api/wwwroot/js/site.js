@@ -3,80 +3,44 @@
 
 // Write your JavaScript code.
 
-/** AJAX TEMPLATE CALL **/
-
-/*
-
-    // vv form submit button vv
-
-    formSubmit.addEventListener('click', function (e) {
-
-        // vv prevent default redirect action vv
-        e.preventDefault();
-
-        // vv you'd probably want to use submit button parent here vv
-
-        var formElement = formSubmit.parentElement; 
-        const formData = new URLSearchParams();
-
-        for (const kv of new FormData(formElement)) {
-            formData.append(kv[0], kv[1]);
-        }
-
-        fetch(formElement.action,
-            {
-                method: "POST",
-                body: formData
-            })
-            .then((response) => {
-
-                return response.text();
-                // or : 
-                // return response.json();
-            })
-            .then((result) => {
-
-               // then do something in a callback
-
-            });
-
-});
-
-
-*/
-
 var routes = {
     0: "cinemas",
     1: "persons",
     2: "studios"
 }
 
+// define search elements
+
+var searchForm = document.getElementById("layout-search");
 var searchSelect = document.getElementById("layout-search-select");
-var searchInput = document.getElementById("layout-search-input");
 var searchButton = document.getElementById("layout-search-submit");
 
-searchButton.addEventListener('click', function (e) {
 
-    let option = searchSelect.selectedOptions[0];
+// form search query
 
-    if (!searchInput.value || searchInput.value < 3) {
+if (searchSelect && searchForm) {
+    searchSelect.selectedIndex = Array.from(searchSelect.options).findIndex(o => window.location.pathname.includes(o.value));
+    searchForm.action = searchSelect.selectedOptions[0].firstElementChild.href;
 
-        if (option.firstElementChild.href.includes(window.location.pathname.toLowerCase())) {
-            return;
-        }
+    searchSelect.addEventListener('change', function (e) {
 
-        window.location = option.firstElementChild.href;
-        return;
-    }
+        let selected = searchSelect.selectedOptions[0];
 
-    window.location = option.firstElementChild.href + "search?search=" + searchInput.value.toLowerCase();
-});
+        searchForm.action = selected.firstElementChild.href;
+    }); 
+}
+
+
+// make brand name interactive
 
 anchorBrandLayout = document.getElementById("brand");
 
 if (window.location.pathname.toLowerCase().includes(anchorBrandLayout.href)) {
     anchorBrandLayout.href = "#";
 }
+
+
+// trim form inputs
 
 var forms = document.querySelectorAll("form.trim-inputs")
 

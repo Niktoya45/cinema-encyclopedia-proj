@@ -29,7 +29,7 @@ namespace EncyclopediaService.Api.Models.Filter
         public List<string> StudiosBind { get; set; } = new List<string>();
 
 
-        [BindProperty(SupportsGet = true, Name = "search")]
+        [BindProperty(SupportsGet = true, Name = "q")]
         public string? Search { get; set; } = default;
     }
 }

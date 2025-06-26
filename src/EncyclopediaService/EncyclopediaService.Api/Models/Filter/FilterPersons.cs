@@ -16,7 +16,7 @@ namespace EncyclopediaService.Api.Models.Filter
         public Country CountryBind { get; set; }
 
 
-        [BindProperty(SupportsGet = true, Name = "search")]
+        [BindProperty(SupportsGet = true, Name = "q")]
         public string? Search { get; set; } = default;
     }
 }

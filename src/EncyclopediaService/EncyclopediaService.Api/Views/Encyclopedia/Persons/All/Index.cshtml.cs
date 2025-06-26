@@ -73,6 +73,11 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons.All
 
         public async Task<IActionResult> OnGetSearch()
         {
+            if (_filterOptions.Search is null)
+            {
+                RedirectToPage();
+            }
+
             if (PageNum < 1) PageNum = 1;
 
             // handle data transfer instead of below
