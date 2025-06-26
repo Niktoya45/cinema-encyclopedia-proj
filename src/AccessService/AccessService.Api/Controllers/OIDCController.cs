@@ -30,13 +30,11 @@ namespace AccessService.Api.Controllers
 
         private readonly UserManager<AccessProfileUser> _userManager;
         JWKConfig _jwkConfig;
-        HttpClient _client;
 
         public OIDCController(JWKConfig jwkConfig, UserManager<AccessProfileUser> userManager)
         {
             _userManager = userManager;
             _jwkConfig = jwkConfig;
-            _client = new HttpClient();
         }
 
         [Route("userinfo")]

@@ -1,7 +1,7 @@
-﻿@using EncyclopediaService.Api.Models.Display
+﻿@using Shared.CinemaDataService.Models.Flags;
 @model EncyclopediaService.Api.Models.Edit.EditStarring
 @{
-	bool NewStarring = Model.Id is null;
+	bool NewStarring  = Model.Id == null || Model.Id == "";
 }
 
 <input type="hidden" id="partial" name="partial" value="form"/>
@@ -16,13 +16,13 @@
 	<div class="col-6 person-picture-grid">
 		<div class="row">
 
-			@if (Model.PictureUri != null)
+			@if (Model.Picture != null)
 			{
 				<img src="@(Model.PictureUri)" class="img img-fluid" alt="Starring Image">
 			}
 			else
 			{
-				<img class="img img-fluid img-placeholder ignore" alt="Starring Image">
+				<img class="img img-fluid img-placeholder" alt="Starring Image">
 			}
 
 		</div>
@@ -33,7 +33,7 @@
 					<li class="list-group-item form-group position-relative search-dropdown search-starring">
 						<label asp-for="Name">Provide name</label>
 						<br>
-						<input class="form-control search-input " asp-for="Name" autofocus autocomplete="off">
+						<input class="form-control search-input" asp-for="Name" autofocus autocomplete="off">
 						<ul class="list-group search-suggestions suggestions-starring person-picture-search"></ul>
 						<br>
 						<span asp-validation-for="Name" class="text-danger"></span>

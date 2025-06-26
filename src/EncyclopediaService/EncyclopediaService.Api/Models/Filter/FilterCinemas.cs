@@ -1,5 +1,6 @@
-﻿using EncyclopediaService.Api.Models.Display;
+﻿using Shared.CinemaDataService.Models.Flags;
 using Microsoft.AspNetCore.Mvc;
+using EncyclopediaService.Api.Models.Display;
 
 namespace EncyclopediaService.Api.Models.Filter
 {
@@ -26,5 +27,9 @@ namespace EncyclopediaService.Api.Models.Filter
 
         [BindProperty(SupportsGet = true, Name = "studiosbind")]
         public List<string> StudiosBind { get; set; } = new List<string>();
+
+
+        [BindProperty(SupportsGet = true, Name = "search")]
+        public string? Search { get; set; } = default;
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
+using AccessService.Infrastructure.Services;
 
 namespace AccessService.Api.Areas.Identity.Pages.Account
 {
@@ -31,13 +32,16 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<AccessProfileUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUserService _userService;
 
         public RegisterModel(
             UserManager<AccessProfileUser> userManager,
             IUserStore<AccessProfileUser> userStore,
             SignInManager<AccessProfileUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserService userService
+            )
         {
             _userManager = userManager;
             _userManager.Options.SignIn.RequireConfirmedAccount = false;
@@ -46,6 +50,7 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userService = userService;
         }
 
 
@@ -97,9 +102,7 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-                user.AppUsername = Input.Username;
-                user.Sub = "2";
+                var user = await CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -111,7 +114,7 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
 
                     var userId = await _userManager.GetUserIdAsync(user);
 
-                    await _userManager.AddClaimAsync(user, new Claim(JwtRegisteredClaimNames.Sub, "2"));
+                    await _userManager.AddClaimAsync(user, new Claim(JwtRegisteredClaimNames.Sub, user.Sub));
                     await _userManager.AddClaimAsync(user, new Claim("role", AccessUserRoles.User.ToString()));
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -127,11 +130,21 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private AccessProfileUser CreateUser()
+        private async Task<AccessProfileUser> CreateUser()
         {
+            var user = await _userService.CreateUser(new Shared.UserDataService.Models.UserDTO.CreateUserRequest
+            {
+                Username = Input.Username
+            },
+            CancellationToken.None);
+
+            if(user is null) throw new ArgumentNullException($"User registration failed.");
+
+            AccessProfileUser profile;
+
             try
             {
-                return Activator.CreateInstance<AccessProfileUser>();
+                profile = Activator.CreateInstance<AccessProfileUser>();
             }
             catch
             {
@@ -139,6 +152,11 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
                     $"Ensure that '{nameof(AccessProfileUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
+
+            profile.Sub = user.Id;
+            profile.AppUsername = user.Username;
+
+            return profile;
         }
 
         private IUserEmailStore<AccessProfileUser> GetEmailStore()

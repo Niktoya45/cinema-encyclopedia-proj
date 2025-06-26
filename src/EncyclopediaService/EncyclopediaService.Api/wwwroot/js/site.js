@@ -51,15 +51,32 @@ var routes = {
     2: "studios"
 }
 
-var selectLayout = document.getElementById("layout-select");
+var searchSelect = document.getElementById("layout-search-select");
+var searchInput = document.getElementById("layout-search-input");
+var searchButton = document.getElementById("layout-search-submit");
 
+searchButton.addEventListener('click', function (e) {
+
+    let option = searchSelect.selectedOptions[0];
+
+    if (!searchInput.value || searchInput.value < 3) {
+
+        if (option.firstElementChild.href.includes(window.location.pathname.toLowerCase())) {
+            return;
+        }
+
+        window.location = option.firstElementChild.href;
+        return;
+    }
+
+    window.location = option.firstElementChild.href + "search?search=" + searchInput.value.toLowerCase();
+});
 
 anchorBrandLayout = document.getElementById("brand");
 
 if (window.location.pathname.toLowerCase().includes(anchorBrandLayout.href)) {
     anchorBrandLayout.href = "#";
 }
-
 
 var forms = document.querySelectorAll("form.trim-inputs")
 

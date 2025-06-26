@@ -1,15 +1,16 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Api.Queries.StudioQueries;
-using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
-using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
+﻿using CinemaDataService.Api.Commands.StudioCommands.CreateCommands;
 using CinemaDataService.Api.Commands.StudioCommands.DeleteCommands;
-using CinemaDataService.Infrastructure.Models.RecordDTO;
-using CinemaDataService.Api.Queries.RecordQueries;
+using CinemaDataService.Api.Commands.StudioCommands.UpdateCommands;
 using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Api.Queries.RecordQueries;
+using CinemaDataService.Api.Queries.StudioQueries;
+using CinemaDataService.Domain.Aggregates.Shared;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Infrastructure.Models.RecordDTO;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.StudioDTO;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -142,6 +143,32 @@ namespace CinemaDataService.Api.Controllers
             var response = await _mediator.Send(
                 new StudioQuery(id), ct
                 );
+
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Get all studios by indices 
+        /// A method goes under POST variable for avoiding query path constraint
+        /// </summary>
+        /// <returns>All studio list</returns>
+        /// <param name="ids">indices to search by</param> 
+        /// <param name="pg">pagination parameters</param> 
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpPost("indexes")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PostAsync(
+            CancellationToken ct,
+            [FromBody] string[] ids,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(_wrapStudiosQuery(new StudiosIdQuery(ids, pg)), ct);
 
             return Ok(response);
         }

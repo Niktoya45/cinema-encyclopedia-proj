@@ -1,5 +1,5 @@
-﻿using EncyclopediaService.Api.Models;
-using EncyclopediaService.Api.Models.Display;
+﻿using Shared.CinemaDataService.Models.Flags;
+using System.Security.Policy;
 
 namespace EncyclopediaService.Api.Extensions
 {

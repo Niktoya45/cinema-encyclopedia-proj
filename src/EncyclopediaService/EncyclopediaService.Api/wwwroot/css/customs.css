@@ -165,6 +165,18 @@
     visibility:hidden;
 }
 
+.editor-toggle {
+    visibility:hidden;
+}
+
+.create-page .editor-toggle {
+    visibility: visible;
+}
+
+.pad-card {
+    width:3rem;
+}
+
 #rating {
     background: none;
     border: none;
@@ -211,7 +223,6 @@
 .offcanvas-backdrop.fade.show{
     opacity: 0;
 }
-
 
 #label-options-toggle {
     border: none;
@@ -422,6 +433,7 @@ button:hover > #eye line {
 .add-cinema-filmography .add-film
 {
     margin: 0.5rem 0rem;
+    border-radius: 0.5rem;
 }
 
 .add-cinema-starrings::-webkit-scrollbar,
@@ -432,6 +444,6 @@ button:hover > #eye line {
 }
 
 .carousel-row {
-    padding:1rem 0.5rem;
-    min-block-size: 22rem;
+    padding:1rem 0rem;
+    min-block-size: 24rem;
 }

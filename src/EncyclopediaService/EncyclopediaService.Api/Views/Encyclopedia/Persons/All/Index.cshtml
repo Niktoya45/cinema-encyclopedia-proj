@@ -1,6 +1,6 @@
 ﻿@page "{handler?}"
 @using EncyclopediaService.Api.Extensions;
-@using EncyclopediaService.Api.Models.Display
+@using Shared.CinemaDataService.Models.Flags;
 @model EncyclopediaService.Api.Views.Encyclopedia.Persons.All.IndexModel;
 @{
     ViewData["Title"] = "Persons";
@@ -18,9 +18,16 @@
                     @foreach (var person in Model.List)
                     {
 						<div class="col-3 row-cols-md-3 col-sm-6">
-                            <div class="card mb-md-4 w-100" style="width:fit-content">
+                            <div class="card person-picture-grid mb-md-4 w-100" style="width:fit-content">
                                 <a asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">
-                                    <img src="@person.Picture" class="card-img-top" alt="Person @(person.Id)">
+                                    @if (@person.Picture != null)
+                                    {
+                                        <img src="@person.PictureUri" class="card-img-top img-fluid" alt="Person @(person.Name)">
+                                    }
+                                    else
+                                    {
+                                        <img class="img img-fluid img-placeholder card-img-top" alt="Person @(person.Name)">
+                                    }
                                 </a>
                                 <div class="card-body border-bottom" style="padding-bottom:1rem;">
                                     <div class="text-truncate">
@@ -29,7 +36,7 @@
                                                asp-page="/encyclopedia/persons/person" asp-route-id="@person.Id">@person.Name</a>
                                         </h6>
                                     </div>
-                                    <div class="row-cols-9">
+                                    <div class="row-cols-9 mt-2">
                                         <p class="text-end card-subtitle fs-6" style="color:cadetblue;">@(string.Join(" | ", person.Jobs.BreakJobsFlag()))</p>
                                     </div>
                                 </div>
@@ -41,7 +48,7 @@
             </div>
 
             <!-- Filter and Sort Options -->
-            <div class="col-md-3">
+            <div id="filter-and-sort" class="col-md-3">
 
                 <div class="card">
                     <div class="card-body">

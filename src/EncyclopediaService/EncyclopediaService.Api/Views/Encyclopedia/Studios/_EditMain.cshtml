@@ -1,5 +1,5 @@
-﻿@using EncyclopediaService.Api.Models.Display
-@model EncyclopediaService.Api.Models.Edit.EditMainStudio
+﻿@using Shared.CinemaDataService.Models.Flags;
+@model EncyclopediaService.Api.Models.Edit.EditMainStudio;
 @{
 }
 
@@ -26,7 +26,7 @@
 		<span asp-validation-for="@Model.Country" class="text-danger"></span>
 	</li>
 
-	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">President name</li>
+	<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">President Name</li>
 	<li class="list-group-item mb-4 border-bottom border-info fs-6">
 		<input class="form-control" asp-for="@Model.PresidentName" value="@Model.PresidentName" type="text" />
 		<br>

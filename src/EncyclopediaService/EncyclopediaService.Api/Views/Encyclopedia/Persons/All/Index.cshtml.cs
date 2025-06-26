@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc;
-using Azure.Storage.Blobs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Shared.CinemaDataService.Models.Flags;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
 using EncyclopediaService.Api.Models.Display;
+using EncyclopediaService.Api.Models.TestData;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Persons.All
 {
@@ -15,7 +16,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons.All
         [BindProperty(SupportsGet = true, Name = "pageNum")]
         public short PageNum { get; set; }
         public bool IsEnd { get; set; }
-        private UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet = true)]
         public FilterPersons _filterOptions { get; set; }
@@ -28,44 +28,55 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons.All
         public string? By { get; set; }
         public IList<PersonRecord> List { get; set; }
 
-        public IndexModel(UISettings settings, SortPersons sortOptions)
+        public IndexModel(SortPersons sortOptions)
         {
-            _settings = settings;
             _sortOptions = sortOptions;
 
             _filterOptions = new FilterPersons();
 
-                   }
-        public async Task<IActionResult> OnGet([FromQuery] short pageNum = 1)
+        }
+        public async Task<IActionResult> OnGet()
         {
-            if (PageNum < 1) PageNum = pageNum;
+            if (PageNum < 1) PageNum = 1;
+
             // request data instead
-
-            List = Enumerable.Range(1, 25).Select(x => new PersonRecord { Id = "" + x, Name = "Person Name" + x, Jobs = Job.Actor, Picture = _settings.DefaultSmallPersonPicture }).ToList();
-
-            IsEnd = List.Count < MaxPerPage;
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnGetJob([FromQuery] short pageNum = 1)
-        {
-            if (PageNum < 1) PageNum = pageNum;
-            // handle data transfer to Country endpoint instead
-
-            List = Enumerable.Range(1, 25).Select(x => new PersonRecord { Id = "" + x, Name = "Person Name" + x, Jobs = Job.Actor, Picture = _settings.DefaultSmallPersonPicture }).ToList();
+            List = TestRecords.PersonsList;
 
             IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetCountry([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGetJob()
         {
-            if (PageNum < 1) PageNum = pageNum;
-            // handle data transfer to Country endpoint instead
+            if (PageNum < 1) PageNum = 1;
 
-            List = Enumerable.Range(1, 25).Select(x => new PersonRecord { Id = "" + x, Name = "Person Name" + x, Jobs = Job.Actor, Picture = _settings.DefaultSmallPersonPicture }).ToList();
+            // handle data transfer to Job endpoint instead
+            List = TestRecords.PersonsList;
+
+            IsEnd = List.Count < MaxPerPage;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetCountry()
+        {
+            if (PageNum < 1) PageNum = 1;
+
+            // handle data transfer to Country endpoint instead
+            List = TestRecords.PersonsList;
+
+            IsEnd = List.Count < MaxPerPage;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetSearch()
+        {
+            if (PageNum < 1) PageNum = 1;
+
+            // handle data transfer instead of below
+            List = TestRecords.PersonsList;
 
             IsEnd = List.Count < MaxPerPage;
 

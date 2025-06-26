@@ -1,7 +1,8 @@
 ﻿
 import {
-    fetchPostMVC, fetchForm, addSearchEvents, addSearchChoice, addSearchClose,
-    getHidden, approveDelete
+    fetchPostMVC, fetchForm,
+    addSearchEvents, addSearchChoice, addSearchClose,
+    getHidden, approveDelete, deleteRecord
 } from './utils.js';
 
 
@@ -11,7 +12,8 @@ const modalFormAddId = 'modal-add-starring';
 const modalFormEditId = 'modal-edit-starring';
 const formAddId = 'form-add-starring';
 const formEditId = 'form-edit-starring';
-const formDeleteId = 'form-delete-element'
+const formDeleteId = 'form-delete-element';
+const blockSelector = '#starrings'
 const optionEditSelector = ".dropdown-menu .dropdown-edit-starring";
 const optionDeleteSelector = ".dropdown-menu .dropdown-delete-starring";
 
@@ -36,33 +38,37 @@ const deleteAction = window.location.pathname + "?handler=deletestarring";
 
 //** ONLOAD ACTIONS ** //
 
-formAddSubmit.disabled = true;
+if (formAddSubmit) {
 
-// add option event to display edit form
+    formAddSubmit.disabled = true;
 
-var refsEditStarring = document.querySelectorAll(optionEditSelector);
+    // add option event to display edit form
 
-refsEditStarring.forEach(function (ref) {
+    var refsEditStarring = document.querySelectorAll(optionEditSelector);
 
-    addFormEditStarringOption(ref);
-});
+    if (refsEditStarring)
+        refsEditStarring.forEach(function (ref) {
 
-var refsDeleteStarring = document.querySelectorAll(optionDeleteSelector);
+            addFormEditStarringOption(ref);
+        });
 
-refsDeleteStarring.forEach(function (ref) {
+    var refsDeleteStarring = document.querySelectorAll(optionDeleteSelector);
 
-    addFormDeleteStarringOption(ref);
-});
+    refsDeleteStarring.forEach(function (ref) {
 
-// add events to starring add form
-refreshFormAdd(formAdd);
+        addFormDeleteStarringOption(ref);
+    });
+
+    // add events to starring add form
+    refreshFormAdd(formAdd);
+}
 
 
 // ** METHODS USED ** //
 
 
 // add onclick event to add submit
-export function addFormAddSubmitStarring(actionAddStarring) {
+export function addFormAddSubmitStarring(actionAddStarring, doFormWrap) {
 
     formAddSubmit.addEventListener('click', function (e) {
 
@@ -70,7 +76,7 @@ export function addFormAddSubmitStarring(actionAddStarring) {
         formAddSubmit.disabled = true;
         let form = formAdd;
 
-        fetchFormAddStarring(form, actionAddStarring);
+        fetchFormAddStarring(form, doFormWrap, actionAddStarring);
 
     });
 }
@@ -93,27 +99,38 @@ export function addFormEditSubmitStarring(actionEditStarring) {
 
 
 // send add form data
-function fetchFormAddStarring(form, actionAddStarring) {
+function fetchFormAddStarring(form, doFormWrap, actionAddStarring) {
 
     fetchForm(
         form,
         function (placeholder) {
+            let div = document.createElement("div");
+            let Id = "";
 
-            let formWrap = document.createElement("form");
+            if (doFormWrap) {
+                let formWrap = document.createElement("form");
 
-            formWrap.innerHTML = placeholder.innerHTML;
+                formWrap.innerHTML = placeholder.innerHTML;
+                
+                Id = getHidden(formWrap, "Id").value;
+
+                formWrap.action = reuseEditAction;
+                formWrap.method = "post";
+                formWrap.id = "update-edit-starring-" + Id;
+
+                div.append(formWrap);
+            } else {
+                div.innerHTML = placeholder.innerHTML;
+                let inpId = getHidden(div, "Id");
+                if (!inpId) {
+                    inpId = div.querySelector("[name$='Index']");
+                }
+                if (inpId)
+                    Id = inpId.value;
+            }
+            div.id = Id;
             placeholder.remove();
 
-            let Id = getHidden(formWrap, "Id").value;
-
-            let div = document.createElement("div");
-            div.id = Id;
-
-            formWrap.action = reuseEditAction;
-            formWrap.method = "post";
-            formWrap.id = "update-edit-starring-" + Id;
-
-            div.append(formWrap);
             addFormEditStarringOption(div.querySelector(optionEditSelector));
             addFormDeleteStarringOption(div.querySelector(optionDeleteSelector));
 
@@ -161,6 +178,8 @@ function fetchFormEditStarring(form, actionEditStarring) {
 
 function addFormEditStarringOption(ref) {
 
+    if (!ref) return;
+
     ref.addEventListener('click', function (e) {
 
         e.preventDefault();
@@ -182,14 +201,19 @@ function addFormEditStarringOption(ref) {
 }
 
 // add onclick event to delete option
-
 function addFormDeleteStarringOption(ref) {
+
+    if (!ref) return;
 
     ref.addEventListener('click', function (e) {
 
         e.preventDefault();
 
-        approveDelete(ref.value, formDelete.closest('.container-fluid'), deleteAction, classDelete)
+        if (formDelete)
+            approveDelete(ref.value, formDelete.closest('.container-fluid'), deleteAction, classDelete);
+        else {
+            deleteRecord(ref.value, blockSelector);
+        }
     });
 
 }
@@ -266,7 +290,11 @@ function searchStarringClose(searchInput) {
 
 
             inputsNameDependant.forEach(function (input) {
-                input.checked = false;
+                if (input.type == 'checkbox' || input.type == 'radio')
+                    input.checked = false;
+                else if (input.firstElementChild)
+                    input.selected = '0';
+                else input.value = '';
                 input.disabled = true;
             });
         }

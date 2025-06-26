@@ -1,9 +1,11 @@
 ﻿@using EncyclopediaService.Api.Extensions;
 @using EncyclopediaService.Api.Models.Display
-@model CinemaRecord
+@model FilmographyRecord
 @{
 	bool IsAdmin = User.IsAdmin();
 }
+
+<input type="hidden" id="partial" name="partial" value="card" />
 
 <div class="card film-card mb-4">
 	<div class="row">
@@ -11,13 +13,13 @@
 
 			<div class="d-flex cinema-poster-grid">
 				<a href="/encyclopedia/cinemas/@Model.Id">
-					@if (Model.PictureUri != null)
+					@if (Model.Picture != null)
 					{
-						<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
+						<img src="@(Model.PictureUri)" class="img img-fluid img-block" alt="@(Model.Name)">
 					}
 					else
 					{
-						<img class="img img-fluid img-placeholder" style="width:130px;" alt="@(Model.Name)">
+						<img class="img img-fluid img-block img-placeholder" alt="@(Model.Name)">
 					}
 				</a>
 
@@ -49,6 +51,10 @@
 							}
 						</ul>
 					</div>
+				}
+				else
+				{
+					<div class="pad-card"></div>
 				}
 			</div>
 

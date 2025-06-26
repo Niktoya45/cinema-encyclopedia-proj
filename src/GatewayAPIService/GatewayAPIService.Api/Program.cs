@@ -120,6 +120,16 @@ namespace GatewayAPIService.Api
                     options.MapInboundClaims = false;
                 });
 
+            builder.Services
+                  .ConfigureApplicationCookie(options =>
+                  {
+                      options.Cookie = new CookieBuilder
+                      {
+                          SameSite = SameSiteMode.None,
+                          SecurePolicy = CookieSecurePolicy.Always
+                      };
+                  });
+
             builder.Services.AddAuthorization(options => {
                 options.AddPolicy("Authenticated", policy =>
                 {
@@ -137,6 +147,7 @@ namespace GatewayAPIService.Api
                 });
             });
 
+            builder.Services.AddMemoryCache();
 
             var app = builder.Build();
 

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
-using MediatR;
-using CinemaDataService.Domain.Aggregates.StudioAggregate;
-using CinemaDataService.Infrastructure.Models.StudioDTO;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
+using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Domain.Aggregates.StudioAggregate;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.StudioDTO;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using MediatR;
 
 namespace CinemaDataService.Api.Queries.StudioQueries
 {
@@ -25,12 +27,27 @@ namespace CinemaDataService.Api.Queries.StudioQueries
 
             switch (request.Query) 
             {
+                case StudiosIdQuery ciq:
+
+                    IList<Studio> list = new List<Studio>();
+
+                    foreach (string id in ciq.Ids)
+                    {
+                        list.Add(await _repository.FindById(id, cancellationToken) ?? throw new NotFoundException(id, "Studios"));
+                    }
+
+                    studios = list;
+
+                    break;
+
                 case StudiosYearQuery syq:
                     studios = await _repository.FindByYear(syq.Year, syq.Pg, syq.Sort, cancellationToken);
                     break;
+
                 case StudiosCountryQuery scq:
                     studios = await _repository.FindByCountry(scq.Country, scq.Pg, scq.Sort, cancellationToken);
                     break;
+
                 default:
                     studios = await _repository.Find(pg:request.Query.Pg, sort:request.Query.Sort, ct:cancellationToken);
                     break;

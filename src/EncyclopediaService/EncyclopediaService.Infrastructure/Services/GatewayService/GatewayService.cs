@@ -1,4 +1,5 @@
 ﻿
+using EncyclopediaService.Infrastructure.Extensions;
 using Shared.CinemaDataService.Models.CinemaDTO;
 using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.PersonDTO;
@@ -6,7 +7,10 @@ using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
 using Shared.CinemaDataService.Models.StudioDTO;
 using Shared.ImageService.Models.ImageDTO;
-using EncyclopediaService.Infrastructure.Extensions;
+using Shared.UserDataService.Models.LabeledDTO;
+using Shared.UserDataService.Models.RatingDTO;
+using Shared.UserDataService.Models.UserDTO;
+using Shared.UserDataService.Models.Flags;
 using System.Net.Http.Json;
 
 namespace EncyclopediaService.Infrastructure.Services.GatewayService
@@ -16,6 +20,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         const string cinemasUri = "/api/cinemas";
         const string personsUri = "/api/persons";
         const string studiosUri = "/api/studios";
+        const string usersUri   = "/api/users";
 
         string sort_paginate(SortBy? st, Pagination? pg) => (st == null ? "" : $"order={st.Order}&field={st.Field}&")
                                                           + (pg == null ? "" : $"skip={pg.Skip}&take={pg.Take}");
@@ -332,5 +337,88 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         // *********************** //
         // ***    STUDIO API   *** //
+
+
+        // ***    USER INTERACTION API   *** //
+        // *********************** //
+
+        /* User GET Requests */
+        public async Task<UserResponse?> GetUser(string id, CancellationToken ct)
+        {
+            var response = await _httpClient.GetAsync(usersUri + $"/{id}", ct);
+
+            return await response.HandleResponse<UserResponse>();
+        }
+        public async Task<LabeledCinemasResponse<CinemasResponse>?> GetUserLabeled(string userId, Label? label, CancellationToken ct)
+        {
+            var response = await _httpClient.GetAsync(usersUri + $"/{userId}/label/{label}", ct);
+
+            return await response.HandleResponse<LabeledCinemasResponse<CinemasResponse>>();
+        }
+        public async Task<LabeledCinemasResponse<CinemasResponse>?> GetUserLabelFor(string userId, string cinemaId, CancellationToken ct)
+        {
+            var response = await _httpClient.GetAsync(usersUri + $"/label?cinemaId={cinemaId}", ct);
+
+            return await response.HandleResponse<LabeledCinemasResponse<CinemasResponse>>();
+        }
+        public async Task<RatingResponse?> GetUserRatingFor(string userId, string cinemaId, CancellationToken ct)
+        {
+            var response = await _httpClient.GetAsync(usersUri + $"/{userId}/rating/{cinemaId}", ct);
+
+            return await response.HandleResponse<RatingResponse>();
+        }
+
+        /******/
+
+        /* User POST Requests */
+        public async Task<UserResponse?> CreateUser(CreateUserRequest user, CancellationToken ct)
+        {
+            var response = await _httpClient.PostAsJsonAsync(usersUri, user, ct);
+
+            return await response.HandleResponse<UserResponse>();
+        }
+        public async Task<LabeledResponse?> CreateForLabeledList(string userId, CreateLabeledRequest labeled, CancellationToken ct)
+        {
+            var response = await _httpClient.PostAsJsonAsync(usersUri + $"/{userId}/label", labeled, ct);
+
+            return await response.HandleResponse<LabeledResponse>();
+        }
+        public async Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct)
+        {
+            var response = await _httpClient.PostAsJsonAsync(usersUri + $"/{userId}/rating", rating, ct);
+
+            return await response.HandleResponse<RatingResponse>();
+        }
+
+        /******/
+
+        /* User PUT Requests */
+        public async Task<UserResponse?> UpdateUser(string id, UpdateUserRequest user, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(usersUri + $"/{id}", user, ct);
+
+            return await response.HandleResponse<UserResponse>();
+        }
+
+        /******/
+
+        /* User DELETE Requests */
+        public async Task<bool> DeleteUser(string id, CancellationToken ct)
+        {
+            var response = await _httpClient.DeleteAsync(usersUri + $"/{id}", ct);
+
+            return response.IsSuccessStatusCode;
+        }
+        public async Task<bool> DeleteFromLabeledList(string userId, string? cinemaId, CancellationToken ct)
+        {
+            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}/label/{cinemaId}", ct);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        /******/
+
+        // *********************** //
+        // ***    USER INTERACTION API   *** //
     }
 }

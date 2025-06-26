@@ -36,11 +36,36 @@
         <form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new film" lock="true" save-close="false" scroll="false">
             <div class="container-fluid">
                 <form id="form-add-filmography" asp-page-handler="addFilmography" class="trim-inputs" method="post">
-                    <partial name="_AddFilm" model="Model.NewFilmography" />
+                    <partial name="_AddFilm" model="Model.EditFilm" />
+                </form>
+            </div>
+        </form-popup>
+
+		
+        <form-popup id="modal-delete-element" form="form-delete-element" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
+            <div class="container-fluid">
+                <form id="form-delete-element" method="post">
+                    <input type="hidden" asp-for="RecordId"/>
+
+                    <div class="d-flex vstack w-100 justify-content-center align-items-center">
+
+                        <p class="label-delete label-person no-display fs-4 fw-bold">Delete this person page?</p>
+                        <p class="label-delete label-filmography no-display fs-4 fw-bold">Delete filmography record for this cinema page?</p>
+
+                        <div class="d-flex hstack gap-4 h-25 justify-content-center">
+                            <div class="d-flex hstack gap-4 h-25" style="width:80%">
+                                <button value="delete" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Delete</button>
+                                <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </form>
             </div>
         </form-popup>
     }
+    
 
     <h1>Person</h1>
     <div class="container mt-5" style="margin-bottom:6rem">
@@ -51,7 +76,40 @@
                 <h1 class="display-5">@Model.Person.Name</h1>
             </div>
 
-            <div class="col-md-2"></div>
+            <div class="col-md-2">
+
+                @if(IsAdmin)
+                {
+                        <div class="editor dropdown">
+                            <button id="dropdown-edit-cinema" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="icon icon-md icon-options-dots"></span>
+                            </button>
+
+                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-cinema">
+                                <li>
+                                    <button class="show-editor-options dropdown-item">
+                                        Edit
+                                    </button>
+                                </li>
+
+                                <li>
+                                    <button class="dropdown-item" value="@Model.Id"
+								    data-bs-target="#modal-delete-element" data-bs-toggle="modal" href="#">
+									    Delete
+								    </button>
+                                </li>
+                            </ul>
+
+                        </div>
+
+                        <div class="hide-editor-options editor hide-close-buttons">
+                            <button class="btn btn-secondary">
+                                Cancel
+                            </button>
+                        </div>
+                }
+
+            </div>
 
         </div>
 
@@ -67,11 +125,11 @@
                 <div class="col-md-10 person-picture">
                     @if (Model.Person.Picture != null)
                     {
-                        <img src="@(Model.Person.PictureUri)" class="img img-fluid" alt="Poster Image">
+                        <img src="@(Model.Person.PictureUri)" class="img img-fluid" alt="Person Picture">
                     }
                     else
                     {
-                        <img class="img img-fluid img-placeholder" alt="Poster Image">
+                        <img class="img img-fluid img-placeholder" alt="Person Picture">
                     }
                 </div>
 
@@ -113,7 +171,7 @@
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Person.Jobs.BreakJobsFlag())</li>
 
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Country of origin</li>
-                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country.ToString())</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country == 0 ? " - " : Model.Person.Country.ToString())</li>
                             </ul>
                         </div>
 
@@ -151,7 +209,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Biography</li>
                 <li class="list-group-item mb-8 border-bottom shadow-sm fs-5">
-                    @(Model.Person.Description)
+                    @(Model.Person.Description??"")
                 </li>
             </ul>
         </div>
@@ -241,7 +299,7 @@
 
 	</div>
 
-	<script src="~/js/person_events.js" asp-append-version="true"></script>
+	<script src="~/js/person_events.js" asp-append-version="true" type="module"></script>
 
 </body>
 

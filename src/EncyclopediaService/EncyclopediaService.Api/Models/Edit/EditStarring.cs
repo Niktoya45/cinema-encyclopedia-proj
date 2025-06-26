@@ -1,4 +1,4 @@
-﻿using EncyclopediaService.Api.Models.Display;
+﻿using Shared.CinemaDataService.Models.Flags;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 

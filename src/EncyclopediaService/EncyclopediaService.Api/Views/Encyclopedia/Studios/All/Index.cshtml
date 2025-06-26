@@ -1,6 +1,6 @@
 ﻿@page "{handler?}"
 @using EncyclopediaService.Api.Extensions;
-@using EncyclopediaService.Api.Models.Display
+@using Shared.CinemaDataService.Models.Flags;
 @model EncyclopediaService.Api.Views.Encyclopedia.Studios.All.IndexModel;
 @{
     ViewData["Title"] = "Studios";
@@ -17,10 +17,17 @@
 				<div class="row row-cols-4 row-cols-md-4 row-cols-sm-2">
                     @foreach (var studio in Model.List)
                     {
-						<div class="col-3 row-cols-md-3 col-sm-6">
-                            <div class="card mb-md-4 w-100" style="width:fit-content">
+                        <div class="col-3 row-cols-md-3 col-sm-6">
+                            <div class="card studio-logo-grid mb-md-4 w-100" style="width:fit-content">
                                 <a asp-page="/encyclopedia/studios/studio" asp-route-id="@studio.Id">
-                                    <img src="@studio.Picture" class="card-img-top" alt="Studio @(studio.Id)">
+                                    @if (@studio.Picture != null)
+                                    {
+                                        <img src="@studio.PictureUri" class="card-img-top img-fluid" alt="Studio @(studio.Name)">
+                                    }
+                                    else
+                                    {
+                                        <img class="img img-placeholder card-img-top img-fluid" alt="Studio @(studio.Name)">
+                                    }
                                 </a>
                                 <div class="card-body border-bottom" style="padding-bottom:1rem;">
                                     <div class="text-truncate">

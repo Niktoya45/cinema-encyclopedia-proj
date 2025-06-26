@@ -42,6 +42,8 @@ export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
         .catch(error => {
             if (error.name === 'AbortError') {
                 console.log('request cancelled');
+            } else {
+                console.log(error.name);
             }
             return null;
         });
@@ -106,6 +108,11 @@ export function fetchGetMVC(action, responseType) {
 }
 
 
+export function bsElementShow(element) {
+
+    element.querySelector("[data-bs-target]").dispatchEvent(clickEvent);
+}
+
 export function bsElementClose(element) {
 
     element.querySelector("[data-bs-dismiss]").dispatchEvent(clickEvent);
@@ -119,12 +126,44 @@ export function getPartialType(partialResultPlaceholder) {
     return partialResultPlaceholder.querySelector("input[type='hidden']#partial").value;
 }
 
+export function transferPicture(inputFile, img) {
+    const [file] = inputFile.files;
+    if (file) {
+        img.src = URL.createObjectURL(file);
+    }
+}
+
+export function addMainPictureEditEvents(formPicture, formPictureSubmit, imgTarget) {
+
+    formPictureSubmit.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        fetchPostMVC(formPicture, formPicture.action, "JSON")
+            .then((result) => {
+
+                if (!result.picture) {
+                    return;
+                }
+
+                if (imgTarget.classList.contains('img-placeholder')) {
+                    imgTarget.classList.remove('img-placeholder');
+                }
+
+                getHidden(formPicture, "ImageId").value = result.picture;
+                getHidden(formPicture, "ImageUri").value = result.pictureUri;
+
+                imgTarget.src = result.pictureUri;
+            });
+    });
+}
+
 export function addShowCloseEvents() {
 
-    var classCloseToggler = "show-close-buttons";
-    var classCloseTogglerArea = "hide-delete";
-    var classCloseToggledElement = "del-record";
-    var classCloseToggledHide = "hide-close-buttons";
+    var classCloseToggler = ".show-close-buttons";
+    var classCloseTogglerArea = ".hide-delete";
+    var classCloseToggledElement = ".del-record";
+    var classCloseToggledHide = ".hide-close-buttons";
 
     addShowToggle(
         classCloseToggler,
@@ -137,10 +176,10 @@ export function addShowCloseEvents() {
 
 export function addShowEditorEvents() {
 
-    var classEditorToggler = "show-editor-options";
+    var classEditorToggler = ".show-editor-options";
     var classEditorTogglerArea = null;
-    var classEditorToggledElement = "editor-toggle";
-    var classEditorToggledHide = "hide-editor-options";
+    var classEditorToggledElement = ".editor-toggle";
+    var classEditorToggledHide = ".hide-editor-options";
 
     addShowToggle(
         classEditorToggler,
@@ -151,9 +190,9 @@ export function addShowEditorEvents() {
     
 }
 
-export function addShowToggle(classToggler, classToggledArea, classToggledElement, classToggledHide) {
+export function addShowToggle(selectorToggler, selectorToggledArea, selectorToggledElement, selectorToggledHide) {
 
-    var refTogglers = document.querySelectorAll('.' + classToggler);
+    var refTogglers = document.querySelectorAll(selectorToggler);
 
     let showTogglerAttribute = "show-toggled-by";
     let hideTogglerAttribute = "hide-show-toggled-by";
@@ -163,21 +202,22 @@ export function addShowToggle(classToggler, classToggledArea, classToggledElemen
         let showTogglerSelector = ref.id ? `[${showTogglerAttribute}='${ref.id}']` : "";
         let hideTogglerSelector = ref.id ? `[${hideTogglerAttribute}='${ref.id}']` : "";
 
-        var closeButtons = document.querySelectorAll(
-            classToggledArea ?
-            '.' + classToggledArea + showTogglerSelector + " ."  + classToggledElement
-            : '.' + classToggledElement + showTogglerSelector
-
-        );
         var cancels = document.querySelectorAll(
-            classToggledHide ?
-            '.' + classToggledHide + hideTogglerSelector
-            : hideTogglerSelector
+            selectorToggledHide ?
+                selectorToggledHide + hideTogglerSelector
+                : hideTogglerSelector
         );
 
         ref.addEventListener('click', (e) => {
-            
-            closeButtons.forEach((b) => {
+
+            let toggled = document.querySelectorAll(
+                selectorToggledArea ?
+                    selectorToggledArea + showTogglerSelector + " " + selectorToggledElement
+                    : selectorToggledElement + showTogglerSelector
+
+            );
+
+            toggled.forEach((b) => {
                 b.style.visibility = 'visible';
             });
             cancels.forEach((c) => {
@@ -189,7 +229,14 @@ export function addShowToggle(classToggler, classToggledArea, classToggledElemen
 
             c.addEventListener('click', (e) => {
 
-                closeButtons.forEach((b) => {
+                let toggled = document.querySelectorAll(
+                    selectorToggledArea ?
+                        selectorToggledArea + showTogglerSelector + " " + selectorToggledElement
+                        : selectorToggledElement + showTogglerSelector
+
+                );
+
+                toggled.forEach((b) => {
                     b.style.visibility = 'hidden';
                 });
                 cancels.forEach((c) => {
@@ -231,6 +278,22 @@ export function addDeleteEvents(formDelete, resultAction) {
         });
 
     });
+}
+
+export function deleteRecord(id, targetBlockSelector) {
+
+    let record;
+
+    if (targetBlockSelector) {
+        let targetBlock = document.querySelector(targetBlockSelector);
+
+        if (targetBlock)
+            record = targetBlock.querySelector("[id='" + id + "']");
+    }
+    if (!record)
+        record = document.getElementById(id);
+
+    record.remove();
 }
 
 export function approveDelete(targetId, modalContainer, deleteActionPath, deleteClass) {
@@ -275,6 +338,8 @@ export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, ch
             img.src = choiceRes.pictureUri;
         }
 
+        searchInput.value = choiceRes.name;
+
         if (afterSetAction) {
             afterSetAction();
         }
@@ -288,8 +353,10 @@ export function addSearchClose(formAdd, searchInput, afterCloseAction) {
     getHidden(formAdd, "Picture").value = null;
     getHidden(formAdd, "PictureUri").value = null;
     let img = formAdd.querySelector("img");
-    img.src = null;
-    img.classList.add('img-placeholder');
+    if (img.src) {
+        img.src = "";
+        img.classList.add('img-placeholder');
+    }
 
     if (afterCloseAction) {
         afterCloseAction();
@@ -338,9 +405,10 @@ export function addSearchEvents(searchDropdown, action, chooseAction, closeActio
                         let listItemImg = document.createElement("img");
                         let listItemSpan = document.createElement("span");
 
-                        listItemImg.src = choice.pictureUri;
                         if (!choice.pictureUri) {
                             listItemImg.classList.add("img-placeholder");
+                        } else {
+                            listItemImg.src = choice.pictureUri;
                         }
                         listItemSpan.textContent = choice.name;
 

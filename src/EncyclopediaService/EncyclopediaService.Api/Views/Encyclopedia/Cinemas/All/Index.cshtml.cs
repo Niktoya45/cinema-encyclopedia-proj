@@ -4,6 +4,8 @@ using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
 using EncyclopediaService.Api.Models.Display;
+using Shared.CinemaDataService.Models.Flags;
+using EncyclopediaService.Api.Models.TestData;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
 {
@@ -15,7 +17,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         public short PageNum { get; set; }
         public bool IsEnd { get; set; }
 
-        UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet=true)]
         public FilterCinemas _filterOptions {  get; set; }
@@ -28,56 +29,75 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         [BindProperty(SupportsGet=true, Name ="by")]
         public string? By { get; set; }
 
-        public IndexModel(UISettings settings, SortCinemas sortOptions)
+        public IndexModel(SortCinemas sortOptions)
         {
-            _settings = settings;
             _sortOptions = sortOptions;
 
             _filterOptions = new FilterCinemas();
         }
 
-        public async Task<IActionResult> OnGet([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGet()
         {
-            if (PageNum < 1) PageNum = pageNum;
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer instead of below
-
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name="Cinema "+ x, Year = x + 1994, Rating=((x%10)+0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = TestRecords.CinemasList;
 
             IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetYears([FromQuery] short pageNum = 1)
-        {   
+        public async Task<IActionResult> OnGetYears()
+        {
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer to Year endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = TestRecords.CinemasList;
 
             IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetGenres([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGetGenres()
         {
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer to Genre endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = TestRecords.CinemasList;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLanguage([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGetLanguage()
         {
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer to Language endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = TestRecords.CinemasList; 
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetStudio([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGetStudio()
         {
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer to Studios endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new CinemaRecord { Id = ""+x, Name = "Cinema " + x, Year = x + 1994, Rating = ((x % 10) + 0.5), Picture = _settings.DefaultSmallPosterPicture }).ToList();
+            List = TestRecords.CinemasList;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetSearch()
+        {
+            if (PageNum < 1) PageNum = 1;
+
+            // handle data transfer instead of below
+            List = TestRecords.CinemasList;
+
+            IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }

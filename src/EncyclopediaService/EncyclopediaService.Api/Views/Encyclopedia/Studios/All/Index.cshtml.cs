@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc;
-using Azure.Storage.Blobs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Shared.CinemaDataService.Models.Flags;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Filter;
 using EncyclopediaService.Api.Models.Display;
+using EncyclopediaService.Api.Models.TestData;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
 {
@@ -16,7 +17,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
         [FromQuery(Name = "pageNum")]
         public short PageNum { get; set; }
         public bool IsEnd { get; set; }
-        private UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet=true)]
         public FilterStudios _filterOptions { get; set; }
@@ -30,41 +30,54 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
         public string? By { get; set; }
         public IList<StudioRecord> List { get; set; }
 
-        public IndexModel(UISettings settings, SortStudios sortOptions)
+        public IndexModel(SortStudios sortOptions)
         {
-            _settings = settings;
             _sortOptions = sortOptions;
 
             _filterOptions = new FilterStudios();
         }
-        public async Task<IActionResult> OnGet([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGet()
         {
-            if (PageNum < 1) PageNum = pageNum;
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer instead of below
-
-            List = Enumerable.Range(1, 25).Select(x => new StudioRecord { Id = "" + x, Name = $"Studio {x}", Picture = _settings.DefaultSmallPersonPicture }).ToList();
+            List = TestRecords.StudiosList;
 
             IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetYears([FromQuery] short pageNum = 1)
+        public async Task<IActionResult> OnGetYears()
         {
-            if (PageNum < 1) PageNum = pageNum;
+            if (PageNum < 1) PageNum = 1;
+
             // handle data transfer to Year endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new StudioRecord { Id = "" + x, Name = $"Studio {x}", Picture = _settings.DefaultSmallPersonPicture }).ToList();
+            List = TestRecords.StudiosList;
 
             IsEnd = List.Count < MaxPerPage;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnGetCountry([FromQuery] short pageNum=1) {
-            if (PageNum < 1) PageNum = pageNum;
+        public async Task<IActionResult> OnGetCountry() {
+
+            if (PageNum < 1) PageNum = 1;
 
             // handle data transfer to Country endpoint instead
-            List = Enumerable.Range(1, 25).Select(x => new StudioRecord { Id = "" + x, Name = $"Studio {x}", Picture = _settings.DefaultSmallPersonPicture }).ToList();
+            List = TestRecords.StudiosList;
+
+            IsEnd = List.Count < MaxPerPage;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetSearch()
+        {
+            if (PageNum < 1) PageNum = 1;
+
+            // handle data transfer instead of below
+            List = TestRecords.StudiosList;
 
             IsEnd = List.Count < MaxPerPage;
 

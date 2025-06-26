@@ -1,4 +1,6 @@
-﻿namespace EncyclopediaService.Api.Models.Display
+﻿using Shared.CinemaDataService.Models.Flags;
+
+namespace EncyclopediaService.Api.Models.Display
 {
     /**/
     public record Starring

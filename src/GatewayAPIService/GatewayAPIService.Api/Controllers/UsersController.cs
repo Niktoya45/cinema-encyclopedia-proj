@@ -71,19 +71,36 @@ namespace GatewayAPIService.Api.Controllers
             [FromQuery] string? cinemaId = null,
             CancellationToken ct = default)
         {
-            var responseLabelled = cinemaId is null ?
+            var responseLabeled = cinemaId is null ?
                 await _userService.GetLabelled(userId, label, ct)
               : await _userService.GetLabelFor(userId, cinemaId, ct);
 
-            if (responseLabelled is null)
+            if (responseLabeled is null)
             {
                 return BadRequest();
             }
 
             var responseCinemas = await _cinemaService.GetByIds(
-                responseLabelled.Select(l => l.CinemaId).ToArray(),
+                responseLabeled.Select(l => l.CinemaId).ToArray(),
                 ct, 
                 null);
+
+            if (responseCinemas is null)
+            {
+                return BadRequest();
+            }
+
+            LabeledCinemasResponse<CinemasResponse> response = new LabeledCinemasResponse<CinemasResponse>
+            {
+                LabeledCinemas = Enumerable.Range(0, responseLabeled.Count())
+                                    .Select(i => 
+                                        new LabeledCinemaResponse<CinemasResponse> 
+                                        { 
+                                            Cinema = responseCinemas.Response.ElementAt(i),
+                                            Label = responseLabeled.ElementAt(i).Label,
+                                        }).ToList(),
+                UserId = userId
+            };
 
             return Ok(responseCinemas);
         }

@@ -1,15 +1,9 @@
-﻿@page 
+﻿@page "{handler?}"
+@model EncyclopediaService.Api.Views.IndexModel
 @{
     ViewData["Title"] = "Home Page";
 }
 
-@functions
-{
-    public async Task<IActionResult> OnGet()
-    {
-        return Redirect("encyclopedia/cinemas/all/index");
-    }
-}
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>

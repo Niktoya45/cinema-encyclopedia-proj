@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using MediatR;
+using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
 using CinemaDataService.Api.Queries;
+using CinemaDataService.Api.Queries.CinemaQueries;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
 using CinemaDataService.Domain.Aggregates.PersonAggregate;
-using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Infrastructure.Models.PersonDTO;
 using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Api.Exceptions.InfrastructureExceptions;
-using CinemaDataService.Domain.Aggregates.CinemaAggregate;
-using CinemaDataService.Infrastructure.Models.CinemaDTO;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
+using MediatR;
 
 namespace CinemaDataService.Api.Queries.PersonQueries
 {
@@ -28,12 +29,27 @@ namespace CinemaDataService.Api.Queries.PersonQueries
 
             switch (request.Query)
             {
+                case PersonsIdQuery piq:
+
+                    IList<Person> list = new List<Person>();
+
+                    foreach (string id in piq.Ids)
+                    {
+                        list.Add(await _repository.FindById(id, cancellationToken) ?? throw new NotFoundException(id, "Persons"));
+                    }
+
+                    persons = list;
+
+                    break;
+
                 case PersonsJobsQuery pjq:
                     persons = await _repository.FindByJobs(pjq.Jobs, pjq.Pg, pjq.Sort, cancellationToken);
                     break;
+
                 case PersonsCountryQuery pcq:
                     persons = await _repository.FindByCountry(pcq.Country, pcq.Pg, pcq.Sort, cancellationToken);
                     break;
+
                 default:
                     persons = await _repository.Find(pg: request.Query.Pg, sort: request.Query.Sort, ct:cancellationToken);
                     break;

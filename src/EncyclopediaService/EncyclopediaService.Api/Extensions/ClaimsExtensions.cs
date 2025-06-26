@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace EncyclopediaService.Api.Extensions
@@ -31,5 +34,35 @@ namespace EncyclopediaService.Api.Extensions
 
             return IsAdmin;
         }
+
+        public static ClaimsPrincipal ToPrincipal(Dictionary<string, string> claimsDictionary, string authenticationType)
+        {
+            List<Claim> claims = new List<Claim>();
+
+            foreach (var c in claimsDictionary)
+            {
+                claims.Add(new Claim(c.Key, c.Value));
+            }
+
+            return new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType));
+        }
+
+        public static async Task SignInByCookies(this ClaimsPrincipal principal, HttpContext context, bool isPersistent)
+        {
+
+            AuthenticationProperties props = null;
+            if (isPersistent)
+            {
+                props = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(45)
+                };
+            }
+            ;
+
+            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+        }
+
     }
 }

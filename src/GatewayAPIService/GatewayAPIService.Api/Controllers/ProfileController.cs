@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GatewayAPIService.Api.Controllers
 {
@@ -9,6 +11,7 @@ namespace GatewayAPIService.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Policy = "Authenticated")]
         public async Task<IActionResult> Profile(string id) 
         {
             var result = Redirect(BaseUrl + $"/profile/{id}");
@@ -18,6 +21,7 @@ namespace GatewayAPIService.Api.Controllers
 
         [HttpGet]
         [Route("{id}/marked")]
+        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Policy = "Authenticated")]
         public async Task<IActionResult> Marked(string id)
         {
             var result = Redirect(BaseUrl + $"/profile/{id}/marked");

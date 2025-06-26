@@ -53,6 +53,40 @@ namespace CinemaDataService.Api.Controllers
             return Ok(response);
         }
 
+
+        /// <summary>
+        /// Get all persons by indices 
+        /// A method goes under POST variable for avoiding query path constraint
+        /// </summary>
+        /// <returns>All person list</returns>
+        /// <param name="ids">indices to search by</param> 
+        /// <param name="pg">pagination parameters</param> 
+        /// <response code="200">Success</response>
+        /// <response code="400">No person was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpPost("indexes")]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PostAsync(
+            CancellationToken ct,
+            [FromBody] string[] ids,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(_wrapPersonsQuery(new PersonsIdQuery(ids, pg)), ct);
+
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Get persons by names using search string 
+        /// </summary>
+        /// <param name="ct"> cancellation token </param>
+        /// <param name="search"> search string </param>
+        /// <param name="pg">pagination parameters (optional)</param>
+        /// <returns></returns>
         [HttpGet("search/{search}")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

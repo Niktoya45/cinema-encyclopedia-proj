@@ -1,4 +1,4 @@
-﻿using EncyclopediaService.Api.Models.Display;
+﻿using Shared.CinemaDataService.Models.Flags;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EncyclopediaService.Api.Models.Filter
@@ -14,5 +14,9 @@ namespace EncyclopediaService.Api.Models.Filter
 
         [BindProperty(SupportsGet =true, Name ="countrybind")]
         public Country CountryBind { get; set; }
+
+
+        [BindProperty(SupportsGet = true, Name = "search")]
+        public string? Search { get; set; } = default;
     }
 }

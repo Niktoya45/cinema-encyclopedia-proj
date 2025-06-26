@@ -1,19 +1,21 @@
 ﻿@using EncyclopediaService.Api.Models.Display;
 @using EncyclopediaService.Api.Extensions;
-@model StudioRecord
+@model ProductionStudio
 @{
     bool IsAdmin = User.IsAdmin();
 }
 
 <div id="@Model.Id" class="col-6 mb-2 position-relative records hide-delete hide-delete-studios" show-toggled-by="delete-studio">
-    <a href="/encyclopedia/studios/@Model.Id" class="studio-logo-grid">
-		@if (Model.PictureUri != null)
+	<input type="hidden" id="partial" name="partial" value="card" />
+    
+	<a href="/encyclopedia/studios/@Model.Id" class="studio-logo-grid">
+		@if (Model.Picture != null)
 		{
-			<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
+			<img src="@(Model.PictureUri)" class="img img-fluid img-block" alt="@(Model.Name)">
 		}
 		else
 		{
-			<img class="img-placeholder" style="width:130px;" alt="@(Model.Name)">
+			<img class="img img-fluid img-block img-placeholder" alt="@(Model.Name)">
 		}
     </a>
     @if (IsAdmin)

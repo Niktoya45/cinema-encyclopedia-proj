@@ -1,6 +1,14 @@
 ﻿
-import { fetchForm, addDeleteEvents, approveDelete, appendToCarousel, removeFromCarousel, addShowCloseEvents, addSearchChoice } from './utils.js';
+import {
+    fetchPostMVC,
+    addDeleteEvents, approveDelete,
+    appendToCarousel, removeFromCarousel,
+    bsElementShow, 
+    addShowEditorEvents, addMainPictureEditEvents,
+    addShowCloseEvents,
+} from './utils.js';
 import { addFormAddSubmitStarring, addFormEditSubmitStarring } from './starring_events.js';
+import { addFormAddSubmitStudio } from './production_studio_events.js';
 
 //** ELEMENTS USED **/
 
@@ -8,33 +16,42 @@ const kpage = 5;
 const nrows = 1;
 const carouselStarringId = "carousel-starrings";
 
-const modalFormStudioAddId = 'modal-add-starring';
-
 const classDeleteCinema = 'label-cinema';
 const classDeleteStarring = 'label-starring';
 const classDeleteStudio = 'label-studio';
 
+const formPictureId = 'form-edit-poster';
+const formPictureSubmitId = 'submit-' + formPictureId;
 const formDeleteId = 'form-delete-element';
+const formEditMainId = 'form-edit-main';
+const formEditMainSubmitId = 'submit-' + formEditMainId;
 const formAddStudioId = 'form-add-studio';
 const formAddStudioSubmitId = 'submit-' + formAddStudioId;
 
+const deleteCinemaAction = window.location.pathname + "?handler=deletecinema";
 const deleteStudioAction = window.location.pathname + "?handler=deleteproductionstudio";
-const searchStudioAddAction = window.location.pathname + "?handler=searchproductionstudio";
-const reuseStudioAddAction = window.location.pathname + "?handler=reuseaddproductionstudio";
+const rateAction = window.location.pathname + "?handler=rate";
+const labelAction = window.location.pathname + "?handler=label";
 
+var formPicture = document.getElementById(formPictureId);
+var formPictureSubmit = document.getElementById(formPictureSubmitId);
 var formDelete = document.getElementById(formDeleteId);
-var formAddStudio = document.getElementById(formAddStudioId);
-var formAddStudioSubmit = document.getElementById(formAddStudioSubmitId);
-
-var modalFormStudioAdd = document.getElementById(modalFormStudioAddId);
+var formEditMain = document.getElementById(formEditMainId);
+var formEditMainSubmit = document.getElementById(formEditMainSubmitId);
 
 var carouselStarring = document.getElementById(carouselStarringId);
-var blockStudio = document.querySelector(".studios-block");
+var blockStudios = document.querySelector(".studios-block");
+var blockLabels = document.querySelector(".labels-block");
+var imgPicture = document.querySelector(".cinema-poster img");
 
 var starsCollapse = document.getElementById("collapse-stars");
 var starsRate = starsCollapse.querySelector("#rate-cinema");
 var starsClick = starsCollapse.querySelectorAll("button.rail");
 var stars = Array.from(starsClick).map(starClick => starClick.querySelector(".star"));
+
+var labelsClick = blockLabels.querySelectorAll("button");
+
+const UserAdmin = formEditMain ? true : false;
 
 
 //** ONLOAD ACTIONS **//
@@ -47,6 +64,11 @@ for (let i = 0; i < stars.length; i++) {
 
         e.preventDefault();
 
+        if (starsRate.classList.contains('login-proceed')) {
+            bsElementShow(starsRate);
+            return;
+        }
+
         let rating = 0;
         if (stars[i].classList.contains('rail')) {
             rating = this.value;
@@ -55,51 +77,112 @@ for (let i = 0; i < stars.length; i++) {
                 rating = starsClick.item(i-1).value
         }
 
-        fillStars(i);
+        fetchPostMVC(new URLSearchParams({ score: rating }), starsRate.action, "JSON")
+            .then((result) => {
+
+                console.log(result);
+
+                fillStars(i);
+            });
+    });
+}
+
+for (let i = 0; i < labelsClick.length; i++) {
+
+    labelsClick.item(i).addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        let labelValue = 0;
+
+        if (this.classList.contains('active')) {
+            labelValue = -parseInt(this.value);
+        }
+        else {
+            labelValue = parseInt(this.value);
+        }
+
+        if (labelValue == 0) {
+            return;
+        }
+        console.log(labelValue);
+
+        if (blockLabels.classList.contains('login-proceed')) {
+            bsElementShow(blockLabels);
+            return;
+        }
+
+        fetchPostMVC(new URLSearchParams({ label: labelValue }), labelAction, "JSON")
+            .then((result) => {
+
+                if (labelValue > 0) {
+                    this.classList.add('active');
+                } else {
+                    this.classList.remove('active')
+                }
+            });
+        
     });
 }
 
 
-// add onlick event for delete popup 
+if (UserAdmin) {
 
-addDeleteEvents(formDelete, function (result, deleteTargetClass) {
+    // add onclick event to show hidden editor options
+    addShowEditorEvents();
 
-    if (deleteTargetClass == classDeleteCinema) {
-        window.location = '/';
-    }
-    else if (deleteTargetClass == classDeleteStarring) {
-        removeFromCarousel(carouselStarring, result, nrows, kpage);
-    }
-    else if (deleteTargetClass == classDeleteStudio) {
-        document.querySelector(".studios-block div[id='" + result + "']").remove();
-    }
-});
+
+    // make cinema page deletion confirmed 
+    approveDelete("", formDelete.closest('.container-fluid'), deleteCinemaAction, classDeleteCinema);
+
+
+    // add onlick events for delete popup after delete button is clicked 
+    addDeleteEvents(formDelete, function (result, deleteTargetClass) {
+
+        if (deleteTargetClass == classDeleteCinema) {
+            window.location = '/';
+        }
+        else if (deleteTargetClass == classDeleteStarring) {
+            removeFromCarousel(carouselStarring, result, nrows, kpage);
+        }
+        else if (deleteTargetClass == classDeleteStudio) {
+            document.querySelector(".studios-block div[id='" + result + "']").remove();
+        }
+    });
+}
 
 
 //** ONLOAD RECORD ACTIONS **//
 
-// add submit starring events
-addFormAddSubmitStarring(function (divStarring) {
-    appendToCarousel(carouselStarring, divStarring, nrows, kpage);
-});
+if (UserAdmin) {
 
-addFormEditSubmitStarring(null);
+    // add submit picture events
+    addMainPictureEditEvents(formPicture, formPictureSubmit, imgPicture);
 
-// add submit studio events 
-formAddStudioSubmit.disabled = true;
-refreshFormAdd(formStudioAdd);
-addFormAddSubmitStudio(function (div) { blockStudio.append(div.firstElementChild); });
+    // add submit starring events
+    addFormAddSubmitStarring(function (divStarring) {
+        appendToCarousel(carouselStarring, divStarring, nrows, kpage);
+    }, true);
 
-// show close buttons for studio
-addShowCloseEvents();
+    addFormEditSubmitStarring(null);
 
+    // add submit studio events 
+    addFormAddSubmitStudio(function (div) {
+        addApproveStudioDelete(div.querySelector(".del-record"));
+        blockStudios.append(div.firstElementChild);
+    }, false);
 
-// add action after studio delete
-var refsDeleteStudio = document.querySelectorAll(".hide-delete-studios .del-record");
+    // show close buttons for studio
+    addShowCloseEvents();
 
-refsDeleteStudio.forEach(ref => {
-    addApproveStudioDelete(ref);
-});
+    // add action after studio delete
+    var refsDeleteStudio = document.querySelectorAll(".hide-delete-studios .del-record");
+
+    refsDeleteStudio.forEach(ref => {
+        addApproveStudioDelete(ref);
+    });
+
+}
 
 
 //** METHODS USED **//
@@ -130,85 +213,9 @@ function fillStars(starIndex) {
 //** Studio Logo **//
 
 
-
-// add onclick event to add studio submit
-function addFormAddSubmitStudio(actionAddStudioLogo) {
-
-    console.log("added");
-    formAddStudioSubmit.addEventListener('click', function (e) {
-
-        e.preventDefault();
-        formAddStudioSubmit.disabled = true;
-
-        let form = formAddStudio;
-
-        fetchFormAddStudioLogo(form, actionAddStudioLogo);
-
-    });
-}
-
-// send add form studio data
-function fetchFormAddStudioLogo(form, actionAddStudioLogo) {
-
-    fetchForm(
-        form,
-        function (placeholder) {
-            let div = document.createElement("div");
-            div.innerHTML = placeholder.innerHTML;
-            placeholder.remove();
-
-            addApproveStudioDelete(div.querySelector(".del-record"));
-
-            // callback after studio addition
-            if (actionAddStudioLogo) {
-                actionAddStudioLogo(div);
-            }
-
-        },
-        refreshFormStudioAdd,
-        modalFormStudioAdd
-    )
-}
-
-// refresh events for studio add form
-function refreshFormStudioAdd(form) {
-
-    formStudioAddSubmit.disabled = true;
-    var searchStudioDropdown = form.querySelector(".search-studio");
-    addSearchEvents(searchStudioDropdown, null, searchStudioChoice, searchStudioClose)
-}
-
-// event on clicking the hinted studio option
-function searchStudioChoice(searchInput, listItem, choice) {
-
-    addSearchChoice(
-        formStudioAdd,
-        searchStudioAddAction,
-        searchInput,
-        listItem,
-        choice,
-        function () {
-            formStudioAddSubmit.disabled = false;
-        }
-    );
-}
-
-// event on closing studio options
-function searchStudioClose(searchInput) {
-
-    addSearchClose(
-        formAdd,
-        searchInput,
-        function () {
-            formStudioAddSubmit.disabled = true;
-        }
-    );
-}
-
-
 // approve studio deletion popup 
 function addApproveStudioDelete(ref) {
-    ref.addEventListener('click', (e) => {
+    ref.addEventListener('click', function(e) {
         approveDelete(ref.value, formDelete.closest('.container-fluid'), deleteStudioAction, classDeleteStudio);
     });
 }

@@ -99,25 +99,13 @@ namespace AccessService.Api.Areas.Identity.Pages.Account
 
                     var user = await _userManager.FindByEmailAsync(Input.Email);
 
-
-                    AuthenticationProperties props = null;
-                    if (Input.RememberMe)
-                    {
-                        props = new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(45)
-                        };
-                    }
-                    ;
-
                     ClaimsPrincipal userPrincipal = user.ToPrincipal("cookie");
 
                     Claim? role = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "role");
 
                     userPrincipal.AddIdentity(new ClaimsIdentity(new Claim[] { role }));
 
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, props);
+                    await userPrincipal.SignInByCookies(HttpContext, Input.RememberMe);
 
                     return LocalRedirect(returnUrl);
                 }

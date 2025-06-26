@@ -1,8 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using Azure.Storage.Blobs;
-using EncyclopediaService.Api.Models.Utils;
-using EncyclopediaService.Infrastructure.Services.ImageService;
 using EncyclopediaService.Api.Models.Sort;
+using EncyclopediaService.Api.Models.Utils;
+using EncyclopediaService.Infrastructure.Services.GatewayService;
+using EncyclopediaService.Infrastructure.Services.ImageService;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
 
@@ -21,7 +23,7 @@ namespace EncyclopediaService.Api
             builder.Services.Configure<RouteOptions>(opts => 
                     {
                         opts.LowercaseUrls = true;
-                        opts.LowercaseQueryStrings = true;
+                        opts.LowercaseQueryStrings = false;
                         opts.AppendTrailingSlash = false;
                     }
                 );
@@ -44,6 +46,22 @@ namespace EncyclopediaService.Api
             {
                 opts.PageViewLocationFormats.Add("/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
             });
+
+            builder.Services.AddAuthentication(options =>
+            {
+
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            })
+            .AddCookie(opts => {
+                opts.SlidingExpiration = true;
+
+                opts.Cookie.IsEssential = true;
+                opts.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                opts.Cookie.SameSite = SameSiteMode.None;
+            })
+            ;
 
             builder.Services.AddSingleton<UISettings>(provider => 
             {
@@ -73,9 +91,15 @@ namespace EncyclopediaService.Api
                 return sort;
             });
 
-            builder.Services.AddHttpClient<IImageService, ImageService>(client => 
+            builder.Services.AddHttpClient<IImageService, ImageService>(client =>
             {
                 string conn = builder.Configuration.GetConnectionString("ImageService") ?? throw new Exception("Missing ImageService route path in ConnectionStrings");
+
+                client.BaseAddress = new Uri(conn);
+            });
+            builder.Services.AddHttpClient<IGatewayService, GatewayService>(client => 
+            {
+                string conn = builder.Configuration.GetConnectionString("GatewayService") ?? throw new Exception("Missing GatewayService route path in ConnectionStrings");
 
                 client.BaseAddress = new Uri(conn);
             });
@@ -93,6 +117,13 @@ namespace EncyclopediaService.Api
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                CheckConsentNeeded = ctx => false,
+
+                MinimumSameSitePolicy = SameSiteMode.None,
+                Secure = CookieSecurePolicy.Always
+            });
 
             app.MapFallback(context => {
                 context.Response.Redirect("/encyclopedia/cinemas/all/");
@@ -101,6 +132,7 @@ namespace EncyclopediaService.Api
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

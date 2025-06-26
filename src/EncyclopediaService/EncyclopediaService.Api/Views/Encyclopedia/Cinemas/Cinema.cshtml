@@ -1,10 +1,12 @@
 ﻿@page "{id}"
 @using EncyclopediaService.Api.Extensions;
+@using Shared.UserDataService.Models.Flags;
 @model EncyclopediaService.Api.Views.Encyclopedia.Cinemas.CinemaModel;
 @{
     ViewData["Title"] = "Cinema";
 
     var Role = User.FindFirst("role");
+    bool LoggedIn = User.IsLoggedIn();
     bool IsAdmin = User.IsAdmin();
 }
 @functions{
@@ -76,6 +78,7 @@
 
                     <div class="d-flex vstack w-100 justify-content-center align-items-center">
 
+                        <p class="label-delete label-cinema no-display fs-4 fw-bold">Delete this cinema page?</p>
                         <p class="label-delete label-starring no-display fs-4 fw-bold">Delete starring record for this cinema page?</p>
                         <p class="label-delete label-studio no-display fs-4 fw-bold">Delete studio record for this cinema page?</p>
 
@@ -91,8 +94,35 @@
                 </form>
             </div>
         </form-popup>
-
     }
+
+
+    @if(!LoggedIn)
+    {
+        <form-popup id="modal-login" form="form-login" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
+            <div class="container-fluid">
+
+                    <div class="d-flex vstack w-100 justify-content-center align-items-center">
+
+                        <p class="fs-4 fw-bold">This action requires you to login</p>
+                        <p class="fs-4 fw-bold">Proceed to login?</p>
+
+                        <div class="d-flex hstack gap-4 h-25 justify-content-center">
+                            <div class="d-flex hstack gap-4 h-25" style="width:80%">
+                                <form id="form-login" asp-page="Index" asp-page-handler="Login" method="post">
+                                <button value="login" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Login</button>
+                                </form>
+                                <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </div>
+        </form-popup>        
+    }
+
+
 
     <h1>Cinema</h1>
     <div class="container mt-5" style="margin-bottom:6rem">
@@ -103,7 +133,40 @@
                 <h1 class="display-5">@Model.Cinema.Name</h1>
             </div>
 
-            <div class="col-md-2"></div>
+            <div class="col-md-2">
+
+                @if(IsAdmin)
+                {
+                        <div class="editor dropdown">
+                            <button id="dropdown-edit-cinema" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="icon icon-md icon-options-dots"></span>
+                            </button>
+
+                            <ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-cinema">
+                                <li>
+                                    <button class="show-editor-options dropdown-item">
+                                        Edit
+                                    </button>
+                                </li>
+
+                                <li>
+                                    <button class="dropdown-item" value="@Model.Id"
+								    data-bs-target="#modal-delete-element" data-bs-toggle="modal" href="#">
+									    Delete
+								    </button>
+                                </li>
+                            </ul>
+
+                        </div>
+
+                        <div class="hide-editor-options editor hide-close-buttons">
+                            <button class="btn btn-secondary">
+                                Cancel
+                            </button>
+                        </div>
+                }
+
+            </div>
 
         </div>
 
@@ -139,7 +202,8 @@
                             starSpan = 0.6f;
                         }
 
-                        <form id="rate-cinema" asp-page-handler="Rate" method="post">
+                        <form id="rate-cinema" asp-page-handler="Rate" class="@(LoggedIn ? "" : "login-proceed")" method="post">
+                            <button data-bs-target="#modal-login" data-bs-toggle="modal" style="display:none"></button>
                             @for (byte i = 0; i < starCount; i++)
                             {
                                 <button class="rail" value="@(i+1)" style="background:none;border:none;padding:0;width:auto;text-decoration:none">
@@ -177,16 +241,18 @@
                             <img class="img img-fluid img-placeholder ignore" alt="Poster Image">
                         }
                     </div>
-                    <div class="row">
+                    <div class="row labels-block @(LoggedIn ? "" : "login-proceed")">
+                        <button data-bs-target="#modal-login" data-bs-toggle="modal" style="display:none"></button>
 
                         <div class="col mt-3 mb-1">
-                            <button title="favorite" class="btn-refresh btn-label">
+                            <button title="favorite" class="@((Model.UserLabel & Label.Favored) == Label.None ? "" : "active") btn-refresh btn-label" value="@((byte)Label.Favored)">
                                 <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                     <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12" />
                                 </svg>
                             </button>
 
-                            <button id="label-options-toggle" title="mark as.." type="button" data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
+                            <button id="label-options-toggle" title="mark as.." type="button" value="@((byte)Label.None)"
+                                    data-bs-toggle="collapse" data-bs-target="#collapse-labels" aria-expanded="false" aria-controls="collapse-labels">
 
                                 <svg id="pencil" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
 
@@ -206,7 +272,7 @@
                             <div id="collapse-labels-body">
                                 <div id="collapse-labels" class="collapse collapse-horizontal">
                                     <div id="labels" class="card card-body hstack">
-                                        <button title="planned">
+                                        <button title="planned" class="@((Model.UserLabel & Label.Planned) == Label.None ? "" : "active")"  value="@((byte)Label.Planned)">
                                             <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3" />
                                                 <line class="thin" x1="17" x2="17" y1="17" y2="9"></line>
@@ -214,7 +280,7 @@
                                                 <line x1="16" x2="18" y1="17" y2="17" stroke-width="3"></line>
                                             </svg>
                                         </button>
-                                        <button title="watching">
+                                        <button title="watching" class="@((Model.UserLabel & Label.Watching) == Label.None ? "" : "active")"  value="@((byte)Label.Watching)">
                                             <svg id="monitor" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="7,4 4,7 4,23 7,26 28,26 31,23 31,7 28,4" />
                                                 <polygon points="12,10 10,12 10,18 12,20  23,20 25,18 25,12 23,10" />
@@ -222,7 +288,7 @@
                                                 <line x1="10" x2="25" y1="30" y2="30" />
                                             </svg>
                                         </button>
-                                        <button title="seen">
+                                        <button title="seen" class="@((Model.UserLabel & Label.Seen) == Label.None ? "" : "active")"  value="@((byte)Label.Seen)">
                                             <svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4" />
                                                 <polygon points="17,7 20,12 21,13 23,14 27,14 27,16 27,17 25,9" />
@@ -275,7 +341,7 @@
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.ReleaseDate.ToString("dd-MMM-yyyy"))</li>
 
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Language of origin</li>
-                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language.ToString())</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Cinema.Language == 0 ? " - " : Model.Cinema.Language.ToString())</li>
 
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Genres</li>
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Cinema.Genres.BreakGenresFlag())</li>
@@ -352,7 +418,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Description</li>
                 <li class="list-group-item mb-8 border-bottom shadow-sm fs-5">
-                    @(Model.Cinema.Description)
+                    @(Model.Cinema.Description??"")
                 </li>
             </ul>
         </div>
@@ -450,6 +516,6 @@
 
 
 	<script src="~/js/cinema_events.js" asp-append-version="true" type="module"></script>
-	<script src="~/js/starring_events.js" asp-append-version="true" type="module"></script>
+    
 
 </body>

@@ -4,6 +4,14 @@
     height: fit-content;
 }
 
+.img-width {
+    width:fit-content;
+}
+
+.img-block {
+    width:120px;
+}
+
 .ignore {
     
 }

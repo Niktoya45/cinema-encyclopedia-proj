@@ -1,4 +1,6 @@
 ﻿using AccessService.Domain.Profiles;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System.Data;
@@ -35,6 +37,22 @@ namespace EncyclopediaService.Api.Extensions
             (role != null && (role.Value.Contains("Administrator") || role.Value.Contains("Superadministrator")));
 
             return IsAdmin;
+        }
+
+        public static async Task SignInByCookies(this ClaimsPrincipal principal, HttpContext context, bool isPersistent) 
+        {
+
+            AuthenticationProperties props = null;
+            if (isPersistent)
+            {
+                props = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.Now.AddMinutes(45)
+                };
+            };
+
+            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
         }
 
         public static ClaimsPrincipal ToPrincipal(this AccessProfileUser user, string authenticationType)

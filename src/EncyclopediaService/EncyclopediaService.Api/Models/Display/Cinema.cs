@@ -1,49 +1,8 @@
 ﻿using EncyclopediaService.Api.Models.Display;
-using Humanizer.Localisation;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+using Shared.CinemaDataService.Models.Flags;
 
 namespace EncyclopediaService.Api.Models
 {
-    /*
-     * vvv src/Shared/.. vvv
-     */
-    /**/ public enum Genre
-    {
-        None = 0b_0000_0000_0000_0000,
-        Action = 0b_0000_0000_0000_0001,
-        Comedy = 0b_0000_0000_0000_0010,
-        Documentary = 0b_0000_0000_0000_0100,
-        Drama = 0b_0000_0000_0000_1000,
-        Fantasy = 0b_0000_0000_0001_0000,
-        Horror = 0b_0000_0000_0010_0000,
-        Musical = 0b_0000_0000_0100_0000,
-        Mystery = 0b_0000_0000_1000_0000,
-        Romance = 0b_0000_0001_0000_0000,
-        SciFi = 0b_0000_0010_0000_0000,
-        Thriller = 0b_0000_0100_0000_0000,
-        Western = 0b_0000_1000_0000_0000
-    }
-    /**/
-    public enum Language
-    {
-        [Display(Name = ". . .")]
-        None,
-        English,
-        German,
-        French,
-        Spanish,
-        Italian
-    }
-
-    /**/ public enum RolePriority 
-    {
-        [Display(Name=". . .")]
-        None,
-        Main,
-        Support, 
-        Episodic 
-    }
 
     public class Cinema
     {
@@ -55,7 +14,7 @@ namespace EncyclopediaService.Api.Models
         public Genre Genres { get; set; }
         public Language? Language { get; set; }
         public double RatingScore { get; set; } = 0.0;
-        public StudioRecord[]? ProductionStudios { get; set; }
+        public ProductionStudio[]? ProductionStudios { get; set; }
         public Starring[]? Starrings { get; set; }
         public string? Description { get; set; }
     }

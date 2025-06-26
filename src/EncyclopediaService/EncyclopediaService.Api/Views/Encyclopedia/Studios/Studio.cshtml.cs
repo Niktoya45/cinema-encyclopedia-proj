@@ -1,70 +1,58 @@
+using EncyclopediaService.Api.Extensions;
+using EncyclopediaService.Api.Models.Display;
 using EncyclopediaService.Api.Models.Edit;
+using EncyclopediaService.Api.Models.Test;
+using EncyclopediaService.Api.Models.TestData;
 using EncyclopediaService.Api.Models.Utils;
+using EncyclopediaService.Infrastructure.Services.GatewayService;
 using EncyclopediaService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using EncyclopediaService.Api.Extensions;
+using Shared.CinemaDataService.Models.SharedDTO;
 using Shared.ImageService.Models.Flags;
-using EncyclopediaService.Api.Models.Display;
+using Shared.ImageService.Models.ImageDTO;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
 {
     public class StudioModel : PageModel
     {
-        private IImageService _imageService { get; init; }
+        private IGatewayService _gatewayService { get; init; }
         private UISettings _settings { get; init; }
 
         [BindProperty(SupportsGet = true)]
-        public int Id { get; set; }
+        public string Id { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? RecordId { get; set; }
 
         [BindProperty]
         public Studio? Studio { get; set; }
 
         [BindProperty]
-        public CinemaRecord NewFilmography { get; set; } = default!;
+        public EditMainStudio? EditMain { get; set; }
 
         [BindProperty]
-        public EditMainStudio? EditMain { get; set; }
+        public EditFilm EditFilm { get; set; } = default!;
 
         [BindProperty]
         public EditImage? EditLogo { get; set; }
 
-        public StudioModel(IImageService imageService, UISettings settings)
+        public StudioModel(IGatewayService gatewayService, UISettings settings)
         {
-            _imageService = imageService;
+            _gatewayService = gatewayService;
             _settings = settings;
         }
 
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
 
-            Studio = new Studio
-            {
-                Id = id,
-                Name = "Long Long Name Long Long Long Surname",
-                FoundDate = new DateOnly(1938, 10, 7),
-                Country = 0,
-                PresidentName = "Name Name Surname",
-                Picture = "/img/logo_placeholder.png",
-                Filmography = new CinemaRecord[] {
-                    new CinemaRecord { Id = "1", Name = "Cinema Title Long Long", Year=2000, Picture=null},
-                    new CinemaRecord { Id = "2", Name = "Cinema Title Long", Year=2000, Picture=null},
-                    new CinemaRecord { Id = "3", Name = "Cinema Title", Year=2000, Picture=null},
-                    new CinemaRecord { Id = "4", Name = "Cinema Title", Year=2000, Picture=null}
-                },
-                Description = "Studio description goes here. A studio with a long history.."
-            };
-
-            if (Studio.Description is null)
-            {
-                Studio.Description = "";
-            }
+            Studio = TestEntities.Studio;
 
             EditMain = new EditMainStudio { Id = Studio.Id, Name = Studio.Name, FoundDate = Studio.FoundDate, Country = Studio.Country, PresidentName = Studio.PresidentName, Description = Studio.Description };
 
-            EditLogo = new EditImage { ImageId = null, ImageUri = Studio.Picture };
+            EditLogo = new EditImage { ImageId = Studio.Picture, ImageUri = Studio.PictureUri };
 
-            NewFilmography = new CinemaRecord { ParentId = Studio.Id, Id = "", Name = "", Picture = _settings.DefaultSmallPosterPicture };
+            EditFilm = new EditFilm { };
 
 
             return Page();
@@ -72,22 +60,18 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
 
         public async Task<IActionResult> OnPostEditStudio([FromRoute] string id)
         {
-            // Implement: convert EditCinema to Cinema and send put request to mediatre proxy
 
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseEditMain(true);
             }
 
             if (EditMain != null)
             {
-                Studio.Id = id;
-                Studio.Name = EditMain.Name.Trim();
-                Studio.PresidentName = EditMain.PresidentName == null? String.Empty : Studio.PresidentName!.Trim();
-                Studio.Description = EditMain.Description == null ? null : EditMain.Description.Trim();
+                EditMain.Id = id;
             }
 
-            return await OnGet(id);
+            return new OkObjectResult(null);
         }
 
         public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id)
@@ -96,64 +80,104 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
 
             if (!ModelState.IsValid)
             {
-                return Redirect("/Error");
+                return OnPostReuseAddFilmography(true);
             }
 
-            return await OnGet(id);
+            return Partial("_FilmCard", new FilmographyRecord
+            {
+                Id = EditFilm.Id,
+                Name = EditFilm.Name,
+                Year = EditFilm.Year,
+                Picture = EditFilm.Picture,
+                PictureUri = EditFilm.PictureUri
+            });
         }
 
         public async Task<IActionResult> OnPostDeleteFilmography([FromRoute] string id)
         {
             // Implement: send delete request specifying ParentId and Id to mediatre proxy
 
-            if (!ModelState.IsValid)
-            {
-                return Redirect("/Error");
-            }
-
-            return await OnGet(id);
+            return new OkObjectResult(RecordId);
         }
 
-        public async Task<IActionResult> OnPostEditLogo([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditPicture([FromRoute] string id, CancellationToken ct)
         {
             // Implement: after receiving image name send put request to mediatre proxy
 
-            if (Studio != null)
-            {
-                Studio.Id = id;
-            }
-
             if (EditLogo.Image is null)
             {
-                // handle error 
-                return await OnGet(id);
+                return new OkObjectResult(new { PictureUri = EditLogo.ImageUri });
             }
 
             if (EditLogo.Image.Length >= _settings.MaxFileLength)
             {
-                // handle error?
-                return await OnGet(id);
+                return new OkObjectResult(new { PictureUri = EditLogo.ImageUri });
             }
 
             string imageName = EditLogo.Image.FileName;
             string imageExt = Path.GetExtension(imageName);
 
             string HashName = imageName.SHA_1() + imageExt;
+            string HashImage = EditLogo.Image.OpenReadStream().ToBase64();
 
-            if (EditLogo.ImageId is null || EditLogo.ImageId == String.Empty)
+            var response = await _gatewayService.UpdateCinemaPhoto(id, new ReplaceImageRequest
             {
-                // if cinema yet has no image
+                Id = EditLogo.ImageId,
+                NewId = HashName,
+                Size = (ImageSize)31,
+                FileBase64 = HashImage
+            },
+            ct);
 
-                await _imageService.AddImage(HashName, EditLogo.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
-            }
-            else if (EditLogo.ImageId != HashName)
+            if (response is null)
             {
-                // if cinema already has an image
-
-                await _imageService.ReplaceImage(EditLogo!.ImageId, HashName, EditLogo.Image.OpenReadStream().ToBase64(), _settings.SizesToInclude);
+                return new OkObjectResult(new { PictureUri = EditLogo.ImageUri });
             }
 
-            return await OnGet(id);
+            return new OkObjectResult(response);
+        }
+
+        public async Task<IActionResult> OnPostSearchFilmography(
+            CancellationToken ct,
+            [FromRoute] string id, [FromForm] string recordId, [FromForm] string search)
+        {
+            // transfer data instead of below
+
+            if (recordId == "" || recordId is null)
+            {
+                IEnumerable<SearchResponse> response = new List<SearchResponse>();
+
+                response = TestRecords.SearchList(search);
+
+                return new OkObjectResult(response);
+            }
+
+            else
+            {
+                return new OkObjectResult(TestRecords.SearchRecord(search));
+            }
+
+        }
+
+        public IActionResult OnPostReuseEditMain(bool error = false)
+        {
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+            return Partial("_EditMain", EditMain);
+
+        }
+
+        public IActionResult OnPostReuseAddFilmography(bool error = false)
+        {
+            if (!error)
+            {
+                ModelState.Clear();
+            }
+
+            return Partial("_AddFilm", EditFilm);
+
         }
     }
 }

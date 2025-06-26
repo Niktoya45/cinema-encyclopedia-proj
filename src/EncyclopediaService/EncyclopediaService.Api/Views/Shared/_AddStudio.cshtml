@@ -1,8 +1,10 @@
-﻿@using EncyclopediaService.Api.Models.Edit
+﻿@using EncyclopediaService.Api.Models.Edit;
 @model EditStudio
 @{
+	bool NewStudio = Model.Id == null || Model.Id == "";
 }
 
+<input type="hidden" id="partial" name="partial" value="form" />
 <input type="hidden" asp-for="@(Model.Id)" value="@(Model.Id)">
 <input type="hidden" asp-for="@(Model.Name)" value="@(Model.Name)">
 <input type="hidden" asp-for="@(Model.Picture)" value="@(Model.Picture)">
@@ -10,9 +12,9 @@
 
 <div class="row studio-logo-grid">
     <div class="col-6">
-		@if (Model.PictureUri != null)
+		@if (Model.Picture != null)
 		{
-			<img src=@(Model.PictureUri) style="width:130px;" alt="@(Model.Name)">
+			<img src="@(Model.PictureUri)" class="img img-fluid" style="width:130px;" alt="@(Model.Name)">
 		}
 		else
 		{
@@ -20,16 +22,25 @@
 		}
     </div>
 	<div class="col-6">
-
-			    <ul class="list-group list-group-flush">
+		<ul class="list-group list-group-flush">
+			@if (NewStudio)
+			{
 				<li class="list-group-item form-group search-dropdown search-studio">
-						<label asp-for="Name">Provide name</label>
-						<br>
-						<input class=" search-input form-control" placeholder="Search.." asp-for="Name" autofocus autocomplete="off">
-					    <ul class="list-group suggestions-studio search-suggestions studio-logo-search"></ul>
-						<br>
-						<span asp-validation-for="Name" class="text-danger"></span>
-					</li>
-			    </ul>
+					<label asp-for="Name">Provide name</label>
+					<br>
+					<input class="search-input form-control" placeholder="Search.." asp-for="Name" autofocus autocomplete="off">
+					<ul class="list-group suggestions-studio search-suggestions studio-logo-search"></ul>
+					<br>
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</li>
+
+			}
+			else
+			{
+				<li class="list-group-item form-group">
+					<input class="form-control search-input search-studio" placeholder="@Model.Name" asp-for="Name" value="@Model.Name" disabled>
+				</li>
+			}
+		</ul>
     </div>
 </div>

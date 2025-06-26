@@ -1,7 +1,10 @@
 ﻿@page
-@using EncyclopediaService.Api.Models.Display;
+@using Shared.CinemaDataService.Models.Flags;
+@using EncyclopediaService.Api.Extensions;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreatePersonModel
 @{
+
+	bool IsAdmin = User.IsAdmin();
 }
 @section scripts {
 	<partial name="_ValidationScriptsPartial" />
@@ -10,22 +13,30 @@
 <body>
 
 	<!-- Add Filmography Popup -->
-	<form id="form-add-filmography" asp-page-handler="addFilm" class="trim-inputs" method="post">
-		<form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new filmography" size="lg" lock="true" save-close="false" scroll="false">
-			<div class="container-fluid">
+	<form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new filmography" size="lg" lock="true" save-close="false" scroll="false">
+		<div class="container-fluid">
+			<form id="form-add-filmography" asp-page-handler="addFilm" class="trim-inputs" method="post">
 				<partial name="_AddFilm" model="Model.AddFilm" />
-			</div>
-		</form-popup>
-	</form>
+			</form>
+		</div>
+	</form-popup>
 
-	<div class="container-fluid">
-		<form id="form-add-cinema" class="trim-inputs" asp-page-handler="addPerson" method="post">
+
+	<div class="container-fluid create-page">
+		<form id="form-add-person" class="trim-inputs" asp-page-handler="addPerson" method="post">
 
 			<div class="row">
 
-				<div class="col-md-3 offset-1">
+				<div class="col-md-3 offset-1 person-picture">
 					<div class="row">
-						<img src=@(Model.Person.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Picture Image">
+						@if (Model.AddPicture.Image != null)
+						{
+							<img src="@Model.AddPicture.ImageUri" class="img img-fluid" alt="Poster Image">
+						}
+						else
+						{
+							<img class="img img-fluid img-placeholder" alt="Poster Image">
+						}
 					</div>
 
 					<!-- Add Person Picture -->
@@ -37,29 +48,29 @@
 				<div class="col-md-7">
 
 					<ul class="list-group list-group-flush">
-						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
+						<li class="list-group-item mb-4 form-group fs-6">
 							<input class="form-control" asp-for="@Model.Person.Name" value="@Model.Person.Name" type="text" />
 							<br>
 							<span asp-validation-for="@Model.Person.Name" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<input type="date" class="form-control" asp-for="@Model.Person.BirthDate" value="@(DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"))" />
 							<br>
 							<span asp-validation-for="@Model.Person.BirthDate" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<select class="form-select" asp-for="@Model.Person.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
 							<br>
 							<span asp-validation-for="@Model.Person.Country" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Occupations</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 
 							<div class="row row-cols-3">
 
@@ -123,6 +134,15 @@
 							<div class="col">
 
 								<div id="filmography" class="add-cinema-filmography row row-cols-5 mb-3">
+									@if (Model.Person.Filmography != null)
+									{
+										@foreach (var film in Model.Person.Filmography)
+										{
+											<div class="col add-film">
+												<partial name="_FilmCard" model="@film"/>
+											</div>
+										}
+									}
 								</div>
 							</div>
 
@@ -145,6 +165,6 @@
 
 
 
-	<script src="~/js/cinema_create_events.js" asp-append-version="true"></script>
+	<script src="~/js/person_create_events.js" asp-append-version="true" type="module"></script>
 
 </body>

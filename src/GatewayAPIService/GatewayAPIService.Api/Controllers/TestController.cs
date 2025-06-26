@@ -21,6 +21,7 @@ namespace GatewayAPIService.Api.Controllers
             var client = new HttpClient();
 
             var token = await HttpContext.GetTokenAsync("access_token");
+
             client.BaseAddress = new Uri("https://localhost:7176");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, token);
 

@@ -1,4 +1,150 @@
 ﻿@page
+@using Shared.CinemaDataService.Models.Flags;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreateStudioModel
 @{
 }
+
+<body>
+
+	<!-- Add Filmography Popup -->
+	<form-popup id="modal-add-filmography" form="form-add-filmography" title="Find and choose new filmography" size="lg" lock="true" save-close="false" scroll="false">
+		<div class="container-fluid">
+			<form id="form-add-filmography" asp-page-handler="addFilm" class="trim-inputs" method="post">
+				<partial name="_AddFilm" model="Model.AddFilm" />
+			</form>
+		</div>
+	</form-popup>
+
+	<div class="container-fluid create-page">
+		<form id="form-add-studio" class="trim-inputs" asp-page-handler="addStudio" method="post">
+
+			<div class="row">
+
+				<div class="col-md-3 offset-1 studio-logo">
+					<div class="row">
+						@if (Model.AddLogo.Image != null)
+						{
+							<img src="@Model.AddLogo.ImageUri" class="img img-fluid" alt="Poster Image">
+						}
+						else
+						{
+							<img class="img img-fluid img-placeholder" alt="Poster Image">
+						}
+					</div>
+
+					<!-- Add Studio Picture -->
+					<div class="row">
+						<partial name="_EditPicture" model="Model.AddLogo" />
+					</div>
+				</div>
+
+				<div class="col-md-7">
+
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Name</li>
+						<li class="list-group-item mb-4 form-group fs-6">
+							<input class="form-control" asp-for="@Model.Studio.Name" value="@Model.Studio.Name" type="text" />
+							<br>
+							<span asp-validation-for="@Model.Studio.Name" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Date found</li>
+						<li class="list-group-item mb-4 form-group fs-6">
+							<input type="date" class="form-control" asp-for="@Model.Studio.FoundDate" value="@(DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"))" />
+							<br>
+							<span asp-validation-for="@Model.Studio.FoundDate" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Country of origin</li>
+						<li class="list-group-item mb-4 form-group fs-6">
+							<select class="form-select" asp-for="@Model.Studio.Country" asp-items="Html.GetEnumSelectList<Country>()"></select>
+							<br>
+							<span asp-validation-for="@Model.Studio.Country" class="text-danger"></span>
+						</li>
+
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">President Name</li>
+						<li class="list-group-item mb-4 form-group fs-6">
+							<input class="form-control" asp-for="@Model.Studio.PresidentName" value="@Model.Studio.PresidentName" type="text" />
+							<br>
+							<span asp-validation-for="@Model.Studio.PresidentName" class="text-danger"></span>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="col-md-10 offset-1">
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Biography</li>
+						<li class="list-group-item mb-4  fs-6">
+							<textarea class="form-control" asp-for="@Model.Studio.Description" style="width:100%;margin-left:-1rem;margin-right:-2rem"></textarea>
+						</li>
+					</ul>
+
+					<!-- Add Filmography -->
+					<div class="row">
+						<div class="row">
+							<ul class="list-group list-group-flush pe-0">
+								<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">
+									<div class="row">
+
+										<div class="col-md-11">
+											<span>Filmography</span>
+										</div>
+
+										<div class="col-md-1">
+											<button id="button-add-filmography" data-bs-target="#modal-add-filmography" data-bs-toggle="modal" type="button" style="border:none;background-color:transparent;" aria-expanded="false">
+												<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+													<line x1="4" x2="26" y1="15" y2="15" stroke="#aaaaaa" stroke-width="3" />
+													<line x1="15" x2="15" y1="4" y2="26" stroke="#aaaaaa" stroke-width="3" />
+												</svg>
+											</button>
+										</div>
+									</div>
+
+								</li>
+							</ul>
+						</div>
+
+
+						<div class="row">
+
+							<div class="col">
+
+								<div id="filmography" class="add-cinema-filmography row row-cols-5 mb-3">
+									@if (Model.Studio.Filmography != null)
+									{
+										@foreach (var film in Model.Studio.Filmography)
+										{
+											<div class="col add-film">
+												<partial name="_FilmCard" model="@film" />
+											</div>
+										}
+									}
+								</div>
+							</div>
+
+						</div>
+
+
+					</div>
+
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="d-flex justify-content-end">
+				<button type="submit" class="btn btn-secondary w-25"> Save </button>
+			</div>
+
+		</form>
+	</div>
+
+
+
+	<script src="~/js/studio_create_events.js" asp-append-version="true" type="module"></script>
+
+</body>

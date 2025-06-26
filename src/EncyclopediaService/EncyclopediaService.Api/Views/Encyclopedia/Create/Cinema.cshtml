@@ -1,4 +1,5 @@
 ﻿@page
+@using Shared.CinemaDataService.Models.Flags;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreateCinemaModel
 @{
 }
@@ -9,33 +10,39 @@
 <body>
 
 	<!-- Add Studio Popup -->
-	<form id="form-add-studio" asp-page-handler="addStudio" class="trim-inputs" method="post">
-		<form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
-			<div class="container-fluid">
+	<form-popup id="modal-add-studio" form="form-add-studio" title="Find and choose new studio" lock="true" save-close="false" scroll="false">
+		<div class="container-fluid">
+			<form id="form-add-studio" asp-page-handler="addProductionStudio" class="trim-inputs" method="post">
 				<partial name="_AddStudio" model="Model.AddStudio" />
-			</div>
-		</form-popup>
-	</form>
-
+			</form>
+		</div>
+	</form-popup>
 
 	<!-- Add Starring Popup -->
-	<form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
-		<form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
-			<div class="container-fluid">
+	<form-popup id="modal-add-starring" form="form-add-starring" title="Find and choose new starring" size="lg" lock="true" save-close="false" scroll="false">
+		<div class="container-fluid">
+			<form id="form-add-starring" asp-page-handler="addStarring" class="trim-inputs" method="post">
 				<partial name="_AddStarring" model="Model.AddStarring" />
-			</div>
-		</form-popup>
-	</form>
+			</form>
+		</div>
+	</form-popup>
 
 
-	<div class="container-fluid">
+	<div class="container-fluid create-page">
 		<form id="form-add-cinema" class="trim-inputs" asp-page-handler="addCinema" method="post" enctype="multipart/form-data">
 
 			<div class="row">
 
-				<div class="col-md-3 offset-1">
+				<div class="col-md-3 offset-1 cinema-poster">
 					<div class="row">
-						<img src=@(Model.Cinema.Picture) style="width:fit-content;height:fit-content" class="img-fluid" alt="Poster Image">
+						@if (Model.AddPoster.ImageUri != null)
+						{
+							<img src="@Model.AddPoster.ImageUri" class="img img-fluid" alt="Poster Image">
+						}
+						else
+						{
+							<img class="img img-fluid img-placeholder" alt="Poster Image">
+						}
 					</div>
 
 					<!-- Add Cinema Poster -->
@@ -48,28 +55,28 @@
 
 					<ul class="list-group list-group-flush">
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Title</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<input class="form-control" asp-for="@Model.Cinema.Name" value="@Model.Cinema.Name" type="text" />
 							<br>
 							<span asp-validation-for="@Model.Cinema.Name" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Released on</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<input type="date" class="form-control" asp-for="@Model.Cinema.ReleaseDate" value="@(DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd"))" />
 							<br>
 							<span asp-validation-for="@Model.Cinema.ReleaseDate" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Language of origin</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<select class="form-select" asp-for="@Model.Cinema.Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
 							<br>
 							<span asp-validation-for="@Model.Cinema.Language" class="text-danger"></span>
 						</li>
 
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Genres</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 
 							<div class="row row-cols-3">
 
@@ -97,7 +104,7 @@
 				<div class="col-md-10 offset-1">
 					<ul class="list-group list-group-flush">
 						<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
-						<li class="list-group-item mb-4  fs-6">
+						<li class="list-group-item mb-4 form-group fs-6">
 							<textarea class="form-control" asp-for="@Model.Cinema.Description" style="width:100%;margin-left:-1rem;margin-right:-2rem"></textarea>
 						</li>
 					</ul>
@@ -134,6 +141,17 @@
 							<div class="col">
 
 								<div id="studios" class="add-cinema-studios row row-cols-5 mb-3">
+
+									@if(Model.Cinema.ProductionStudios != null)
+									{
+										@foreach (var studio in Model.Cinema.ProductionStudios)
+										{
+											<div class="col add-studio">
+												<partial name="_StudioCard" model="@studio"/>
+											</div>
+										}
+									}
+
 								</div>
 							</div>
 
@@ -173,6 +191,15 @@
 							<div class="col">
 
 								<div id="starrings" class="add-cinema-starrings row row-cols-5 mb-3">
+									@if (Model.Cinema.Starrings != null)
+									{
+										@foreach (var starring in Model.Cinema.Starrings)
+										{
+											<div class="col add-starring">
+												<partial name="_StarringCard" model="@starring"/>
+											</div>
+										}
+									}
 								</div>
 							</div>
 
@@ -187,7 +214,7 @@
 			<hr/>
 
 			<div class="d-flex justify-content-end">
-				<button type="submit" class="btn btn-secondary w-25"> Save </button>
+				<button id="submit-form-add-cinema" type="submit" class="btn btn-secondary w-25"> Save </button>
 			</div>
 
 		</form>
@@ -195,6 +222,6 @@
 
 
 
-	<script src="~/js/cinema_create_events.js" asp-append-version="true"></script>
+	<script src="~/js/cinema_create_events.js" asp-append-version="true" type="module"></script>
 
 </body>

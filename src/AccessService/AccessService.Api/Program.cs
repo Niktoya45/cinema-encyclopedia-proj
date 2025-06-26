@@ -1,6 +1,7 @@
 using AccessService.Api.Extensions;
 using AccessService.Domain.Profiles;
 using AccessService.Infrastructure.Context;
+using AccessService.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -29,6 +30,13 @@ namespace AccessService.Api
 
             builder.Services.AddJsonWebKeys("keys.jwks");
 
+            builder.Services.AddHttpClient<IUserService, UserService>(client =>
+            {
+                string UserDataServiceUrl = builder.Configuration.GetConnectionString("UserDataService") ?? throw new Exception("Missing UserDataService route path in ConnectionStrings");
+
+                client.BaseAddress = new Uri(UserDataServiceUrl);
+            });
+
             builder.Services.AddAuthentication(options =>
             {
 
@@ -36,20 +44,17 @@ namespace AccessService.Api
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
             })
-            .AddCookie()
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/account/login";
+
+                options.Cookie = new CookieBuilder
+                {
+                    SameSite = SameSiteMode.None,
+                    SecurePolicy = CookieSecurePolicy.Always
+                };
+            })
             ; 
-
-            builder.Services
-                  .ConfigureApplicationCookie(options =>
-                  {
-                      options.LoginPath = "/account/login";
-
-                      options.Cookie = new CookieBuilder
-                      {
-                          SameSite = SameSiteMode.Lax,
-                          SecurePolicy = CookieSecurePolicy.Always
-                      };
-                  });
 
             builder.Services.Configure<RouteOptions>(opts =>
             {
@@ -85,14 +90,13 @@ namespace AccessService.Api
             app.UseHttpsRedirection();
 
             app.MapControllers();
+            app.UseStaticFiles();
 
             app.UseCookiePolicy(new CookiePolicyOptions
             {
                 MinimumSameSitePolicy = SameSiteMode.None,
                 Secure = CookieSecurePolicy.Always
             });
-
-            app.UseStaticFiles();
 
             app.UseRouting();
 

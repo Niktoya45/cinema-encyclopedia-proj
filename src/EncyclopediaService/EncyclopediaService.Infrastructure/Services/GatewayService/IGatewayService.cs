@@ -1,13 +1,16 @@
 ﻿
-using System.Globalization;
-using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.CinemaDTO;
+using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.PersonDTO;
-using Shared.CinemaDataService.Models.StudioDTO;
 using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
-using Shared.ImageService.Models.ImageDTO;
+using Shared.CinemaDataService.Models.StudioDTO;
+using Shared.UserDataService.Models.UserDTO;
+using Shared.UserDataService.Models.LabeledDTO;
+using Shared.UserDataService.Models.RatingDTO;
 using Shared.ImageService.Models.Flags;
+using Shared.ImageService.Models.ImageDTO;
+using Shared.UserDataService.Models.Flags;
 
 namespace EncyclopediaService.Infrastructure.Services.GatewayService
 {
@@ -133,16 +136,30 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         // ***    USER INTERACTION API   *** //
         // *********************** //
 
-        /* GET Requests For User */
+        /* User GET Requests */
+        Task<UserResponse?> GetUser(string id, CancellationToken ct);
+        Task<LabeledCinemasResponse<CinemasResponse>?> GetUserLabeled(string userId, Label? label, CancellationToken ct);
+        Task<LabeledCinemasResponse<CinemasResponse>?> GetUserLabelFor(string userId, string cinemaId, CancellationToken ct);
+        Task<RatingResponse?> GetUserRatingFor(string userId, string cinemaId, CancellationToken ct);
+
         /******/
 
-        /* POST Requests For User */
+        /* User POST Requests */
+        Task<UserResponse?> CreateUser(CreateUserRequest user, CancellationToken ct);
+        Task<LabeledResponse?> CreateForLabeledList(string userId, CreateLabeledRequest labeled, CancellationToken ct);
+        Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct);
+
         /******/
 
-        /* PUT Requests For User */
+        /* User PUT Requests */
+        Task<UserResponse?> UpdateUser(string id, UpdateUserRequest user, CancellationToken ct);
+
         /******/
 
-        /* DELETE Requests For User */
+        /* User DELETE Requests */
+        Task<bool> DeleteUser(string id, CancellationToken ct);
+        Task<bool> DeleteFromLabeledList(string userId, string? cinemaId, CancellationToken ct);
+
         /******/
 
         // *********************** //
