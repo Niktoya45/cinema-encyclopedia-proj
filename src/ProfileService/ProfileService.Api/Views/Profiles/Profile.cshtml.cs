@@ -5,6 +5,8 @@ using ProfileService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProfileService.Api.Extensions;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 
 namespace ProfileService.Api.Views.Profiles
@@ -34,12 +36,11 @@ namespace ProfileService.Api.Views.Profiles
 
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
-
             Profile = new Profile
             {
                 Id = id,
                 Username = "Long Long Profile Name",
-                Birthdate = new DateOnly(1938, 10, 7),
+                Birthdate = new DateOnly(2000, 1, 1),
                 Picture = "/img/logo_placeholder.png",
                 Description = "Generally interested in alternative horrors and.."
             };

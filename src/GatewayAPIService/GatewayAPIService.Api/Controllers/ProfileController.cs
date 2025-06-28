@@ -1,32 +1,41 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace GatewayAPIService.Api.Controllers
 {
     [Route("profile")]
     public class ProfileController : Controller
     {
-        public string BaseUrl { get; init; } = "https://localhost:7136";
+        public const string _baseUrl = "https://localhost:7136";
+        public const string _callback= "/authorize";
 
         [HttpGet]
         [Route("{id}")]
-        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Policy = "Authenticated")]
-        public async Task<IActionResult> Profile(string id) 
+        public async Task<IActionResult> Profile(string id, string? code = null) 
         {
-            var result = Redirect(BaseUrl + $"/profile/{id}");
-
-            return result;
+            return HandleRedirect($"/profiles/{id}", code);
         }
 
         [HttpGet]
         [Route("{id}/marked")]
-        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Policy = "Authenticated")]
-        public async Task<IActionResult> Marked(string id)
+        public async Task<IActionResult> Marked(string id, string? code = null)
         {
-            var result = Redirect(BaseUrl + $"/profile/{id}/marked");
+            return HandleRedirect($"/profiles/{id}/marked", code);
+        }
 
-            return result;
+        protected IActionResult HandleRedirect(string url, string? code)
+        {
+            if (code != null && code != "")
+                return RedirectAuthorize(url, code);
+
+            return Redirect(_baseUrl + url);
+        }
+
+        protected IActionResult RedirectAuthorize(string targetRedirect, string code)
+        {
+            string redirect = HttpUtility.UrlEncode(targetRedirect);
+
+            return Redirect(_baseUrl + $"{_callback}?redirect={redirect}&key={code}");
         }
     }
 }

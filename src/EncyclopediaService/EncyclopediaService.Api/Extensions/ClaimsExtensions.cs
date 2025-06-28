@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.DotNet.Scaffolding.Shared;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace EncyclopediaService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = true;
-        public static bool DisableRoles = true;
+        public static bool DisableAuthentication = false;
+        public static bool DisableRoles = false;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {
@@ -47,6 +49,27 @@ namespace EncyclopediaService.Api.Extensions
             return new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType));
         }
 
+        public static bool AddJwtTokenIdentity(this ClaimsPrincipal principal, string jwtToken) 
+        {
+            JsonWebTokenHandler tokenHandler = new JsonWebTokenHandler();
+
+            JsonWebToken token;
+
+            try
+            {
+                token = tokenHandler.ReadJsonWebToken(jwtToken);
+            }
+            catch (Exception) {
+                return false;
+            }
+
+            var claims = token.Claims;
+
+            principal.AddIdentity(new ClaimsIdentity(claims.Append(new Claim("token", jwtToken)), "cookie"));
+
+            return true;
+        }
+
         public static async Task SignInByCookies(this ClaimsPrincipal principal, HttpContext context, bool isPersistent)
         {
 
@@ -64,5 +87,9 @@ namespace EncyclopediaService.Api.Extensions
             await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
         }
 
+        public static async Task SignOutByCookies(this ClaimsPrincipal principal, HttpContext context)
+        {
+            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
     }
 }

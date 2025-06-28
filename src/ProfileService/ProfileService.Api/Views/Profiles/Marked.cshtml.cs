@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.IdentityModel.JsonWebTokens;
 using ProfileService.Api.Models;
+using System.Security.Claims;
 
 namespace ProfileService.Api.Views.Profiles
 {

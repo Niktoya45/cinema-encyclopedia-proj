@@ -1,120 +1,76 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Shared.UserDataService.Models.UserDTO;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace GatewayAPIService.Api.Controllers
 {
     [Route("encyclopedia")]
     public class EncyclopediaController : Controller
     {
-        public string BaseUrl { get; init; } = "https://localhost:7116";
-        public string CurrentUrl { get; init; } = "https://localhost:7176";
-        public HttpClient _client { get; set; }
-        public IMemoryCache _cache { get; set; }
-        public EncyclopediaController(IMemoryCache cache) 
-        {
-            _client = new HttpClient();
-            _cache = cache;
-        }
+        public const string _baseUrl = "https://localhost:7116";
+        protected const string _callback = "/authorize";
 
         [HttpGet]
-        public async Task<IActionResult> Index() 
+        [Route("index")]
+        public async Task<IActionResult> Index(string? code = null) 
         {
-            var result = Redirect(BaseUrl + "/index");
-
-            return result;
-        }
-
-        [HttpGet]
-        [Route("authorize")]
-        public async Task<IActionResult> Authorize([FromQuery] string code)
-        {
-            string? token = null;  
-
-            if (!_cache.TryGetValue(code, out token))
-            {
-                return Ok(null);
-            }
-
-            return Ok(token);
-        }
-
-        [HttpGet]
-        [Route("login")]
-        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Policy = "Authenticated")]
-        public async Task<IActionResult> Login([FromQuery] string callback)
-        {
-            var ctoken = await HttpContext.GetTokenAsync("access_token");
-
-            var key = Guid.NewGuid().ToString();
-
-            _cache.Set<string>(key, ctoken, DateTime.UtcNow.AddMinutes(5));
-            _cache.Set<string>(User.FindFirstValue(JwtRegisteredClaimNames.Name)??User.Identity.Name, ctoken);
-
-            return Redirect(callback + $"&key={key}");
+            return HandleRedirect("/index", code);
         }
 
         [HttpGet]
         [Route("cinemas")]
-        public async Task<IActionResult> Cinemas()
+        public async Task<IActionResult> Cinemas(string? code = null)
         {
-            var result = Redirect(BaseUrl+"/encyclopedia/cinemas/all/");
-
-            return result;
+            return HandleRedirect("/encyclopedia/cinemas/all/", code);
         }
 
         [HttpGet]
         [Route("cinemas/{id}")]
-        public async Task<IActionResult> Cinema(string id)
+        public async Task<IActionResult> Cinema(string id, string code = null)
         {
-            var result = Redirect(BaseUrl + $"/encyclopedia/cinemas/{id}");
-
-            return result;
+            return HandleRedirect($"/encyclopedia/cinemas/{id}", code);
         }
 
         [HttpGet]
         [Route("persons")]
-        public async Task<IActionResult> Persons()
+        public async Task<IActionResult> Persons(string? code = null)
         {
-            var result = Redirect(BaseUrl + "/encyclopedia/persons/all/");
-
-            return result;
+            return HandleRedirect("/encyclopedia/persons/all/", code);
         }
 
         [HttpGet]
         [Route("persons/{id}")]
-        public async Task<IActionResult> Person(string id)
+        public async Task<IActionResult> Person(string id, string? code = null)
         {
-            var result = Redirect(BaseUrl + $"/encyclopedia/persons/{id}");
-
-            return result;
+            return HandleRedirect($"/encyclopedia/persons/{id}", code);
         }
 
         [HttpGet]
         [Route("studios")]
-        public async Task<IActionResult> Studios()
+        public async Task<IActionResult> Studios(string? code = null)
         {
-            var result = Redirect(BaseUrl + "/encyclopedia/studios/all/");
-
-            return result;
+            return HandleRedirect("/encyclopedia/studios/all/", code);
         }
 
         [HttpGet]
         [Route("studios/{id}")]
-        public async Task<IActionResult> Studio(string id)
+        public async Task<IActionResult> Studio(string id, string? code = null)
         {
-            var result = Redirect(BaseUrl + $"/encyclopedia/studios/{id}");
+            return HandleRedirect($"/encyclopedia/studios/{id}", code);
+        }
 
-            return result;
+        protected IActionResult HandleRedirect(string url, string? code) 
+        {
+            if (code != null && code != "")
+                return RedirectAuthorize(url, code);
+
+            return Redirect(_baseUrl + url);
+        }
+
+        protected IActionResult RedirectAuthorize(string targetRedirect, string code)
+        {
+            string redirect = HttpUtility.UrlEncode(targetRedirect);
+
+            return Redirect(_baseUrl + $"{_callback}?redirect={redirect}&key={code}");
         }
     }
 }

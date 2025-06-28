@@ -54,8 +54,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
         public async Task<IActionResult> OnGet(string id) 
         {
-            string path = Request.Path;
-
             // send data request instead of block below
 
             Cinema = TestEntities.Cinema;

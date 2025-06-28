@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
 namespace ProfileService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = true;
-        public static bool DisableRoles = true;
+        public static bool DisableAuthentication = false;
+        public static bool DisableRoles = false;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {
@@ -32,6 +33,11 @@ namespace ProfileService.Api.Extensions
 
             return IsAdmin;
         }
+        
+        public static bool IsProfileOwner(this ClaimsPrincipal principal, string profileId)
+        {
+            return principal.FindFirstValue(JwtRegisteredClaimNames.Sub) == profileId;
+        }
 
         public static ClaimsPrincipal ToPrincipal(Dictionary<string, string> claimsDictionary, string authenticationType)
         {
@@ -43,6 +49,29 @@ namespace ProfileService.Api.Extensions
             }
 
             return new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType));
+        }
+
+
+        public static bool AddJwtTokenIdentity(this ClaimsPrincipal principal, string jwtToken)
+        {
+            JsonWebTokenHandler tokenHandler = new JsonWebTokenHandler();
+
+            JsonWebToken token;
+
+            try
+            {
+                token = tokenHandler.ReadJsonWebToken(jwtToken);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            var claims = token.Claims;
+
+            principal.AddIdentity(new ClaimsIdentity(claims.Append(new Claim("token", jwtToken)), "cookie"));
+
+            return true;
         }
 
         public static async Task SignInByCookies(this ClaimsPrincipal principal, HttpContext context, bool isPersistent)

@@ -1,0 +1,101 @@
+﻿
+.img {
+    width: fit-content;
+    height: fit-content;
+}
+
+.img-width {
+    width:fit-content;
+}
+
+.img-block {
+    width:120px;
+}
+
+.ignore {
+    
+}
+
+.cinema-poster .img-placeholder {
+    content: url("../img/poster_placeholder.png");
+}
+
+.cinema-poster-grid .img-placeholder {
+    content: url("../img/grid_poster_placeholder.png");
+}
+
+.cinema-poster-search .img-placeholder {
+    content: url("../img/search_poster_placeholder.png");
+}
+
+.person-picture .img-placeholder {
+    content: url("../img/person_placeholder.png");
+}
+
+.person-picture-grid .img-placeholder {
+    content: url("../img/grid_person_placeholder.png");
+}
+
+.person-picture-search .img-placeholder {
+    content: url("../img/search_person_placeholder.png");
+}
+
+.studio-logo .img-placeholder {
+    content: url("../img/logo_placeholder.png");
+}
+
+.studio-logo-grid .img-placeholder {
+    content: url("../img/grid_logo_placeholder.png");
+}
+
+.studio-logo-search .img-placeholder {
+    content: url("../img/search_logo_placeholder.png");
+}
+
+
+.profile-picture .img-placeholder {
+    content: url("../img/person_placeholder.png");
+}
+
+.profile-picture-grid .img-placeholder {
+    content: url("../img/grid_person_placeholder.png");
+}
+
+.profile-picture-search .img-placeholder {
+    content: url("../img/search_person_placeholder.png");
+}
+
+
+.template-url {
+    background-image: url("data:image/svg+xml, ");
+    background-repeat: no-repeat;
+}
+
+.icon {
+    display: block;
+}
+
+.icon-sm {
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+.icon-md {
+    height: 2rem;
+    width: 2rem;
+}
+
+.icon-options-dots {
+    background-image: url("data:image/svg+xml, %09%3Csvg%20id%3D%22options-dots%22%20viewBox%3D%220%200%205%2020%22%20%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%09%09%3Ccircle%20cx%3D%223%22%20cy%3D%224%22%20r%3D%222%22%20stroke%3D%22none%22%20fill%3D%22%23aaaaaa%22%20stroke-width%3D%220%22%20%2F%3E%0A%09%09%3Ccircle%20cx%3D%223%22%20cy%3D%2210%22%20r%3D%222%22%20stroke%3D%22none%22%20fill%3D%22%23aaaaaa%22%20stroke-width%3D%220%22%20%2F%3E%0A%09%09%3Ccircle%20cx%3D%223%22%20cy%3D%2216%22%20r%3D%222%22%20stroke%3D%22none%22%20fill%3D%22%23aaaaaa%22%20stroke-width%3D%220%22%20%2F%3E%0A%09%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+}
+
+.icon-plus {
+    background-image: url("data:image/svg+xml, %09%3Csvg%20id%3D%22plus%22%20viewBox%3D%220%200%2021%2021%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%09%09%3Cline%20x1%3D%222%22%20x2%3D%2219%22%20y1%3D%2211%22%20y2%3D%2211%22%20stroke%3D%22%23aaaaaa%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22%20%2F%3E%0A%09%09%3Cline%20x1%3D%2211%22%20x2%3D%2211%22%20y1%3D%222%22%20y2%3D%2219%22%20stroke%3D%22%23aaaaaa%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%09%3C%2Fsvg%3E%09");
+    background-repeat: no-repeat;
+}
+
+.icon-heart {
+    background-image: url("data:image/svg+xml, %09%3Csvg%20id%3D%22heart%22%20class%3D%22label-icons%22%20viewBox%3D%220%200%2021%2021%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%09%09%3Cpolygon%20points%3D%2210.3%2C5%208%2C3%206%2C2%204%2C2%202%2C3%201%2C5%200.5%2C6%200.5%2C7%201%2C10%203%2C13%206%2C16%208%2C17%2010%2C18%2011%2C18%2013%2C17%2015%2C16%2018%2C13%2020%2C10%2020.5%2C7%2020.5%2C6%2020%2C5%2019%2C3%2017%2C2%2015%2C2%2013%2C3%2010.7%2C5%22%20%2F%3E%0A%09%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Api.Models.Utils;
 using ProfileService.Infrastructure.Services.ImageService;
@@ -49,6 +50,22 @@ namespace ProfileService.Api
                 client.BaseAddress = new Uri(conn);
             });
 
+            builder.Services.AddAuthentication(options =>
+            {
+
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            })
+            .AddCookie(opts => {
+                opts.SlidingExpiration = true;
+
+                opts.Cookie.IsEssential = true;
+                opts.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                opts.Cookie.SameSite = SameSiteMode.None;
+            })
+            ;
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -62,8 +79,17 @@ namespace ProfileService.Api
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                CheckConsentNeeded = ctx => false,
+
+                MinimumSameSitePolicy = SameSiteMode.None,
+                Secure = CookieSecurePolicy.Always
+            });
+
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

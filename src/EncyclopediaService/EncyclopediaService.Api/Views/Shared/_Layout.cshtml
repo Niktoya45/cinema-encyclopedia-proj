@@ -1,5 +1,6 @@
-﻿@using EncyclopediaService.Api.Extensions;
+﻿@using System.Security.Claims;
 @using System.IdentityModel.Tokens.Jwt;
+@using EncyclopediaService.Api.Extensions;
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +67,10 @@
 						<ul id="account-options" class="dropdown-menu dropdown-menu-end box-shadow bg-dark flex-grow-1 mb-2" aria-labelledby="account">
 							@if (LoggedIn)
 							{
-								string profileUrl = Url.PageLink("/Index", "Profile", new { id = User.FindFirst(JwtRegisteredClaimNames.Sub) });
+								string profileUrl = Url.PageLink("/Index", "Profile", new { id = User.FindFirstValue(JwtRegisteredClaimNames.Sub) });
+								string profileMarkedUrl = Url.PageLink("/Index", "Profile", new { id = User.FindFirstValue(JwtRegisteredClaimNames.Sub), path="/marked" });
+
+								string logoutUrl = Url.PageLink("/Index", "Logout");
 
 								<li class="nav-item">
 									<a class="nav-link" href="@profileUrl">Profile</a>
@@ -98,12 +102,12 @@
 
 								<li><hr class="dropdown-divider"></li>
 								<li class="nav-item pt-5">
-									<a class="nav-link">Logout</a>
+									<a class="nav-link" href="@logoutUrl">Logout</a>
 								</li>
 							}
 							else
 							{
-								string loginUrl = Url.PageLink("/Index", "Login", new { redirect = Url.PageLink("/Index", "Profile", new { id = "" }) });
+								string loginUrl = Url.PageLink("/Index", "Profile");
 
 								<li><hr class="dropdown-divider"></li>
 								<li class="nav-item pt-5">

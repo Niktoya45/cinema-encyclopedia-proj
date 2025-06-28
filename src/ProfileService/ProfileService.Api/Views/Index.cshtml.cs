@@ -1,23 +1,25 @@
-﻿using EncyclopediaService.Api.Extensions;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.JsonWebTokens;
+using ProfileService.Api.Extensions;
+using System.IO;
 using System.Security.Claims;
 using System.Web;
 
-namespace EncyclopediaService.Api.Views
+namespace ProfileService.Api.Views
 {
     public class IndexModel : PageModel
     {
         const string _baseGateway = "https://localhost:7176";
 
-        const string _defaultRedirect = "gateway/cinemas/all/index";
-        public string Domain(HttpRequest request) => $"{request.Scheme}://{request.Host}";
-
         HttpClient _gatewayService;
-        public IMemoryCache _cache { get; init; }
+
+        IMemoryCache _cache;
+        public string Domain(HttpRequest request) => $"{request.Scheme}://{request.Host}";
 
         public IndexModel(IMemoryCache cache)
         {
@@ -27,15 +29,23 @@ namespace EncyclopediaService.Api.Views
             _cache = cache;
         }
 
-        public async Task<IActionResult> OnGet([FromQuery] string? redirect = null, [FromQuery] string? key = null)
+        public async Task<IActionResult> OnGet()
         {
-            if (!User.IsLoggedIn() && key != null)
+            if (!User.IsLoggedIn())
             {
-                string? token = GetAF(key);
+                string id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
-                await TryAuthenticateByCookiesFromJwt(token);
+                Redirect($"/profiles/{id}");
             }
-            return Redirect(redirect??_defaultRedirect);
+
+            return await OnGetProfile("");
+        }
+
+        public async Task<IActionResult> OnGetEncyclopedia([FromQuery] string? path = null)
+        {
+            string? keyAF = SetAF();
+
+            return RedirectOuter(_baseGateway + $"/encyclopedia{path??""}", keyAF);
         }
 
         public async Task<IActionResult> OnGetProfile([FromQuery] string? id = null, [FromQuery] string? path = null)
@@ -45,14 +55,12 @@ namespace EncyclopediaService.Api.Views
                 return await OnGetLogin(Request.GetDisplayUrl());
             }
 
-            string? keyAF = SetAF();
-
             if (id == null || id == "")
             {
-                return RedirectOuter(_baseGateway + $"/profile/{User.FindFirstValue(JwtRegisteredClaimNames.Sub)}{path ?? ""}", keyAF);
+                return Redirect($"/profiles/{User.FindFirstValue(JwtRegisteredClaimNames.Sub)}{path ?? ""}");
             }
 
-            return RedirectOuter(_baseGateway + $"/profile/{id}{path ?? ""}", keyAF);
+            return Redirect($"/profiles/{id}{path ?? ""}");
         }
 
         public async Task<IActionResult> OnGetLogin([FromQuery] string redirect)
@@ -61,16 +69,15 @@ namespace EncyclopediaService.Api.Views
             {
                 string query = $"callback={HttpUtility.UrlEncode(Url.PageLink("/Index", "Authorize", new { redirect = redirect }))}";
 
-                return Redirect(_baseGateway + "/gateway/login" + "?" + query );
+                return Redirect(_baseGateway + "/gateway/login" + "?" + query);
             }
 
             return Redirect(redirect);
         }
 
-
-        public async Task<IActionResult> OnGetLogout()
+        public async Task<IActionResult> OnGetLogout() 
         {
-            await User.SignOutByCookies(HttpContext);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Redirect(_baseGateway + "/gateway/logout");
         }
@@ -92,7 +99,7 @@ namespace EncyclopediaService.Api.Views
             return redirect is null ? RedirectToPage() : User.IsLoggedIn() ? Redirect(redirect) : await OnGet();
         }
 
-        public async Task<IActionResult> OnPostAuthorize([FromQuery] string? key) 
+        public async Task<IActionResult> OnPostAuthorize([FromQuery] string? key)
         {
             if (key is null)
                 return Unauthorized();
@@ -132,21 +139,19 @@ namespace EncyclopediaService.Api.Views
             return false;
         }
 
-        protected string? SetAF() 
+        protected string SetAF()
         {
             string keyAF = Guid.NewGuid().ToString();
-
-            if (!User.IsLoggedIn())
-                return null;
 
             _cache.Set<string>(keyAF, User.FindFirstValue("token"), DateTime.UtcNow.AddMinutes(5));
 
             return keyAF;
         }
 
-        protected string? GetAF(string keyAF) 
+        protected string? GetAF(string keyAF)
         {
             return _cache.Get<string>(keyAF);
         }
     }
+
 }

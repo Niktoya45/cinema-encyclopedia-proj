@@ -8,7 +8,7 @@ namespace EncyclopediaService.Api.Models.TestData
     {
         public const bool Used = true;
 
-        public static IList<CinemaRecord> CinemasList = Enumerable.Range(1, 25).Select(
+        public static IList<CinemaRecord> CinemasList = Enumerable.Range(1, 30).Select(
             x => new CinemaRecord { 
                 Id = "" + x, Name = "Cinema " + x, 
                 Year = x + 1994, Rating = ((x % 10) + 0.5) }
