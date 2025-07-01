@@ -7,6 +7,7 @@ using UserDataService.Api.Queries.UserQueries;
 using UserDataService.Infrastructure.Models.UserDTO;
 using UserDataService.Infrastructure.Models.LabeledDTO;
 using UserDataService.Infrastructure.Models.RatingDTO;
+using UserDataService.Infrastructure.Models.SharedDTO;
 using UserDataService.Domain.Aggregates.UserAggregate;
 
 namespace UserDataService.Api.Controllers
@@ -130,29 +131,6 @@ namespace UserDataService.Api.Controllers
         }
 
         /// <summary>
-        /// Post new user made of request parameter
-        /// </summary>
-        /// <param name="userId">authorized user Id</param>
-        /// <param name="request">request body</param>
-        /// <returns>Newly created user instance</returns>
-        /// <response code="200">Success</response>
-        [HttpPost("{userId}/rating")]
-        [ProducesResponseType(typeof(RatingResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Rating(
-            [FromRoute] string userId,
-            [FromBody] CreateRatingRequest request,
-            CancellationToken ct = default
-            )
-        {
-            var response = await _mediator.Send(new CreateRatingCommand(
-                                        userId,
-                                        request.CinemaId,
-                                        request.Rating), ct);
-
-            return Ok(response);
-        }
-
-        /// <summary>
         /// Update single user with provided request parameters
         /// </summary>
         /// <param name="userId">authorized user Id</param>
@@ -160,7 +138,7 @@ namespace UserDataService.Api.Controllers
         /// <returns>Updated user instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
-        [HttpPut]
+        [HttpPut("{userId}")]
         [ProducesResponseType(typeof(UpdateUserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
@@ -179,21 +157,72 @@ namespace UserDataService.Api.Controllers
         }
 
         /// <summary>
+        /// Post new user made of request parameter
+        /// </summary>
+        /// <param name="userId">authorized user Id</param>
+        /// <param name="request">request body</param>
+        /// <returns>Newly created user instance</returns>
+        /// <response code="200">Success</response>
+        [HttpPut("{userId}/rating")]
+        [ProducesResponseType(typeof(RatingResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Rating(
+            [FromRoute] string userId,
+            [FromBody] UpdateRatingRequest request,
+            CancellationToken ct = default
+            )
+        {
+            var response = await _mediator.Send(new UpdateRatingCommand(
+                                        userId,
+                                        request.CinemaId,
+                                        request.Rating), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update single user with provided request parameters
+        /// </summary>
+        /// <param name="userId">authorized user Id</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated user instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">User is not found</response>
+        [HttpPut("{userId}/picture")]
+        [ProducesResponseType(typeof(UpdatePictureResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Picture(
+            CancellationToken ct,
+            [FromRoute] string userId,
+            [FromBody] UpdatePictureRequest request
+            )
+        {
+            var response = await _mediator.Send(
+                new UpdateUserPictureCommand(
+                        userId,
+                        request.Picture
+                    ),
+                ct
+                );
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Delete single user by its name
         /// </summary>
         /// <param name="userId">authorized user Id</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteAsync(
-            [FromRoute] string userId,
+            [FromRoute] string id,
             CancellationToken ct = default
             )
         {
-            await _mediator.Send(new DeleteUserCommand(userId), ct);
+            await _mediator.Send(new DeleteUserCommand(id), ct);
 
             return Ok();
         }

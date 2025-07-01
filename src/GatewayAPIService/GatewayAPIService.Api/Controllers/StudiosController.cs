@@ -268,19 +268,16 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateFilmographyRequest request
             )
         {
-            if (request.Name is null)
+            CinemaResponse? cinema = await _cinemaService.GetById(request.Id, ct);
+
+            if (cinema is null)
             {
-                CinemaResponse? cinema = await _cinemaService.GetById(request.Id, ct);
-
-                if (cinema is null)
-                {
-                    return BadRequest(request.Id);
-                }
-
-                request.Name = cinema.Name;
-                request.Year = cinema.ReleaseDate.Year;
-                request.Picture = cinema.Picture;
+                return BadRequest(request.Id);
             }
+
+            request.Name = cinema.Name;
+            request.Year = cinema.ReleaseDate.Year;
+            request.Picture = cinema.Picture;
 
             StudioResponse? studio = await _studioService.GetById(studioId, ct);
 

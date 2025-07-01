@@ -16,8 +16,11 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
         }
         public async Task<UpdateRatingResponse> Handle(UpdateCinemaRatingCommand request, CancellationToken cancellationToken)
         {
-            //handle data validation
-            Cinema? updated = await _repository.UpdateRating(request.Id, request.Rating, cancellationToken);
+            if(request.Rating < 0) request.Rating = -request.Rating;
+            if(request.OldRating < 0) request.OldRating = -request.OldRating;
+
+            
+            Cinema? updated = await _repository.UpdateRating(request.Id, request.Rating, request.OldRating, cancellationToken);
 
             if (updated == null)
             {

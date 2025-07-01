@@ -6,5 +6,6 @@ namespace UserDataService.Infrastructure.Models.LabeledDTO
     {
         public TCinema Cinema { get; set; }
         public Label Label { get; set; }
+        public DateTime AddedAt { get; set; }
     }
 }

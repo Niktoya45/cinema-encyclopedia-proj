@@ -34,7 +34,9 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         }
         public async Task<List<Cinema>?> FindByYear(int year, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
-            return await Find(c => c.ReleaseDate.Year == year,
+            DateOnly YearBegin = new DateOnly(year, 1, 1);
+
+            return await Find(c => c.ReleaseDate > YearBegin && c.ReleaseDate <= YearBegin.AddYears(1),
                               pg,
                               st,
                               ct
@@ -217,7 +219,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
 
             return starring;
         }
-        public async Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct)
+        public async Task<Cinema?> UpdateRating(string id, double rating, double oldRating, CancellationToken ct)
         {
             Cinema? cinema = await FindById(id, ct);
 
@@ -225,28 +227,33 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
             {
                 return null;
             }
-            if (rating == 0) 
-            {
+
+            if (rating == 0 && oldRating == 0)
                 return cinema;
-            }
 
             cinema.Rating.Score *= cinema.Rating.N;
 
-            if (rating < 0)
+            if (rating == 0)
             {
                 cinema.Rating.N--;
             }
-            else {
+            else if (oldRating == 0)
+            {
                 cinema.Rating.N++;
             }
 
-            cinema.Rating.Score += rating;
-            cinema.Rating.Score /= cinema.Rating.N;
+            cinema.Rating.Score += rating - oldRating;
+            cinema.Rating.Score = cinema.Rating.N == 0 ? 0 : cinema.Rating.Score / cinema.Rating.N;
 
             var update = Builders<Cinema>.Update.Set(e => e.Rating, cinema.Rating);
             var find = Builders<Cinema>.Filter.Where(e => e.Id == cinema.Id);
 
             var res = await _collection.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct); ;
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
 
             return cinema;
         }

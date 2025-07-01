@@ -21,7 +21,7 @@ namespace UserDataService.Api.Commands.UserCommands.UpdateCommands
         {
             User User = _mapper.Map<UpdateUserCommand, User>(request);
 
-            User? updated = await _repository.Update(User, cancellationToken);
+            User? updated = await _repository.UpdateMain(User, cancellationToken);
 
             if (updated == null)
             {

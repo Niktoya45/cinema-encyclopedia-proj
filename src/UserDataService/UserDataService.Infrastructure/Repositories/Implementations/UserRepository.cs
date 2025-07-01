@@ -47,28 +47,6 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return cinema;
         }
 
-        public async Task<RatingRecord?> AddToRatingList(RatingRecord rating, CancellationToken ct = default) 
-        {
-            User? user = await FindById(rating.UserId, ct);
-
-            if (user == null)
-            {
-                return null;
-            }
-
-            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.Id == rating.Id));
-            var updateLabel = Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating);
-
-            var res = await _db.RatingRecords.UpdateOneAsync(findIfExists, updateLabel, new UpdateOptions { IsUpsert = true }, ct);
-
-            if (!res.IsAcknowledged)
-            {
-                return null;
-            }
-
-            return rating;
-        }
-
         public async Task<User?> FindOne(Expression<Func<User, bool>>? query = null, CancellationToken ct = default)
         {
             var condition = Builders<User>.Filter.Where(query ?? (e => true));
@@ -154,6 +132,69 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             }
 
             return user;
+        }
+
+        public async Task<User?> UpdateMain(User user, CancellationToken ct = default) {
+            UpdateDefinitionBuilder<User> builder = Builders<User>.Update;
+
+            UpdateDefinition<User> Set<TField>(Expression<Func<User, TField>> field, TField value) => builder.Set(field, value);
+
+            var update = Builders<User>.Update.Combine(
+                    Set(u => u.Username, user.Username),
+                    Set(u => u.Birthdate, user.Birthdate)
+                );
+
+            var find = Builders<User>.Filter.Where(u => u.Id == user.Id);
+
+            var res = await _db.Users.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return user;
+        }
+
+        public async Task<User?> UpdatePicture(string id, string? picture, CancellationToken ct = default)
+        {
+            User? entity = await FindById(id, ct);
+
+            if (entity is null)
+            {
+                return null;
+            }
+
+            entity.Picture = picture;
+
+            var update = Builders<User>.Update.Set(e => e.Picture, entity.Picture);
+            var find = Builders<User>.Filter.Where(e => e.Id == entity.Id);
+
+            var res = await _db.Users.UpdateOneAsync(find, update, new UpdateOptions { IsUpsert = false }, ct);
+
+            return entity;
+        }
+
+        public async Task<RatingRecord?> UpdateRatingList(RatingRecord rating, CancellationToken ct = default)
+        {
+            User? user = await FindById(rating.UserId, ct);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.Id == rating.Id));
+            var updateRating = Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating);
+
+            var res = await _db.RatingRecords.UpdateOneAsync(findIfExists, updateRating, new UpdateOptions { IsUpsert = true }, ct);
+
+            if (!res.IsAcknowledged)
+            {
+                return null;
+            }
+
+            return rating;
         }
 
         public async Task<User?> Delete(string id, CancellationToken ct = default)

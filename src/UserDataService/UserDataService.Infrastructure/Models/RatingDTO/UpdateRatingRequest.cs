@@ -2,7 +2,7 @@
 
 namespace UserDataService.Infrastructure.Models.LabeledDTO
 {
-    public class CreateRatingRequest
+    public class UpdateRatingRequest
     {
         public string CinemaId { get; set; }
         public double Rating { get; set; }

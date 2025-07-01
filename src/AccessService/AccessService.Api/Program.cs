@@ -3,10 +3,13 @@ using AccessService.Domain.Profiles;
 using AccessService.Infrastructure.Context;
 using AccessService.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace AccessService.Api
 {
@@ -39,7 +42,6 @@ namespace AccessService.Api
 
             builder.Services.AddAuthentication(options =>
             {
-
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
@@ -54,7 +56,25 @@ namespace AccessService.Api
                     SecurePolicy = CookieSecurePolicy.Always
                 };
             })
-            ; 
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.Authority = builder.Configuration.GetValue<string>("AuthProviders:jwt:issuer");
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = false,
+                    AuthenticationType = "at+jwt",
+                    SaveSigninToken = true,
+                    NameClaimType = "name",
+                    RoleClaimType = "role"
+                };
+
+                options.MapInboundClaims = false;
+            });
 
             builder.Services.Configure<RouteOptions>(opts =>
             {
@@ -69,6 +89,16 @@ namespace AccessService.Api
                 options.AddPolicy("Authenticated", policy =>
                 {
                     policy.RequireAuthenticatedUser();
+                });
+
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAssertion(ctx =>
+                    {
+                        Claim? userRole = ctx.User.Claims.FirstOrDefault(c => c.Type == "role");
+                        return userRole != null &&
+                        userRole.Value.Contains("dministrator");
+                    });
                 });
             });
 

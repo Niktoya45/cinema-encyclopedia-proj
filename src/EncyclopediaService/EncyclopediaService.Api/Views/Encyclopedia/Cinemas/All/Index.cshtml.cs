@@ -13,7 +13,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
     {
         public const byte MaxPerPage = 28;
 
-        [BindProperty(SupportsGet = true, Name ="pageNum")]
+        [BindProperty(SupportsGet = true, Name ="pagen")]
         public short PageNum { get; set; }
         public bool IsEnd { get; set; }
 

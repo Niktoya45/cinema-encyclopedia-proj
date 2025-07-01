@@ -26,8 +26,9 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         }
         public async Task<List<Studio>?> FindByYear(int year, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {
-            return await Find( s => s.FoundDate.Year == year,
-                                pg,
+            DateOnly YearBegin = new DateOnly(year, 1, 1);
+
+            return await Find(c => c.FoundDate > YearBegin && c.FoundDate <= YearBegin.AddYears(1), pg,
                                 st,
                                 ct
                 );

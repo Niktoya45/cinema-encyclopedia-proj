@@ -33,7 +33,7 @@ namespace CinemaDataService.Api.Commands.StudioCommands.UpdateCommands
             }
 
             FilmographyResponse response = _mapper.Map<CinemaRecord, FilmographyResponse>(updated);
-            response.ParentId = null;
+            response.ParentId = request.ParentId;
 
             return response;
 

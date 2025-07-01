@@ -17,7 +17,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
         public Task<Starring?> FindStarringById(string? cinemaId, string starringId, CancellationToken ct);
         public Task<StudioRecord?> UpdateProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct);
         public Task<Starring?> UpdateStarring(string? cinemaId, Starring starring, CancellationToken ct);
-        public Task<Cinema?> UpdateRating(string id, double rating, CancellationToken ct);
+        public Task<Cinema?> UpdateRating(string id, double rating, double oldRating, CancellationToken ct);
         public Task<StudioRecord?> DeleteProductionStudio(string? cinemaId, StudioRecord studio, CancellationToken ct);
         public Task<Starring?> DeleteStarring(string? cinemaId, Starring starring, CancellationToken ct);
     }

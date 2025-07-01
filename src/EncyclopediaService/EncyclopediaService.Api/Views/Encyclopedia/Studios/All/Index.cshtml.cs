@@ -13,8 +13,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
     {
         public const byte MaxPerPage = 28;
 
-        [BindProperty(SupportsGet = true, Name = "pageNum")]
-        [FromQuery(Name = "pageNum")]
+        [BindProperty(SupportsGet = true, Name = "pagen")]
         public short PageNum { get; set; }
         public bool IsEnd { get; set; }
 

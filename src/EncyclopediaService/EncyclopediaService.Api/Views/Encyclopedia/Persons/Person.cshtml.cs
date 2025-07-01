@@ -73,7 +73,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 EditMain.Jobs = EditMain.JobsBind.Aggregate((acc, j) => acc | j);
             }
 
-            return new OkObjectResult(null);
+            return new OkResult();
         }
 
         public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id)

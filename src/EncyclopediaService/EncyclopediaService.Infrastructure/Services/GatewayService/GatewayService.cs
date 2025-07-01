@@ -383,13 +383,6 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<LabeledResponse>();
         }
-        public async Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct)
-        {
-            var response = await _httpClient.PostAsJsonAsync(usersUri + $"/{userId}/rating", rating, ct);
-
-            return await response.HandleResponse<RatingResponse>();
-        }
-
         /******/
 
         /* User PUT Requests */
@@ -399,6 +392,13 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<UserResponse>();
         }
+        public async Task<RatingResponse?> UpdateRatingList(string userId, UpdateRatingRequest rating, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(usersUri + $"/{userId}/rating", rating, ct);
+
+            return await response.HandleResponse<RatingResponse>();
+        }
+
 
         /******/
 

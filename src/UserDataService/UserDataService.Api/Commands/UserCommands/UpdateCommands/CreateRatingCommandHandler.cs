@@ -5,22 +5,22 @@ using UserDataService.Infrastructure.Models.RatingDTO;
 using UserDataService.Infrastructure.Repositories.Abstractions;
 using UserDataService.Api.Exceptions.UserExceptions;
 
-namespace UserDataService.Api.Commands.UserCommands.CreateCommands
+namespace UserDataService.Api.Commands.UserCommands.UpdateCommands
 {
-    public class CreateRatingCommandHandler : IRequestHandler<CreateRatingCommand, RatingResponse>
+    public class UpdateRatingCommandHandler : IRequestHandler<UpdateRatingCommand, RatingResponse>
     {
         IUserRepository _repository;
         IMapper _mapper;
 
-        public CreateRatingCommandHandler(IUserRepository repository, IMapper mapper)
+        public UpdateRatingCommandHandler(IUserRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
         }
-        public async Task<RatingResponse> Handle(CreateRatingCommand request, CancellationToken cancellationToken)
+        public async Task<RatingResponse> Handle(UpdateRatingCommand request, CancellationToken cancellationToken)
         {
-            RatingRecord rating = _mapper.Map<CreateRatingCommand, RatingRecord>(request);
-            RatingRecord? added = await _repository.AddToRatingList(rating, cancellationToken);
+            RatingRecord rating = _mapper.Map<UpdateRatingCommand, RatingRecord>(request);
+            RatingRecord? added = await _repository.UpdateRatingList(rating, cancellationToken);
 
             if (added is null)
             {

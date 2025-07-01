@@ -20,6 +20,8 @@ namespace CinemaDataService.Api.Controllers
         private readonly IMediator _mediator;
 
         private readonly Func<CinemasQuery, CinemasQueryCommonWrapper> _wrapCinemasQuery = (CinemasQuery query) => new CinemasQueryCommonWrapper(query);
+        private readonly Func<StarringQuery, StarringQueryCommonWrapper> _wrapStarringQuery = (StarringQuery query) => new StarringQueryCommonWrapper(query);
+        private readonly Func<ProductionStudioQuery, ProductionStudioQueryCommonWrapper> _wrapProductionStudioQuery = (ProductionStudioQuery query) => new ProductionStudioQueryCommonWrapper(query);
 
         public CinemaController(IMediator mediator)
         {
@@ -238,7 +240,7 @@ namespace CinemaDataService.Api.Controllers
             [FromRoute] string starringId
             )
         {
-            var response = await _mediator.Send(new CinemaStarringQuery(cinemaId, starringId), ct);
+            var response = await _mediator.Send(_wrapStarringQuery(new CinemaStarringQuery(cinemaId, starringId)), ct);
 
             return Ok(response);
         }
@@ -260,7 +262,7 @@ namespace CinemaDataService.Api.Controllers
             [FromRoute] string studioId
             )
         {
-            var response = await _mediator.Send(new CinemaProductionStudioQuery(cinemaId, studioId), ct);
+            var response = await _mediator.Send(_wrapProductionStudioQuery(new CinemaProductionStudioQuery(cinemaId, studioId)), ct);
 
             return Ok(response);
         }
@@ -468,7 +470,8 @@ namespace CinemaDataService.Api.Controllers
             var response = await _mediator.Send(
                 new UpdateCinemaRatingCommand(
                         cinemaId,
-                        request.Rating
+                        request.Rating,
+                        request.OldRating
                     ),
                 ct
                 );
@@ -558,7 +561,7 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeleteCinemaCommand(id), ct);
 
-            return Ok();
+            return Ok(id);
         }
 
         /// <summary>
@@ -581,7 +584,7 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeleteCinemaProductionStudioCommand(cinemaId, studioId), ct);
 
-            return Ok();
+            return Ok(studioId);
         }
 
         /// <summary>
@@ -604,7 +607,7 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeleteCinemaStarringCommand(cinemaId, starringId), ct);
 
-            return Ok();
+            return Ok(starringId);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using UserDataService.Infrastructure.Models.RatingDTO;
 
-namespace UserDataService.Api.Commands.UserCommands.CreateCommands
+namespace UserDataService.Api.Commands.UserCommands.UpdateCommands
 {
-    public class CreateRatingCommand : IRequest<RatingResponse>
+    public class UpdateRatingCommand : IRequest<RatingResponse>
     {
-        public CreateRatingCommand(
+        public UpdateRatingCommand(
             string userId,
             string cinemaId,
             double rating

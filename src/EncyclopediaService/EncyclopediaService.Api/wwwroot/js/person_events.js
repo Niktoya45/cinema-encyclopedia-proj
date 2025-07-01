@@ -42,6 +42,22 @@ if (UserAdmin) {
     // add onclick event to show hidden editor options
     addShowEditorEvents();
 
+    // add main object edit form submission
+    formEditMainSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        this.disabled = true;
+
+        let form = formEditMain;
+
+        fetchForm(
+            form,
+            (p) => { window.location.reload(); },
+            null,
+            null
+        );
+
+    });
 
     // make person page deletion confirmed 
     approveDelete("", formDelete.closest('.container-fluid'), deletePersonAction, classDeletePerson);

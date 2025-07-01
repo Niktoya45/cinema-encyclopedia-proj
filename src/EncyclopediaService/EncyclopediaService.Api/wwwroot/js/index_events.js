@@ -1,14 +1,18 @@
 ﻿
 // provide references to corresponding pagination elements preserving other query parameters
 
-var pageNums = document.querySelectorAll("#pages .page-item");
+const pageNumParam = 'pagen'
+const pageNumsSelector = '#pages .page-item'
+
+var pageNums = document.querySelectorAll(pageNumsSelector);
 
 var locationSearch = window.location.search;
 var locationPlain = window.location.pathname;
+
 const currentSearch = new URLSearchParams(locationSearch);
 
-if (currentSearch.has("pageNum")) {
-    currentSearch.delete("pageNum");
+if (currentSearch.has(pageNumParam)) {
+    currentSearch.delete(pageNumParam);
 }
 if (currentSearch.size) {
 

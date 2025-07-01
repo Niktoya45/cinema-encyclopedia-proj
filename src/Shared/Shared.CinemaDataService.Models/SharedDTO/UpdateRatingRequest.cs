@@ -5,5 +5,6 @@ namespace Shared.CinemaDataService.Models.SharedDTO
     {
         public string Id { get; set; }
         public double Rating { get; set; }
+        public double OldRating { get; set; }
     }
 }

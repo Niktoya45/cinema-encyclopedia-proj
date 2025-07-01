@@ -2,6 +2,7 @@ using GatewayAPIService.Infrastructure.Services.CinemaService;
 using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
 using GatewayAPIService.Infrastructure.Services.UserService;
+using GatewayAPIService.Infrastructure.Services.AccessService;
 using GatewayAPIService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -31,6 +32,7 @@ namespace GatewayAPIService.Api
             string CinemaDataServiceUrl = builder.Configuration.GetConnectionString("CinemaDataService") ?? throw new Exception("Missing CinemaDataService route path in ConnectionStrings");
             string UserDataServiceUrl = builder.Configuration.GetConnectionString("UserDataService") ?? throw new Exception("Missing UserDataService route path in ConnectionStrings");
             string ImageServiceUrl = builder.Configuration.GetConnectionString("ImageService") ?? throw new Exception("Missing ImageService route path in ConnectionStrings");
+            string AccessServiceUrl = builder.Configuration.GetConnectionString("AccessService") ?? throw new Exception("Missing AccessService route path in ConnectionStrings");
 
             builder.Services.AddHttpClient<ICinemaService, CinemaService>(client =>
             {
@@ -48,11 +50,14 @@ namespace GatewayAPIService.Api
             {
                 client.BaseAddress = new Uri(UserDataServiceUrl);
             });
+            builder.Services.AddHttpClient<IAccessService, AccessService>(client =>
+            {
+                client.BaseAddress = new Uri(AccessServiceUrl);
+            });
             builder.Services.AddHttpClient<IImageService, ImageService>(client =>
             {
                 client.BaseAddress = new Uri(ImageServiceUrl);
             });
-
 
             builder.Services.AddAuthentication(options =>
             {
@@ -142,7 +147,7 @@ namespace GatewayAPIService.Api
                     {
                         Claim? userRole = ctx.User.Claims.FirstOrDefault(c => c.Type == "role");
                         return userRole != null && 
-                        (userRole.Value.Contains("Administrator") || userRole.Value.Contains("Superadministrator"));
+                        userRole.Value.Contains("dministrator");
                     });
                 });
             });

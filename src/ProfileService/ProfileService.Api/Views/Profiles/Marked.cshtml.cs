@@ -26,7 +26,7 @@ namespace ProfileService.Api.Views.Profiles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostDelete([FromQuery] string id, [FromQuery] string cinemaId)
+        public async Task<IActionResult> OnPostDelete([FromRoute] string id, [FromQuery] string cinemaId)
         {
             return new OkObjectResult("log delete");
         }

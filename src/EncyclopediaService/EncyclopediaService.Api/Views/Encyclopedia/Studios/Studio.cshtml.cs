@@ -71,7 +71,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
                 EditMain.Id = id;
             }
 
-            return new OkObjectResult(null);
+            return new OkResult();
         }
 
         public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id)

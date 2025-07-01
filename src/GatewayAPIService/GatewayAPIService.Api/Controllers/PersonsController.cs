@@ -260,19 +260,16 @@ namespace GatewayAPIService.Api.Controllers
             )
         {
 
-            if (request.Name is null)             
+            CinemaResponse? cinema = await _cinemaService.GetById(request.Id, ct);
+
+            if (cinema is null) 
             {
-                CinemaResponse? cinema = await _cinemaService.GetById(request.Id, ct);
-
-                if (cinema is null) 
-                {
-                    return BadRequest(request.Id);
-                }
-
-                request.Name = cinema.Name;
-                request.Year = cinema.ReleaseDate.Year;
-                request.Picture = cinema.Picture;
+                return BadRequest(request.Id);
             }
+
+            request.Name = cinema.Name;
+            request.Year = cinema.ReleaseDate.Year;
+            request.Picture = cinema.Picture;
 
             PersonResponse? person = await _personService.GetById(personId, ct);
 

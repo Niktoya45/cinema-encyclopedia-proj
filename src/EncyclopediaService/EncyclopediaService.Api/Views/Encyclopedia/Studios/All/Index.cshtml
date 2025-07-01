@@ -145,7 +145,7 @@
                     }
 
                     <li class="page-item">
-                        <a class="page-link" href="@(Model.PageNum<=(ps/2+1) ? null : $"?pageNum={Model.PageNum+dif-1}")" aria-label="Previous">
+                        <a class="page-link" href="@(Model.PageNum<=(ps/2+1) ? null : $"?pagen={Model.PageNum+dif-1}")" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -153,12 +153,12 @@
                     @for (int off = dif; off < n; off++)
                     {
                         <li class="page-item page-num @(off==0 ? "active" : "")">
-                            <a class="page-link" href="@(off==0 ? "#" : $"?pageNum={Model.PageNum+off}")">@(Model.PageNum + off)</a>
+                            <a class="page-link" href="@(off==0 ? "#" : $"?pagen={Model.PageNum+off}")">@(Model.PageNum + off)</a>
                         </li>
                     }
 
                     <li class="page-item">
-                        <a class="page-link" href="@((Model.IsEnd && Model.PageNum>=(lid - ps/2 - 1)) ? null : $"?pageNum={Model.PageNum+n}")" aria-label="Next">
+                        <a class="page-link" href="@((Model.IsEnd && Model.PageNum>=(lid - ps/2 - 1)) ? null : $"?pagen={Model.PageNum+n}")" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

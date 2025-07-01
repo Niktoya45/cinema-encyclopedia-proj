@@ -25,9 +25,16 @@ namespace GatewayAPIService.Api.Controllers
 
         [HttpGet]
         [Route("cinemas/{id}")]
-        public async Task<IActionResult> Cinema(string id, string code = null)
+        public async Task<IActionResult> Cinema(string id, string? code = null)
         {
             return HandleRedirect($"/encyclopedia/cinemas/{id}", code);
+        }
+
+        [HttpGet]
+        [Route("create/cinema")]
+        public async Task<IActionResult> CreateCinema(string? code = null)
+        {
+            return HandleRedirect($"/encyclopedia/create/cinema", code);
         }
 
         [HttpGet]
@@ -45,6 +52,13 @@ namespace GatewayAPIService.Api.Controllers
         }
 
         [HttpGet]
+        [Route("create/person")]
+        public async Task<IActionResult> CreatePerson(string? code = null)
+        {
+            return HandleRedirect($"/encyclopedia/create/person", code);
+        }
+
+        [HttpGet]
         [Route("studios")]
         public async Task<IActionResult> Studios(string? code = null)
         {
@@ -56,6 +70,13 @@ namespace GatewayAPIService.Api.Controllers
         public async Task<IActionResult> Studio(string id, string? code = null)
         {
             return HandleRedirect($"/encyclopedia/studios/{id}", code);
+        }
+
+        [HttpGet]
+        [Route("create/studio")]
+        public async Task<IActionResult> CreateStudio(string? code = null)
+        {
+            return HandleRedirect($"/encyclopedia/create/studio", code);
         }
 
         protected IActionResult HandleRedirect(string url, string? code) 

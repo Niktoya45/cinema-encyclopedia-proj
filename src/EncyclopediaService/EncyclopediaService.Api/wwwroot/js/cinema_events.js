@@ -1,6 +1,6 @@
 ﻿
 import {
-    fetchPostMVC,
+    fetchPostMVC, fetchForm,
     addDeleteEvents, approveDelete,
     appendToCarousel, removeFromCarousel,
     bsElementShow, 
@@ -131,6 +131,22 @@ if (UserAdmin) {
     // add onclick event to show hidden editor options
     addShowEditorEvents();
 
+    // add main object edit form submission
+    formEditMainSubmit.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        this.disabled = true;
+
+        let form = formEditMain;
+
+        fetchForm(
+            form,
+            (p) => { window.location.reload(); },
+            null,
+            null
+        );
+
+    });
 
     // make cinema page deletion confirmed 
     approveDelete("", formDelete.closest('.container-fluid'), deleteCinemaAction, classDeleteCinema);

@@ -10,6 +10,26 @@
     --mark-seen-q: #aa78b488; 
 }
 
+
+.btn-refresh {
+    border: none;
+    background-color: transparent;
+    width: auto;
+    height: auto;
+}
+
+.no-display {
+    display: none;
+}
+
+.label-delete {
+    padding: 2rem;
+}
+
+#modal-manage-profile .container-fluid {
+    padding: 4rem;
+}
+
 .link-black {
     color: black;
 }
@@ -117,6 +137,31 @@
 #account:hover #account-name {
     color: #ccc;
     transition: color 0.1s ease-in;
+}
+
+.hide-delete .del-record {
+    visibility: hidden;
+    transition: ease-in 0.3s;
+}
+
+.show-close-buttons {
+    cursor: pointer;
+}
+
+.hide-close-buttons {
+    visibility: hidden;
+}
+
+.editor-toggle {
+    visibility: hidden;
+}
+
+.create-page .editor-toggle {
+    visibility: visible;
+}
+
+.pad-card {
+    width: 3rem;
 }
 
 #rating {
@@ -267,7 +312,7 @@
 }
 
 #list-tabs .switch-tab:has(> .active){
-    border-radius: 0.5rem 0 0 0;
+    border-radius: 0.5rem 0.5rem 0 0;
     border:none;
 }
 
@@ -281,46 +326,53 @@
 
 #tabfolder {
     overflow: visible;
-    background-color: inherit;
+    background-color: #000;
     border-top-right-radius: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 #tabs {
     position: relative;
-    overflow: visible;
-    margin-top: 1.5rem;
+    overflow:visible;
+    height: 2.5rem;
 }
 
 #tabs .switch-tab {
     position:relative;
-    top: -1.2rem;
-    z-index:2;
+    top: -0.8rem;
+    z-index: 2;
 }
 
 #tabs .switch-tab{
     background-color: white;
 }
 
-#tabs .switch-tab:first-child{
-    border-radius: 0.5rem 0 0 0;
-}
-
-#tabs .switch-tab:last-child{
-    border-radius: 0 0.5rem 0 0;
+#tabs .switch-tab{
+    border-radius: 0.5rem 0.5rem 0 0 ;
 }
 
 #tabs .switch-tab:has( .link:hover){
     border: initial;
-    top: -1.6rem;
+    top: -1.3rem;
 
     transition: top ease-in 0.2s;
 }
 
 #tabs .switch-tab .link .icon-wrapper{
     background-color:#202228;
-    border-radius: 0.5rem;
     padding: 0.3rem;
+    border-radius: 0.5rem;
 }
+
+/*
+#tabs .switch-tab:first-child{
+    border-top-left-radius: 1rem;
+}
+
+#tabs .switch-tab:last-child{
+    border-top-right-radius: 1rem;
+}
+*/
 
 #mark-favored.active,
 #mark-favored.active .label-icons line,
@@ -417,6 +469,10 @@
 
 #list {
    width: 100%; 
+   position:relative;
+   margin-top:0.5rem;
+   top:-0.5rem;
+   z-index:3;
    background-color: inherit;
    border: none;
 }
@@ -468,7 +524,9 @@
     text-align:center;
 }
 
+/*
 .hide-delete {
     display:none;
     transition: ease-in 0.3s;
 }
+*/

@@ -8,11 +8,13 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
     {
         public string Id { get; set; }
         public double Rating { get; set; }
+        public double OldRating { get; set; }
 
-        public UpdateCinemaRatingCommand(string id, double rating)
+        public UpdateCinemaRatingCommand(string id, double rating, double oldRating)
         {
             Id = id;
             Rating = rating;
+            OldRating = oldRating;
         }
     }
 }

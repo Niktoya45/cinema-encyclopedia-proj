@@ -1,29 +1,27 @@
 ﻿@model ProfileService.Api.Models.Edit.EditMain
 
-<div class="container-fluid">
-    <form id="form-modal-edit-main" asp-page-handler="editMain" method="post">
-        <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Username</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input class="form-control" asp-for="@Model.Username" value="@Model.Username" type="text" />
-                <br>
-                <span asp-validation-for="@Model.Username" class="text-danger"></span>
-            </li>
+<form id="form-modal-edit-main" asp-page-handler="editMain" method="post">
+	<input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Username</li>
+		<li class="list-group-item mb-4 border-bottom border-info fs-6">
+			<input class="form-control" asp-for="@Model.Username" value="@Model.Username" type="text" />
+			<br>
+			<span asp-validation-for="@Model.Username" class="text-danger"></span>
+		</li>
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <input type="date" class="form-control" asp-for="@Model.Birthdate" value="@(Model.Birthdate.Year == 1900 ? "-" : Model.Birthdate.ToString("dd-MM-yyyy"))" />
-                <br>
-                <span asp-validation-for="@Model.Birthdate" class="text-danger"></span>
-            </li>
+		<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Birthdate</li>
+		<li class="list-group-item mb-4 border-bottom border-info fs-6">
+			<input type="date" class="form-control" asp-for="@Model.Birthdate" value="@(Model.Birthdate.Year == 1900 ? "-" : Model.Birthdate.ToString("dd-MM-yyyy"))" />
+			<br>
+			<span asp-validation-for="@Model.Birthdate" class="text-danger"></span>
+		</li>
 
 
-            <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
-            <li class="list-group-item mb-4 border-bottom border-info fs-6">
-                <textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
-            </li>
+		<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-6">Description</li>
+		<li class="list-group-item mb-4 border-bottom border-info fs-6">
+			<textarea class="form-control" asp-for="@Model.Description" style="width:27rem;margin-left:-1rem;margin-right:-2rem"></textarea>
+		</li>
 
-        </ul>
-    </form>
-</div>
+	</ul>
+</form>

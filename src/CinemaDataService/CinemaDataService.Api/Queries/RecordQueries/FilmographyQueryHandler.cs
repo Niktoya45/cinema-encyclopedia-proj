@@ -8,7 +8,7 @@ using CinemaDataService.Domain.Aggregates.Shared;
 
 namespace CinemaDataService.Api.Queries.RecordQueries
 {
-    public class FilmographyQueryHandler : IRequestHandler<FilmographyQuery, FilmographyResponse>
+    public class FilmographyQueryHandler : IRequestHandler<FilmographyQueryCommonWrapper, FilmographyResponse>
     {
         IPersonRepository _personRepository;
         IStudioRepository _studioRepository;
@@ -19,12 +19,12 @@ namespace CinemaDataService.Api.Queries.RecordQueries
             _studioRepository = studioRepository;
             _mapper = mapper;
         }
-        public async Task<FilmographyResponse> Handle(FilmographyQuery request, CancellationToken cancellationToken)
+        public async Task<FilmographyResponse> Handle(FilmographyQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             CinemaRecord? filmography = null;
             string coll = "";
 
-            switch (request)
+            switch (request.Query)
             {
 
                 case PersonFilmographyQuery pfq:
@@ -43,7 +43,7 @@ namespace CinemaDataService.Api.Queries.RecordQueries
 
             if (filmography == null) 
             {
-                throw new NotFoundRecordException(request.ParentId, request.Id, coll);
+                throw new NotFoundRecordException(request.Query.ParentId, request.Query.Id, coll);
             }
 
 

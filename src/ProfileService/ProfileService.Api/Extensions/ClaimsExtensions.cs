@@ -7,8 +7,9 @@ namespace ProfileService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = false;
-        public static bool DisableRoles = false;
+        public static bool DisableAuthentication = true;
+        public static bool DisableRoles = true;
+        public static bool DisablePosession = true;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {
@@ -29,14 +30,33 @@ namespace ProfileService.Api.Extensions
         public static bool IsAdmin(this Claim role)
         {
             bool IsAdmin = DisableRoles ||
-            (role != null && (role.Value.Contains("Administrator") || role.Value.Contains("Superadministrator")));
+            (role != null && role.Value.Contains("dministrator"));
+
+            return IsAdmin;
+        }
+
+        public static bool IsSuperAdmin(this ClaimsPrincipal principal) 
+        {
+            var Role = principal.FindFirst("role");
+
+            bool IsAdmin = DisableRoles ||
+                (Role != null && Role.IsSuperAdmin());
+
+            return IsAdmin;
+        }
+
+        public static bool IsSuperAdmin(this Claim role)
+        {
+            bool IsAdmin = DisableRoles ||
+            (role != null && role.Value.Contains("Superadministrator"));
 
             return IsAdmin;
         }
         
         public static bool IsProfileOwner(this ClaimsPrincipal principal, string profileId)
         {
-            return principal.FindFirstValue(JwtRegisteredClaimNames.Sub) == profileId;
+            return DisablePosession || 
+                principal.FindFirstValue(JwtRegisteredClaimNames.Sub) == profileId;
         }
 
         public static ClaimsPrincipal ToPrincipal(Dictionary<string, string> claimsDictionary, string authenticationType)

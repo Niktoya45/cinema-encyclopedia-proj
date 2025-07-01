@@ -1,13 +1,49 @@
 ﻿@page "{id}/marked"
+@using ProfileService.Api.Extensions;
 @model ProfileService.Api.Views.Profiles.MarkedModel
 @{
+	bool IsUser = User.IsProfileOwner(Model.Id);
 }
 
 <body>
 
 	<div class="container mt-5 mb-3">
 
-		<h3 class="mb-3 border-2 border-black border-bottom"> Lists of marked cinemas </h3>
+		<div class="row border-2 border-black border-bottom ">
+
+			<div class="col-10"><h3 class="mb-3"> Lists of marked cinemas </h3></div>
+
+			<div class="col-2">
+
+				@if (IsUser)
+				{
+					<div class="editor dropdown">
+						<button id="dropdown-edit-marked" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="icon icon-md icon-options-dots"></span>
+						</button>
+
+						<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-marked">
+							<li>
+								<button class="dropdown-item show-close-buttons">
+									Delete
+								</button>
+							</li>
+						</ul>
+
+					</div>
+
+					<div class="hide-editor-options editor hide-close-buttons">
+						<button class="btn btn-secondary">
+							Cancel
+						</button>
+					</div>
+				}
+
+			</div>
+
+		</div>
+
+		
 		<div class="row">
 
 			<div class="col">
@@ -62,7 +98,6 @@
 									<li class="nav-item switch-tab">
 										<button id="mark-seen" title="seen" class="nav-link link"
 												data-bs-toggle="tab" data-bs-target="#tab-@Label.Seen" aria-controls="tab-@Label.Seen" aria-selected="false">
-
 											<div class="icon-wrapper">
 												<svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
 													<polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4" />
@@ -72,7 +107,6 @@
 													<polygon points="17,7 14,12 13,13 11,14 7,14 7,16 7,17 10,9" />
 												</svg>
 											</div>
-
 										</button>
 									</li>
 
@@ -80,9 +114,9 @@
 
 							</div>
 
-							<div id="list" class="card card-body mt-2">
+							<div id="list" class="card card-body">
 
-								<div class="tab-content">
+								<div class="tab-content hide-delete">
 
 									@foreach(int mark in Enum.GetValues<Label>())
 									{
@@ -108,16 +142,15 @@
 													</thead>
 
 													<tbody>
-
 														@foreach (CinemaRecord record in Model.List.Where(r => r.Label == (Label)mark))
 														{
 															q++;
-															<tr>
+															<tr class="record">
 																<th scope="row" style="width:10%;"> <span>@q</span> </th>
 
 																<td>
 																	<div class="text-truncate">
-																		<a class="nav-link link-opacity-50-hover" href="@("https://localhost:7116/encyclopedia/cinemas/"+record.Id)">
+																		<a class="nav-link link-opacity-50-hover" href="@(Url.PageLink("/Index", "Encyclopedia", new {path = $"/cinemas/{record.Id}"}))">
 																			@record.Name
 																		</a>
 																	</div>
@@ -126,10 +159,13 @@
 																<td style="width:30%;">@record.AddedAt.ToString("yyyy-MM-dd HH:mm")</td>
 
 																<td>
-																	<form method="post" >
-																		<button id="delete-record-@record.Id" value="@record.Id" class="btn-close position-absolute del-record"
-																				formaction="?handler=Delete&id=@record.ParentId&cinemaId=@record.Id" aria-label="Delete" type="submit"></button>
-																	</form>
+																	@if (IsUser)
+																	{
+																		<form method="post" >
+																			<button id="delete-record-@record.Id" value="@record.Id" class="btn-close position-absolute del-record"
+																			formaction="?handler=Delete&cinemaId=@record.Id" aria-label="Delete" type="submit"></button>
+																		</form>
+																	}
 																</td>
 															</tr>
 														}
@@ -153,15 +189,20 @@
 
 							</div>
 
+							<div id="tabs-footer" class="bg-black pt-5"></div>
+
 						</div>
 
 					</div>
 
+
+					<div class="col-1"></div>
 				</div>
 			</div>
 
 		</div>
 
 	</div>
-	<script src="~/js/marked.js" asp-append-version="true"></script>
+
+	<script src="~/js/marked_events.js" asp-append-version="true" type="module"></script>
 </body>

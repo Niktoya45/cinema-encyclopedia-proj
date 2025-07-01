@@ -1,10 +1,11 @@
 ﻿
 
+using GatewayAPIService.Infrastructure.Extensions;
+using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.UserDataService.Models.Flags;
 using Shared.UserDataService.Models.LabeledDTO;
 using Shared.UserDataService.Models.RatingDTO;
 using Shared.UserDataService.Models.UserDTO;
-using Shared.UserDataService.Models.Flags;
-using GatewayAPIService.Infrastructure.Extensions;
 using System.Net.Http.Json;
 
 namespace GatewayAPIService.Infrastructure.Services.UserService
@@ -61,12 +62,6 @@ namespace GatewayAPIService.Infrastructure.Services.UserService
 
             return await response.HandleResponse<LabeledResponse>(ct);
         }
-        public async Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct)
-        {
-            var response = await _httpClient.PostAsJsonAsync<CreateRatingRequest>(usersUri+$"/{userId}/rating", rating, ct);
-
-            return await response.HandleResponse<RatingResponse>(ct);
-        }
 
         /******/
 
@@ -76,6 +71,19 @@ namespace GatewayAPIService.Infrastructure.Services.UserService
             var response = await _httpClient.PutAsJsonAsync<UpdateUserRequest>(usersUri+$"/{id}", user, ct);
 
             return await response.HandleResponse<UserResponse>(ct);
+        }
+
+        public async Task<UpdatePictureResponse?> UpdatePhoto(string userId, UpdatePictureRequest picture, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync<UpdatePictureRequest>(usersUri + $"/{userId}/picture", picture, ct);
+
+            return await response.HandleResponse<UpdatePictureResponse>();
+        }
+        public async Task<RatingResponse?> UpdateRatingList(string userId, UpdateUserRatingRequest rating, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(usersUri + $"/{userId}/rating", rating, ct);
+
+            return await response.HandleResponse<RatingResponse>(ct);
         }
 
         /******/

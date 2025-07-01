@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using CinemaDataService.Infrastructure.Repositories.Implementations;
+using CinemaDataService.Api.Middlewares;
 
 namespace CinemaDataService.Api
 {
@@ -46,6 +47,8 @@ namespace CinemaDataService.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

@@ -10,8 +10,8 @@ namespace EncyclopediaService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = false;
-        public static bool DisableRoles = false;
+        public static bool DisableAuthentication = true;
+        public static bool DisableRoles = true;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {
@@ -32,7 +32,7 @@ namespace EncyclopediaService.Api.Extensions
         public static bool IsAdmin(this Claim role)
         {
             bool IsAdmin = DisableRoles ||
-            (role != null && (role.Value.Contains("Administrator") || role.Value.Contains("Superadministrator")));
+            (role != null && role.Value.Contains("dministrator"));
 
             return IsAdmin;
         }

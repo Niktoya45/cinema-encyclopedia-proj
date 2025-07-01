@@ -30,7 +30,10 @@ namespace CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands
                 throw new NotFoundException(request.Id, "Cinemas");
             }
 
-            return _mapper.Map<StudioRecord, ProductionStudioResponse>(updated);
+            ProductionStudioResponse response = _mapper.Map<StudioRecord, ProductionStudioResponse>(updated);
+            response.ParentId = request.CinemaId;
+
+            return response;
         }
     }
 }

@@ -31,7 +31,10 @@ namespace CinemaDataService.Api.Commands.PersonCommands.UpdateCommands
                 throw new NotFoundException(request.Id, "Person");
             }
 
-            return _mapper.Map<CinemaRecord, FilmographyResponse>(updated);
+            FilmographyResponse response = _mapper.Map<CinemaRecord, FilmographyResponse>(updated);
+            response.ParentId = request.ParentId;
+
+            return response;
         }
     }
 }

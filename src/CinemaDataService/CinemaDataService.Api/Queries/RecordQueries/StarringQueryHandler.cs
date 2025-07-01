@@ -7,7 +7,7 @@ using MediatR;
 
 namespace CinemaDataService.Api.Queries.RecordQueries
 {
-    public class StarringQueryHandler : IRequestHandler<StarringQuery, StarringResponse>
+    public class StarringQueryHandler : IRequestHandler<StarringQueryCommonWrapper, StarringResponse>
     {
         ICinemaRepository _cinemaRepository;
         IMapper _mapper;
@@ -16,11 +16,11 @@ namespace CinemaDataService.Api.Queries.RecordQueries
             _cinemaRepository = cinemaRepository;
             _mapper = mapper;
         }
-        public async Task<StarringResponse> Handle(StarringQuery request, CancellationToken cancellationToken)
+        public async Task<StarringResponse> Handle(StarringQueryCommonWrapper request, CancellationToken cancellationToken)
         {
             Starring? starring = null;
 
-            switch (request)
+            switch (request.Query)
             {
 
                 case CinemaStarringQuery csq:
@@ -33,7 +33,7 @@ namespace CinemaDataService.Api.Queries.RecordQueries
 
             if (starring == null)
             {
-                throw new NotFoundRecordException(request.ParentId, request.Id, "Cinemas");
+                throw new NotFoundRecordException(request.Query.ParentId, request.Query.Id, "Cinemas");
             }
 
 

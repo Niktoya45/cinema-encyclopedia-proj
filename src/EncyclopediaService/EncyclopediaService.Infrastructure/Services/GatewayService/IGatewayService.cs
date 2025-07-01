@@ -147,12 +147,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         /* User POST Requests */
         Task<UserResponse?> CreateUser(CreateUserRequest user, CancellationToken ct);
         Task<LabeledResponse?> CreateForLabeledList(string userId, CreateLabeledRequest labeled, CancellationToken ct);
-        Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct);
 
         /******/
 
         /* User PUT Requests */
         Task<UserResponse?> UpdateUser(string id, UpdateUserRequest user, CancellationToken ct);
+        Task<RatingResponse?> UpdateRatingList(string userId, UpdateRatingRequest rating, CancellationToken ct);
 
         /******/
 

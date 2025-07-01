@@ -85,7 +85,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 //return Ok(response);
             }
 
-            return RedirectToPage();
+            return new OkResult();
         }
 
         public async Task<IActionResult> OnPostDeleteCinema([FromRoute] string id) 

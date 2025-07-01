@@ -67,7 +67,7 @@ namespace GatewayAPIService.Api.Controllers
 
             foreach (CinemasResponse cinema in response.Response)
             {
-                if(false && cinema.Picture != null) 
+                if(cinema.Picture != null) 
                 {
                     cinema.PictureUri = await _imageService.GetImage(cinema.Picture, ImageSize.Medium);  
                 }
@@ -417,18 +417,16 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct
             )
         {
-            if (request.Name is null)
+            StudioResponse? studio = await _studioService.GetById(request.Id, ct);
+
+            if (studio is null)
             {
-                StudioResponse? studio = await _studioService.GetById(request.Id, ct);
-
-                if (studio is null)
-                {
-                    return BadRequest(request.Id);
-                }
-
-                request.Name = studio.Name;
-                request.Picture = studio.Picture;
+                return BadRequest(request.Id);
             }
+
+            request.Name = studio.Name;
+            request.Picture = studio.Picture;
+
 
             CinemaResponse? cinema = await _cinemaService.GetById(cinemaId, ct);
 
@@ -478,18 +476,17 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct
             )
         {
-            if (request.Name is null)
+
+            PersonResponse? person = await _personService.GetById(request.Id, ct);
+
+            if (person is null)
             {
-                PersonResponse? person = await _personService.GetById(request.Id, ct);
-
-                if (person is null)
-                {
-                    return BadRequest(request.Id);
-                }
-
-                request.Name = person.Name;
-                request.Picture = person.Picture;
+                return BadRequest(request.Id);
             }
+
+            request.Name = person.Name;
+            request.Picture = person.Picture;
+
 
             CinemaResponse? cinema = await _cinemaService.GetById(cinemaId, ct);
 

@@ -11,11 +11,11 @@ export function refreshRequestCancel() {
     signalCancel = controllerCancel.signal;
 }
 
-export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
+export function fetchForm(form, eventAdd, eventRefreshForm, modalForm) {
 
     fetchPostMVC(form, form.action, "TEXT")
         .then((result) => {
-            if (!result) return null;
+            if (!result) { window.location.reload(); return; }
 
             let placeholder = document.createElement("div");
 
@@ -26,17 +26,17 @@ export function fetchForm(form, actionAdd, actionRefreshForm, modalForm) {
                 form.innerHTML = result;
                 placeholder.remove();
 
-                actionRefreshForm(form);
+                if (eventRefreshForm)
+                    eventRefreshForm(form);
 
                 return;
             }
 
-            actionAdd(placeholder);
+            if (eventAdd)
+                eventAdd(placeholder);
 
-            if (modalForm) {
-                let modal = modalForm;
-                bsElementClose(modal);
-            }
+            if (modalForm)
+                bsElementClose(modalForm);
 
         })
         .catch(error => {
@@ -247,8 +247,78 @@ export function addShowToggle(selectorToggler, selectorToggledArea, selectorTogg
     });
 }
 
+export function addConfirmPopupEvents(popupToggler, confirmAction, confirmShowEvent, confirmResultEvent) {
+    var popupSelector = popupToggler.getAttribute('data-bs-target');
 
-export function addDeleteEvents(formDelete, resultAction) {
+    if (!popupSelector)
+        return null;
+
+    var popup = document.querySelector(popupSelector);
+
+    if (!popup)
+        return null;
+
+    let popupForm = popup.querySelector('form');
+    let popupButtons = popup.querySelectorAll('button');
+    var resultCallback = null;
+
+    popupToggler.addEventListener('click', function (e) {
+
+        let popupLabelSelector = popupToggler.getAttribute('target-label');
+        let popupLabels = popupLabelSelector ? popup.querySelectorAll(popupLabelSelector) : null;
+
+        if (confirmAction)
+            popupForm.action = confirmAction;
+
+        if (confirmShowEvent)
+            confirmShowEvent(popupToggler, popupForm);
+
+        if (popupLabels)
+            popupLabels.forEach((label) => { label.classList.remove('no-display'); });
+
+        if (confirmResultEvent)
+            resultCallback = confirmResultEvent;
+
+    });
+
+    popupButtons.forEach((button) => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let popupLabelSelector = popupToggler.getAttribute('target-label');
+            let popupLabels = popupLabelSelector ? popup.querySelectorAll(popupLabelSelector) : null;
+
+            if (this.value == "submit" || this.value == "confirm") {
+
+                fetchPostMVC(popupForm, popupForm.action, "TEXT")
+                    .then((result) => {
+
+                        if (popupLabels)
+                            popupLabels.forEach((label) => { setTimeout(() => { label.classList.add('no-display'); }, 1500); });
+
+                        if (resultCallback)
+                            resultCallback(popupToggler, result);
+
+                    })
+                    .catch(error => {
+                        if (error.name === 'AbortError') {
+                            console.log('request cancelled');
+                            if (popupLabels)
+                                popupLabels.forEach((label) => { setTimeout(() => { label.classList.add('no-display'); }, 1500); })
+                            return null;
+                        }
+                    });
+            }
+            else if (this.value == "cancel") {
+                if (popupLabels)
+                    popupLabels.forEach((label) => { setTimeout(() => { label.classList.add('no-display'); }, 1500); })
+            }
+        });
+    });
+
+}
+
+export function addDeleteEvents(formDelete, eventResult) {
     let formDeleteSubmits = formDelete.querySelectorAll("button");
     formDeleteSubmits.forEach(function (button) {
 
@@ -266,7 +336,7 @@ export function addDeleteEvents(formDelete, resultAction) {
                 .then((result) => {
                     if (!result) return null;
 
-                    resultAction(result, button.getAttribute(deleteAttribute));
+                    eventResult(result, button.getAttribute(deleteAttribute));
                 })
                 .catch(error => {
                     if (error.name === 'AbortError') {
@@ -274,7 +344,6 @@ export function addDeleteEvents(formDelete, resultAction) {
                         return null;
                     }
                 });
-
         });
 
     });
@@ -296,7 +365,7 @@ export function deleteRecord(id, targetBlockSelector) {
     record.remove();
 }
 
-export function approveDelete(targetId, modalContainer, deleteActionPath, deleteClass) {
+export function approveDelete(targetId, modalContainer, deleteAction, deleteClass) {
     let form = modalContainer.querySelector("form");
 
     let labels = modalContainer.querySelectorAll(".label-delete");
@@ -312,14 +381,14 @@ export function approveDelete(targetId, modalContainer, deleteActionPath, delete
 
     });
 
-    form.action = deleteActionPath;
+    form.action = deleteAction;
     form.querySelectorAll('button').forEach(function (button) {
         button.setAttribute(deleteAttribute, deleteClass);
     });
     getHidden(form, "RecordId").value = targetId;
 }
 
-export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, choice, afterSetAction) {
+export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, choice, eventAfterSet) {
 
     fetchPostMVC(new URLSearchParams({ recordId : choice.id }), actionSearch, "JSON")
     .then((result) => {
@@ -340,14 +409,14 @@ export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, ch
 
         searchInput.value = choiceRes.name;
 
-        if (afterSetAction) {
-            afterSetAction();
+        if (eventAfterSet) {
+            eventAfterSet();
         }
     });
 
 }
 
-export function addSearchClose(formAdd, searchInput, afterCloseAction) {
+export function addSearchClose(formAdd, searchInput, eventAfterClose) {
     getHidden(formAdd, "Id").value = null;
     getHidden(formAdd, "Name").value = null;
     getHidden(formAdd, "Picture").value = null;
@@ -358,12 +427,12 @@ export function addSearchClose(formAdd, searchInput, afterCloseAction) {
         img.classList.add('img-placeholder');
     }
 
-    if (afterCloseAction) {
-        afterCloseAction();
+    if (eventAfterClose) {
+        eventAfterClose();
     }
 }
 
-export function addSearchEvents(searchDropdown, action, chooseAction, closeAction) {
+export function addSearchEvents(searchDropdown, action, eventChoose, eventClose) {
 
     let searchInput = searchDropdown.querySelector(".search-input");
 
@@ -376,8 +445,8 @@ export function addSearchEvents(searchDropdown, action, chooseAction, closeActio
         refreshRequestCancel();
 
         if (inputValue.length < 3) {
-            if (closeAction) {
-                closeAction(searchInput);
+            if (eventClose) {
+                eventClose(searchInput);
             }
             suggestionsList.style.visibility = "hidden";
             return;
@@ -421,9 +490,9 @@ export function addSearchEvents(searchDropdown, action, chooseAction, closeActio
                             suggestionsList.innerHTML = "";
                             suggestionsList.style.visibility = "hidden";
 
-                            if (chooseAction) {
+                            if (eventChoose) {
                                 console.log("choice action");
-                                chooseAction(searchInput, listItem, choice);
+                                eventChoose(searchInput, listItem, choice);
                             }
 
                         });

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using ProfileService.Api.Models.Utils;
 using ProfileService.Infrastructure.Services.ImageService;
+using ProfileService.Infrastructure.Services.GatewayService;
 
 namespace ProfileService.Api
 {
@@ -46,6 +47,13 @@ namespace ProfileService.Api
             builder.Services.AddHttpClient<IImageService, ImageService>(client =>
             {
                 string conn = builder.Configuration.GetConnectionString("ImageService") ?? throw new Exception("Missing ImageService route path in ConnectionStrings");
+
+                client.BaseAddress = new Uri(conn);
+            });
+
+            builder.Services.AddHttpClient<IGatewayService, GatewayService>(client =>
+            {
+                string conn = builder.Configuration.GetConnectionString("Gateway") ?? throw new Exception("Missing Gateway route path in ConnectionStrings");
 
                 client.BaseAddress = new Uri(conn);
             });

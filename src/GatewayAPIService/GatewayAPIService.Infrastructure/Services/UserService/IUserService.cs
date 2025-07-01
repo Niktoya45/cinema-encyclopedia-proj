@@ -3,6 +3,7 @@ using Shared.UserDataService.Models.UserDTO;
 using Shared.UserDataService.Models.LabeledDTO;
 using Shared.UserDataService.Models.RatingDTO;
 using Shared.UserDataService.Models.Flags;
+using Shared.CinemaDataService.Models.SharedDTO;
 
 namespace GatewayAPIService.Infrastructure.Services.UserService
 {
@@ -19,12 +20,13 @@ namespace GatewayAPIService.Infrastructure.Services.UserService
         /* User Post Requests */
         Task<UserResponse?> Create(CreateUserRequest user, CancellationToken ct);
         Task<LabeledResponse?> CreateForLabeledList(string userId, CreateLabeledRequest labeled, CancellationToken ct);
-        Task<RatingResponse?> CreateForRatingList(string userId, CreateRatingRequest rating, CancellationToken ct);
 
         /******/
 
         /* User Put Requests */
         Task<UserResponse?> Update(string id, UpdateUserRequest user, CancellationToken ct);
+        Task<UpdatePictureResponse?> UpdatePhoto(string userId, UpdatePictureRequest picture, CancellationToken ct);
+        Task<RatingResponse?> UpdateRatingList(string userId, UpdateUserRatingRequest rating, CancellationToken ct);
 
         /******/
 

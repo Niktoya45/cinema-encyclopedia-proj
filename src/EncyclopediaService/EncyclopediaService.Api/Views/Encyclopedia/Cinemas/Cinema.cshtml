@@ -39,9 +39,11 @@
 
         <!-- Edit Film Poster Popup -->
         <form-popup id="modal-edit-poster" form="form-edit-poster" title="Choose poster picture" lock="true" save-close="true" scroll="true">
-            <form id="form-edit-poster" asp-page-handler="editPoster" class="trim-inputs" method="post" enctype="multipart/form-data">        
-                <partial name="_EditPoster" model="Model.EditPoster" />
-            </form>
+            <div class="container-fluid">
+                <form id="form-edit-poster" asp-page-handler="editPoster" class="trim-inputs" method="post" enctype="multipart/form-data">        
+                    <partial name="_EditPoster" model="Model.EditPoster" />
+                </form>
+            </div>
         </form-popup>
 
         <!-- Edit Starring Popup -->

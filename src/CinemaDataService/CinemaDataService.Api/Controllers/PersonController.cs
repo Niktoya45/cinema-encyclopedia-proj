@@ -23,6 +23,7 @@ namespace CinemaDataService.Api.Controllers
 
         private readonly IMediator _mediator;
         private readonly Func<PersonsQuery, PersonsQueryCommonWrapper> _wrapPersonsQuery = (PersonsQuery query) => new PersonsQueryCommonWrapper(query);
+        private readonly Func<FilmographyQuery, FilmographyQueryCommonWrapper> _wrapFilmographyQuery = (FilmographyQuery query) => new FilmographyQueryCommonWrapper(query);
 
         public PersonController(IMediator mediator)
         {
@@ -191,7 +192,7 @@ namespace CinemaDataService.Api.Controllers
             [FromRoute] string filmographyId
             )
         {
-            var response = await _mediator.Send(new PersonFilmographyQuery(personId, filmographyId), ct);
+            var response = await _mediator.Send(_wrapFilmographyQuery(new PersonFilmographyQuery(personId, filmographyId)), ct);
 
             return Ok(response);
         }
