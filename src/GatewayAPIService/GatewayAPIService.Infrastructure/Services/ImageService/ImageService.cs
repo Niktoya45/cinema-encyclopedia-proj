@@ -7,6 +7,7 @@ namespace GatewayAPIService.Infrastructure.Services.ImageService
 {
     public class ImageService:IImageService
     {
+        const string imagesUri = "/api/images";
 
         HttpClient _imageHttpClient;
 
@@ -15,36 +16,38 @@ namespace GatewayAPIService.Infrastructure.Services.ImageService
         }
         public async Task<string?> GetImage(string id, ImageSize sizes) 
         {
-            return await _imageHttpClient.GetFromJsonAsync<string>($"images?id={id}&sizes={sizes}");
+            var response = await _imageHttpClient.GetFromJsonAsync<ImageResponse>(imagesUri + $"?id={id}&size={sizes}");
+
+            return response is null ? null : response.Uris[sizes];
         }
-        public async Task<string?> AddImage(string id, string imageBase64, ImageSize sizes) 
+        public async Task<string?> AddImage(string id, string imageBase64, ImageSize sizes, ImageSize targetSize) 
         {
 
             AddImageRequest payload = new AddImageRequest { Id = id, FileBase64 = imageBase64, Size = sizes};
 
-            var response = await _imageHttpClient.PostAsJsonAsync<AddImageRequest>("images", payload);
+            var response = await _imageHttpClient.PostAsJsonAsync<AddImageRequest>(imagesUri, payload);
 
             if (response.IsSuccessStatusCode)
             {
-                ImageResponse? body = await response.Content.ReadFromJsonAsync<ImageResponse>()??throw new Exception("Achtung11! Null body on image POST :(");
+                ImageResponse? responseImage = await response.Content.ReadFromJsonAsync<ImageResponse>();
 
-                return body.Id;
+                return responseImage is null ? null : responseImage.Uris[targetSize];
             }
 
             return null;
         }
-        public async Task<string?> ReplaceImage(string id, string newId, string imageBase64, ImageSize sizes) 
+        public async Task<string?> ReplaceImage(string id, string newId, string imageBase64, ImageSize sizes, ImageSize targetSize) 
         {
 
             ReplaceImageRequest payload = new ReplaceImageRequest { Id = id, NewId = newId, FileBase64 = imageBase64, Size = sizes };
 
-            var response = await _imageHttpClient.PutAsJsonAsync<ReplaceImageRequest>("images", payload);
+            var response = await _imageHttpClient.PutAsJsonAsync<ReplaceImageRequest>(imagesUri, payload);
 
             if (response.IsSuccessStatusCode)
             {
-                ImageResponse? body = await response.Content.ReadFromJsonAsync<ImageResponse>() ?? throw new Exception("Achtung11! Null body on image PUT :(");
+                ImageResponse? responseImage = await response.Content.ReadFromJsonAsync<ImageResponse>();
 
-                return body.Id;
+                return responseImage is null ? null : responseImage.Uris[targetSize];
             }
 
             return null;

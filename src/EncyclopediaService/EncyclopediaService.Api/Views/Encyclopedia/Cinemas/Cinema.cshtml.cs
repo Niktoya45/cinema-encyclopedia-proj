@@ -2,17 +2,19 @@
 using EncyclopediaService.Api.Models;
 using EncyclopediaService.Api.Models.Display;
 using EncyclopediaService.Api.Models.Edit;
+using EncyclopediaService.Api.Models.Test;
+using EncyclopediaService.Api.Models.TestData;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.GatewayService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Shared.CinemaDataService.Models.CinemaDTO;
+using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
-using Shared.CinemaDataService.Models.Flags;
 using Shared.ImageService.Models.Flags;
 using Shared.ImageService.Models.ImageDTO;
+using Shared.UserDataService.Models.LabeledDTO;
 using Shared.UserDataService.Models.Flags;
-using EncyclopediaService.Api.Models.Test;
-using EncyclopediaService.Api.Models.TestData;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 {
@@ -42,6 +44,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
         [BindProperty]
         public EditImage? EditPoster { get; set; }
 
+        [BindProperty(SupportsGet=true)]
         public float UserScore { get; set; }
 
         public Label UserLabel { get; set; }
@@ -52,11 +55,69 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             _settings = settings;
         }
 
-        public async Task<IActionResult> OnGet(string id) 
+        public async Task<IActionResult> OnGet([FromRoute] string id, CancellationToken ct) 
         {
-            // send data request instead of block below
+            if (TestEntities.Used)
+            {
+                Cinema = TestEntities.Cinema;
+                UserScore = 5;
+            }
+                
+            else
+            {
+                var response = await _gatewayService.GetCinemaById(id, ct);
 
-            Cinema = TestEntities.Cinema;
+                if (response is null)
+                {
+                    return RedirectToPage("/Index");
+                }
+
+                Cinema = new Cinema
+                {
+                    Id = response.Id,
+                    Name = response.Name,
+                    Picture = response.Picture,
+                    PictureUri = response.PictureUri,
+                    ReleaseDate = response.ReleaseDate,
+                    Genres = response.Genres,
+                    Language = response.Language,
+                    RatingScore = response.Rating.Score,
+                    Description = response.Description,
+
+                };
+
+                Cinema.Starrings = response.Starrings.Select(s => new EncyclopediaService.Api.Models.Display.Starring
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Picture = s.Picture,
+                    PictureUri = s.PictureUri,
+                    Jobs = s.Jobs,
+                    RoleName = s.RoleName,
+                    RolePriority = s.RolePriority
+                }).ToArray();
+
+                Cinema.ProductionStudios = response.ProductionStudios.Select(s => new ProductionStudio
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Picture = s.Picture,
+                    PictureUri = s.PictureUri
+                }).ToArray();
+
+                if (User.IsLoggedIn())
+                {
+                    string userId = User.GetId();
+
+                    var responseScore = await _gatewayService.GetUserRatingFor(userId, id, ct);
+                    var responseLabels = await _gatewayService.GetUserLabelFor(userId, id, ct);
+
+                    Label setLabel = responseLabels is null || responseLabels.LabeledCinemas.Count == 0 ? Label.None : responseLabels.LabeledCinemas.FirstOrDefault().Label;
+
+                    UserScore = responseScore is null ? 0.0f : (float)responseScore.Rating;
+                    UserLabel =  setLabel;
+                }
+            }
 
             EditMain = new EditMainCinema { Id = Cinema.Id, Name = Cinema.Name, ReleaseDate = Cinema.ReleaseDate, Language = Cinema.Language, Genres = Cinema.Genres, Description = Cinema.Description };
 
@@ -69,9 +130,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             return Page();
         }
 
-        public async Task<IActionResult> OnPostEditCinema([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditCinema([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: convert EditCinema to Cinema and send put request to mediatre proxy
             ModelState.Remove("JobsBind");
 
             if (!ModelState.IsValid)
@@ -79,39 +139,88 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 return OnPostReuseEditMain(true);
             }
 
-            if (EditMain != null) 
+            if (EditMain != null && !TestEntities.Used) 
             {
-                //var response = _gateway.UpdateCinema(Cinema); 
-                //return Ok(response);
+                var response = await _gatewayService.UpdateCinemaMain(id, new UpdateCinemaRequest
+                {
+                    Name = EditMain.Name,
+                    ReleaseDate = EditMain.ReleaseDate,
+                    Genres = EditMain.GenresBind.Aggregate((acc, g) => acc | g),
+                    Language = EditMain.Language.GetValueOrDefault(),
+                    Description = EditMain.Description,
+                }, ct); 
             }
 
             return new OkResult();
         }
 
-        public async Task<IActionResult> OnPostDeleteCinema([FromRoute] string id) 
+        public async Task<IActionResult> OnPostDeleteCinema([FromRoute] string id, CancellationToken ct) 
         {
+            if (!TestEntities.Used)
+            {
+                bool response = await _gatewayService.DeleteCinema(id, ct);
+            }
+
             return new OkObjectResult(id);
         }
 
-        public async Task<IActionResult> OnPostRate([FromRoute] string id, [FromForm] byte score)
+        public async Task<IActionResult> OnPostRate([FromRoute] string id, [FromForm] byte score, CancellationToken ct)
         {
-            UserScore = score;
+            if(!TestEntities.Used)
+            {
+                if (!User.IsLoggedIn())
+                    return new OkObjectResult(0);
 
-            return new OkObjectResult(UserScore);
+                string userId = User.GetId();
+
+                var response = await _gatewayService.UpdateRatingList(userId, new UpdateRatingRequest {
+                    Id = id,
+                    Rating = score,
+                    OldRating = UserScore // add value to form
+                }, ct);
+            }
+
+            return new OkObjectResult(score);
         }
 
-        public async Task<IActionResult> OnPostLabel([FromRoute] string id, [FromForm] int label)
+        public async Task<IActionResult> OnPostLabel([FromRoute] string id, [FromForm] int label, CancellationToken ct)
         {
+            bool remove = label < 0;
 
-            if (label < 0)
+            if (remove)
             {
                 UserLabel = (Label)(-label);
             }
             else {
                 UserLabel = (Label)(label);
             }
-            
-            return new OkObjectResult((byte)UserLabel);
+
+            if (!TestEntities.Used)
+            {
+                if (!User.IsLoggedIn())
+                    return new OkObjectResult(0);
+
+                string userId = User.GetId();
+
+                if (remove)
+                {
+                    var response = await _gatewayService.DeleteFromLabeledList(userId, id, UserLabel, ct);
+
+                    return new OkObjectResult(new { label = (byte)response.Label });
+                }
+                else 
+                {
+                    var response = await _gatewayService.CreateForLabeledList(userId, new CreateLabeledRequest
+                    {
+                        CinemaId = id,
+                        Label = UserLabel
+                    }, ct);
+
+                    return new OkObjectResult(new { label = (byte)response.Label });
+                }
+            }
+
+            return new OkObjectResult(new { label = (byte)UserLabel });
         }
 
         public async Task<IActionResult> OnPostEditPoster([FromRoute] string id, CancellationToken ct)
@@ -135,7 +244,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             string HashImage = EditPoster.Image.OpenReadStream().ToBase64();
 
             var response = await _gatewayService.UpdateCinemaPhoto(id, new ReplaceImageRequest { 
-                Id = EditPoster.ImageId, 
+                Id = EditPoster.ImageId??"0", 
                 NewId = HashName, Size = (ImageSize)31, 
                 FileBase64 = HashImage },
                 ct);
@@ -148,7 +257,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             return new OkObjectResult(response);
         }
 
-        public async Task<IActionResult> OnPostAddProductionStudio([FromRoute] string id)
+        public async Task<IActionResult> OnPostAddProductionStudio([FromRoute] string id, CancellationToken ct)
         {
             // Implement: set ParentId and send NewProductionStudio to mediatre proxy 
             ClearExtra();
@@ -158,27 +267,45 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 return OnPostReuseAddProductionStudio(true);
             }
 
+            if (!TestEntities.Used && EditStudio != null && EditStudio.Id != null)
+            {
+                var response = await _gatewayService.CreateCinemaProductionStudioFor(id, new CreateProductionStudioRequest
+                {
+                    Id = EditStudio.Id,
+                    Name = EditStudio.Name,
+                    Picture = EditStudio.Picture
+                }, ct);
+            }
+
             return Partial("_StudioLogoCard", new ProductionStudio
             {
                 ParentId = null,
-                Id = EditStarring.Id,
-                Name = EditStarring.Name,
-                Picture = EditStarring.Picture,
-                PictureUri = EditStarring.PictureUri
+                Id = EditStudio.Id,
+                Name = EditStudio.Name,
+                Picture = EditStudio.Picture,
+                PictureUri = EditStudio.PictureUri
             });
         }
 
-        public async Task<IActionResult> OnPostDeleteProductionStudio([FromRoute] string id)
+        public async Task<IActionResult> OnPostDeleteProductionStudio([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: send delete request specifying ParentId and Id to mediatre proxy
+            if (!TestEntities.Used && RecordId != null)
+            {
+                if (RecordId != null)
+                { 
+                    var response = await _gatewayService.DeleteCinemaProductionStudio(id, RecordId, ct);
+
+                    if(response)
+                        return new OkObjectResult(RecordId);
+                }
+                return new OkObjectResult(null);
+            }
 
             return new OkObjectResult(RecordId);
         }
 
-        public async Task<IActionResult> OnPostAddStarring([FromRoute] string id)
+        public async Task<IActionResult> OnPostAddStarring([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: convert EditStarring object to Starring, set ParentId and send post request to mediatre proxy
-
             ModelState.Remove("GenresBind");
 
             if (!ModelState.IsValid)
@@ -186,9 +313,22 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 return OnPostReuseAddStarring(true);
             }
 
+            if (!TestEntities.Used && EditStarring != null && EditStarring.Id != null)
+            {
+                var response = await _gatewayService.CreateCinemaStarringFor(id, new CreateStarringRequest
+                {
+                    Id = EditStarring.Id,
+                    Name = EditStarring.Name,
+                    Picture = EditStarring.Picture,
+                    Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j),
+                    RoleName = EditStarring.RoleName,
+                    RolePriority = EditStarring.RolePriority.GetValueOrDefault()
+                }, ct);
+            }
+
             EditStarring.Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j);
 
-            return Partial("_StarringCard", new Starring
+            return Partial("_StarringCard", new EncyclopediaService.Api.Models.Display.Starring
             {
                 ParentId = null,
                 Id = EditStarring.Id,
@@ -201,10 +341,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             });
         }
 
-        public async Task<IActionResult> OnPostEditStarring([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditStarring([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: convert EditStarring object to Starring, set ParentId and send put request to mediatre proxy
-
             ModelState.Remove("GenresBind");
 
             if (!ModelState.IsValid)
@@ -212,9 +350,21 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 return OnPostReuseEditStarring(true);
             }
 
+            if (!TestEntities.Used && EditStarring != null && EditStarring.Id != null)
+            {
+                var response = await _gatewayService.UpdateCinemaStarring(id, EditStarring.Id, new UpdateStarringRequest
+                {
+                    Name = EditStarring.Name,
+                    Picture = EditStarring.Picture,
+                    Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j),
+                    RoleName = EditStarring.RoleName,
+                    RolePriority = EditStarring.RolePriority.GetValueOrDefault()
+                }, ct);
+            }
+
             EditStarring.Jobs = EditStarring.JobsBind.Aggregate((acc, j) => acc | j);
 
-            return Partial("_StarringCard", new Starring
+            return Partial("_StarringCard", new EncyclopediaService.Api.Models.Display.Starring
             {
                 ParentId = null,
                 Id = EditStarring.Id,
@@ -227,9 +377,18 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             });
         }
 
-        public async Task<IActionResult> OnPostDeleteStarring([FromRoute] string id)
+        public async Task<IActionResult> OnPostDeleteStarring([FromRoute] string id, CancellationToken ct)
         {
             // Implement: send delete request with ParentId and Id to mediatre proxy
+            if (!TestEntities.Used)
+            {
+                var response = await _gatewayService.DeleteCinemaStarring(id, RecordId, ct);
+
+                if (!response)
+                {
+                    return new OkObjectResult(null);
+                }
+            }
 
             return new OkObjectResult(RecordId);
         }
@@ -238,41 +397,62 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             CancellationToken ct,
             [FromRoute] string id, [FromForm] string recordId, [FromForm] string search)
         {
-            // transfer data instead of below
-
             if (recordId == "" || recordId is null)
             {
                 IEnumerable<SearchResponse> response = new List<SearchResponse>();
 
-                response = TestRecords.SearchList(search);
+                if (TestRecords.Used)
+                    response = TestRecords.SearchList(search);
+                else
+                {
+                    response = await _gatewayService.GetStudiosBySearch(search, ct, new Pagination(0, 5));
+                }
 
                 return new OkObjectResult(response);
             }
-
             else
             {
-                return new OkObjectResult(TestRecords.SearchRecord(search));
+                if(TestRecords.Used)
+                    return new OkObjectResult(TestRecords.SearchRecord(search));
+                else
+                {
+                    var response = await _gatewayService.GetStudiosByIds(new string[] { recordId }, ct, null);
+
+                    return new OkObjectResult( response is null ? null : response.Response.FirstOrDefault());
+                }
             }
 
         }
 
         public async Task<IActionResult> OnPostSearchStarring(
             CancellationToken ct,
-            [FromRoute] string id, [FromForm] string recordId, [FromForm] string search)
+            [FromRoute] string id, [FromForm] string? recordId, [FromForm] string? search)
         {
             // transfer data instead of below
 
             if (recordId == "" || recordId is null)
             {
-                IEnumerable<SearchResponse> response = new List<SearchResponse>();
+                IEnumerable<SearchResponse>? response = new List<SearchResponse>();
 
-                response = TestRecords.SearchList(search);
+                if (TestRecords.Used)
+                    response = TestRecords.SearchList(search);
+                else
+                {
+                    response = await _gatewayService.GetPersonsBySearch(search, ct, new Pagination(0, 5));
+                }
 
                 return new OkObjectResult(response);
             }
             else
             {
-                return new OkObjectResult(TestRecords.SearchRecord(search));
+                if (TestRecords.Used)
+                    return new OkObjectResult(TestRecords.SearchRecord(search));
+                else
+                {
+                    var response = await _gatewayService.GetPersonsByIds(new string[] { recordId }, ct, null);
+
+                    return new OkObjectResult(response is null ? null : response.Response.FirstOrDefault());
+                }
             }
 
         }

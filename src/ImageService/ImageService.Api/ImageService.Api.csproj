@@ -17,4 +17,12 @@
     <ProjectReference Include="..\ImageService.Infrastructure\ImageService.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\intest\big\" />
+    <Folder Include="wwwroot\images\intest\large\" />
+    <Folder Include="wwwroot\images\intest\medium\" />
+    <Folder Include="wwwroot\images\intest\small\" />
+    <Folder Include="wwwroot\images\intest\tiny\" />
+  </ItemGroup>
+
 </Project>

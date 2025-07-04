@@ -149,7 +149,7 @@
                                 @foreach (var studio in Model._filterOptions.StudiosChoice)
                                 {
                                     <div class="form-check col-8 offset-4">
-                                        <input class="form-check-input form-submit" type="checkbox" value="@studio.Id" id="options-studio-@studio" name="studiosdind" checked="@(Model._filterOptions.StudiosBind.Exists(sid => sid == studio.Id))">
+                                        <input class="form-check-input form-submit" type="checkbox" value="@studio.Id" id="options-studio-@studio" name="studiosbind" checked="@(Model._filterOptions.StudiosBind.Exists(sid => sid == studio.Id))">
                                         <label class="form-check-label" for="option-studio-@studio">
                                             @studio.Name
                                         </label>

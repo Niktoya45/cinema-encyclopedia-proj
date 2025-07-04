@@ -1,4 +1,6 @@
 ﻿@page "{id}/marked"
+@using Shared.UserDataService.Models.Flags;
+@using ProfileService.Api.Models.Display;
 @using ProfileService.Api.Extensions;
 @model ProfileService.Api.Views.Profiles.MarkedModel
 @{
@@ -142,7 +144,7 @@
 													</thead>
 
 													<tbody>
-														@foreach (CinemaRecord record in Model.List.Where(r => r.Label == (Label)mark))
+														@foreach (Marked record in Model.List.Where(r => r.Label == (Label)mark))
 														{
 															q++;
 															<tr class="record">
@@ -163,7 +165,7 @@
 																	{
 																		<form method="post" >
 																			<button id="delete-record-@record.Id" value="@record.Id" class="btn-close position-absolute del-record"
-																			formaction="?handler=Delete&cinemaId=@record.Id" aria-label="Delete" type="submit"></button>
+																			formaction="?handler=Delete&cinemaId=@record.Id&label=@record.Label" aria-label="Delete" type="submit"></button>
 																		</form>
 																	}
 																</td>

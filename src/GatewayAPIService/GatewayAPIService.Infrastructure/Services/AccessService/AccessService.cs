@@ -20,7 +20,7 @@ namespace GatewayAPIService.Infrastructure.Services.AccessService
         { 
             var response = await _httpClient.GetAsync(accessUri + $"/{userId}/role", ct);
 
-            return await response.HandleResponse<string>();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /******/
@@ -29,15 +29,15 @@ namespace GatewayAPIService.Infrastructure.Services.AccessService
 
         public async Task<string?> GrantRole(string userId, string role, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(accessUri + $"/{userId}/grant-role", role, ct);
+            var response = await _httpClient.PutAsync(accessUri + $"/{userId}/grant-role?rolename={role}",null, ct);
 
-            return await response.HandleResponse<string>();
+            return await response.Content.ReadAsStringAsync();
         }
         public async Task<string?> RevokeRole(string userId, string role, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(accessUri + $"/{userId}/revoke-role", role, ct);
+            var response = await _httpClient.PutAsync(accessUri + $"/{userId}/revoke-role?rolename={role}",null, ct);
 
-            return await response.HandleResponse<string>(); 
+            return await response.Content.ReadAsStringAsync();
         }
 
         /******/

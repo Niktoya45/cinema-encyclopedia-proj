@@ -20,6 +20,8 @@ var searchButton = document.getElementById("layout-search-submit");
 
 if (searchSelect && searchForm) {
     searchSelect.selectedIndex = Array.from(searchSelect.options).findIndex(o => window.location.pathname.includes(o.value));
+    if (searchSelect.selectedIndex == -1) searchSelect.selectedIndex = 0;
+
     searchForm.action = searchSelect.selectedOptions[0].firstElementChild.href;
 
     searchSelect.addEventListener('change', function (e) {

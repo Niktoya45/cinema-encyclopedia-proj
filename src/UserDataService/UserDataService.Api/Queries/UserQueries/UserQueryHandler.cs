@@ -22,7 +22,7 @@ namespace UserDataService.Api.Queries.UserQueries
             User? user = await _repository.FindById(request.Id, cancellationToken);
 
             if (user == null) {
-                new NotFoundException(request.Id, "Users");
+                throw new NotFoundException(request.Id, "Users");
             }
 
 

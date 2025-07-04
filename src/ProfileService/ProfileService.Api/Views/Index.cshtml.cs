@@ -45,7 +45,7 @@ namespace ProfileService.Api.Views
         {
             string? keyAF = SetAF();
 
-            return RedirectOuter(_baseGateway + $"/encyclopedia{path??""}", keyAF);
+            return RedirectOuter(_baseGateway + $"/encyclopedia{path??"/index"}", keyAF);
         }
 
         public async Task<IActionResult> OnGetProfile([FromQuery] string? id = null, [FromQuery] string? path = null)

@@ -1,4 +1,4 @@
-﻿namespace ProfileService.Api.Models
+﻿namespace ProfileService.Api.Models.Display
 {
     public class Profile
     {

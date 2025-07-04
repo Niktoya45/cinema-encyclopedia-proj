@@ -21,14 +21,15 @@ namespace ProfileService.Infrastructure.Services.GatewayService
 
         /* User PUT Requests */
         Task<UserResponse?> UpdateUser(string id, UpdateUserRequest user, CancellationToken ct);
-        Task<string?> AddUserRole(string id, string user, CancellationToken ct);
-        Task<string?> RemoveUserRole(string id, string user, CancellationToken ct);
+        Task<string?> AddUserRole(string id, string role, CancellationToken ct);
+        Task<string?> RemoveUserRole(string id, string role, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdateUserPhoto(string userId, ReplaceImageRequest picture, CancellationToken ct);
 
         /******/
 
         /* User DELETE Requests */
-        Task<bool> DeleteFromLabeledList(string userId, string cinemaId, CancellationToken ct);
+        Task<bool> Delete(string id, CancellationToken ct);
+        Task<bool> DeleteFromLabeledList(string userId, string cinemaId, Label label, CancellationToken ct);
 
         /******/
 

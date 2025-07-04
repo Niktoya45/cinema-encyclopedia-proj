@@ -5,10 +5,10 @@ using EncyclopediaService.Api.Models.Test;
 using EncyclopediaService.Api.Models.TestData;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.GatewayService;
-using EncyclopediaService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.CinemaDataService.Models.StudioDTO;
 using Shared.ImageService.Models.Flags;
 using Shared.ImageService.Models.ImageDTO;
 
@@ -43,10 +43,44 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             _settings = settings;
         }
 
-        public async Task<IActionResult> OnGet([FromRoute] string id)
+        public async Task<IActionResult> OnGet([FromRoute] string id, CancellationToken ct)
         {
 
-            Studio = TestEntities.Studio;
+            if (TestEntities.Used)
+            {
+                Studio = TestEntities.Studio;
+            }
+            else
+            {
+                var response = await _gatewayService.GetStudioById(id, ct);
+
+                if (response is null)
+                {
+                    return RedirectToPage("/Index");
+                }
+
+                Studio = new Studio
+                {
+                    Id = response.Id,
+                    Name = response.Name,
+                    Picture = response.Picture,
+                    PictureUri = response.PictureUri,
+                    FoundDate = response.FoundDate,
+                    PresidentName = response.PresidentName,
+                    Country = response.Country,
+                    Description = response.Description,
+
+                };
+
+                Studio.Filmography = response.Filmography.Select(s => new FilmographyRecord
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Year = s.Year,
+                    Picture = s.Picture,
+                    PictureUri = s.PictureUri
+                }).ToArray();
+            }
 
             EditMain = new EditMainStudio { Id = Studio.Id, Name = Studio.Name, FoundDate = Studio.FoundDate, Country = Studio.Country, PresidentName = Studio.PresidentName, Description = Studio.Description };
 
@@ -58,7 +92,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             return Page();
         }
 
-        public async Task<IActionResult> OnPostEditStudio([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditStudio([FromRoute] string id, CancellationToken ct)
         {
 
             if (!ModelState.IsValid)
@@ -66,21 +100,41 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
                 return OnPostReuseEditMain(true);
             }
 
-            if (EditMain != null)
+            if (EditMain != null && !TestEntities.Used)
             {
-                EditMain.Id = id;
+                var response = await _gatewayService.UpdateStudioMain(id, new UpdateStudioRequest
+                {
+                    Name = EditMain.Name,
+                    FoundDate = EditMain.FoundDate,
+                    PresidentName = EditMain.PresidentName,
+                    Country = EditMain.Country,
+                    Description = EditMain.Description,
+                }, ct);
             }
 
             return new OkResult();
         }
 
-        public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id)
+        public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: set ParentId and send post NewFilmography to mediatre proxy 
-
             if (!ModelState.IsValid)
             {
                 return OnPostReuseAddFilmography(true);
+            }
+
+            if (!TestEntities.Used && EditFilm != null && EditFilm.Id != null)
+            {
+                var response = await _gatewayService.CreateStudioFilmographyFor(id, new Shared.CinemaDataService.Models.RecordDTO.CreateFilmographyRequest
+                {
+                    Id = EditFilm.Id,
+                    Name = EditFilm.Name,
+                    Picture = EditFilm.Picture
+                }, ct);
+
+                if (response is null)
+                {
+                    return new OkObjectResult(null);
+                }
             }
 
             return Partial("_FilmCard", new FilmographyRecord
@@ -93,9 +147,14 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             });
         }
 
-        public async Task<IActionResult> OnPostDeleteFilmography([FromRoute] string id)
+        public async Task<IActionResult> OnPostDeleteFilmography([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: send delete request specifying ParentId and Id to mediatre proxy
+            if(TestEntities.Used && RecordId != null)
+            {
+                var response = await _gatewayService.DeleteStudioFilmography(id, RecordId, ct);
+
+                if (!response) return new OkObjectResult(null);
+            }
 
             return new OkObjectResult(RecordId);
         }
@@ -147,14 +206,27 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             {
                 IEnumerable<SearchResponse> response = new List<SearchResponse>();
 
-                response = TestRecords.SearchList(search);
+                if (TestRecords.Used)
+                    response = TestRecords.SearchList(search);
+                else
+                {
+                    response = await _gatewayService.GetCinemasBySearch(search, ct, new Pagination(0, 5));
+                }
 
                 return new OkObjectResult(response);
             }
-
             else
             {
-                return new OkObjectResult(TestRecords.SearchRecord(search));
+                if (TestRecords.Used)
+                {
+                    return new OkObjectResult(TestRecords.SearchRecord(search));
+                }
+                else
+                {
+                    var response = await _gatewayService.GetCinemasByIds(new string[] { recordId }, ct, null);
+
+                    return new OkObjectResult(response);
+                }
             }
 
         }

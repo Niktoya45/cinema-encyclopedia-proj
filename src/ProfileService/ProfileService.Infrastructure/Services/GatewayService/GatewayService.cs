@@ -40,7 +40,7 @@ namespace ProfileService.Infrastructure.Services.GatewayService
         {
             var response = await _httpClient.GetAsync(usersUri + $"/{userId}/role", ct);
 
-            return await response.HandleResponse<string>();
+            return await response.Content.ReadAsStringAsync();
         }
 
         /******/
@@ -54,15 +54,15 @@ namespace ProfileService.Infrastructure.Services.GatewayService
         }
         public async Task<string?> AddUserRole(string id, string role, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync<string>(usersUri + $"/{id}/grant-role", role, ct);
+            var response = await _httpClient.PutAsync(usersUri + $"/{id}/grant-role?role={role}", null, ct);
 
-            return await response.HandleResponse<string>();
+            return await response.Content.ReadAsStringAsync();
         }
         public async Task<string?> RemoveUserRole(string id, string role, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync<string>(usersUri + $"/{id}/revoke-role", role, ct);
+            var response = await _httpClient.PutAsync(usersUri + $"/{id}/revoke-role?role={role}", null, ct);
 
-            return await response.HandleResponse<string>();
+            return await response.Content.ReadAsStringAsync();
         }
         public async Task<UpdatePictureResponse?> UpdateUserPhoto(string userId, ReplaceImageRequest picture, CancellationToken ct)
         {
@@ -74,9 +74,16 @@ namespace ProfileService.Infrastructure.Services.GatewayService
         /******/
 
         /* User DELETE Requests */
-        public async Task<bool> DeleteFromLabeledList(string userId, string cinemaId, CancellationToken ct)
+
+        public async Task<bool> Delete(string userId, CancellationToken ct)
         {
-            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}/label/{cinemaId}", ct);
+            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}", ct);
+
+            return response.IsSuccessStatusCode;
+        }
+        public async Task<bool> DeleteFromLabeledList(string userId, string cinemaId, Label label, CancellationToken ct)
+        {
+            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}/label/{cinemaId}" + (label == Label.None ? "" : $"/{label}"), ct);
 
             return response.IsSuccessStatusCode;
         }

@@ -6,7 +6,10 @@ namespace CinemaDataService.Api.Queries.PersonQueries
 {
     public class PersonsQueryCommonWrapper : IRequest<Page<PersonsResponse>>
     {
-        public PersonsQueryCommonWrapper(PersonsQuery query) { }
+        public PersonsQueryCommonWrapper(PersonsQuery query) 
+        {
+            Query = query;
+        }
 
         public PersonsQuery Query { get; }
     }

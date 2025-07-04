@@ -62,7 +62,44 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
+            }
+
+            foreach (StudiosResponse studio in response.Response)
+            {
+                if (studio.Picture != null)
+                {
+                    studio.PictureUri = await _imageService.GetImage(studio.Picture, ImageSize.Medium);
+                }
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all studios by indexes and optional sort criteria
+        /// </summary>
+        /// <param name="ids">index list</param>
+        /// <param name="st">sort parameters (optional)</param>
+        /// <returns>All studios list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found for this user</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpPost("indexes")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsync(
+            CancellationToken ct,
+            [FromBody] string[] ids,
+            [FromQuery] SortBy? st = null
+            )
+        {
+            Page<StudiosResponse>? response = await _studioService.GetByIds(ids, ct, st);
+
+            if (response is null)
+            {
+                return NotFound();
             }
 
             foreach (StudiosResponse studio in response.Response)
@@ -83,7 +120,7 @@ namespace GatewayAPIService.Api.Controllers
         /// <returns>Updated task instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">None instance is found</response>
-        [HttpGet("search")]
+        [HttpGet("search/{search}")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -97,7 +134,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (SearchResponse studio in response)
@@ -105,6 +142,41 @@ namespace GatewayAPIService.Api.Controllers
                 if (studio.Picture != null)
                 {
                     studio.PictureUri = await _imageService.GetImage(studio.Picture, ImageSize.Tiny);
+                }
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Search by studio name
+        /// </summary>
+        /// <param name="search">string tokens to use</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">None instance is found</response>
+        [HttpGet("search-page/{search}")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchPage(
+            CancellationToken ct,
+            [FromRoute] string search,
+            [FromQuery] Pagination? pg = null
+        )
+        {
+            Page<StudiosResponse>? response = await _studioService.GetBySearchPage(search, ct, pg);
+
+            if (response is null)
+            {
+                return NotFound();
+            }
+
+            foreach (StudiosResponse studio in response.Response)
+            {
+                if (studio.Picture != null)
+                {
+                    studio.PictureUri = await _imageService.GetImage(studio.Picture, ImageSize.Medium);
                 }
             }
 
@@ -136,7 +208,48 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
+            }
+
+            foreach (StudiosResponse studio in response.Response)
+            {
+                if (studio.Picture != null)
+                {
+                    studio.PictureUri = await _imageService.GetImage(studio.Picture, ImageSize.Medium);
+                }
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all studios by provided year with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="lower">year span lower boundary (>=)</param>
+        /// <param name="upper">year span upper boundary (<)</param>
+        /// <param name="st">sort parameters</param>
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All studios list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found for this user</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("year")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> YearSpan(
+            CancellationToken ct,
+            [FromQuery] int[] lys,
+            [FromQuery] int d,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            Page<StudiosResponse>? response = await _studioService.GetByYearSpans(lys, d, ct, st, pg);
+
+            if (response is null)
+            {
+                return NotFound();
             }
 
             foreach (StudiosResponse studio in response.Response)
@@ -175,7 +288,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (StudiosResponse studio in response.Response)
@@ -208,7 +321,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             if (response.Picture != null)
@@ -243,12 +356,48 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateStudioRequest request
             )
         {
+            Page<CinemasResponse>? responseFilm;
+            CinemasResponse? filmRecord;
+
+            if (request.Filmography != null && request.Filmography.Any())
+            {
+                foreach (var film in request.Filmography)
+                {
+                    responseFilm = await _cinemaService.GetByIds(new string[] { film.Id }, ct, null);
+
+
+                    if (responseFilm == null) continue;
+
+                    filmRecord = responseFilm.Response.FirstOrDefault();
+
+                    if (filmRecord == null) continue;
+
+                    film.Name = filmRecord.Name;
+                    film.Year = filmRecord.Year;
+                    film.Picture = filmRecord.Picture;
+                }
+            }
+
             StudioResponse? response = await _studioService.Create(request, ct);
 
             if (response is null)
             {
                 return BadRequest(request);
             }
+
+            if (request.Filmography != null && request.Filmography.Any())
+            {
+                foreach (var film in request.Filmography)
+                {
+                    await _cinemaService.CreateProductionStudioFor(film.Id, new CreateProductionStudioRequest
+                    {
+                        Id = response.Id,
+                        Name = response.Name,
+                        Picture = response.Picture
+                    }, ct);
+                }
+            }
+
 
             return Ok(response);
         }
@@ -272,7 +421,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (cinema is null)
             {
-                return BadRequest(request.Id);
+                return NotFound(request.Id);
             }
 
             request.Name = cinema.Name;
@@ -283,7 +432,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (studio is null)
             {
-                return BadRequest(studioId);
+                return NotFound(studioId);
             }
 
             FilmographyResponse? response = null;
@@ -300,7 +449,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest(request.Id);
+                return NotFound(request.Id);
             }
 
             ProductionStudioResponse? responseBack = await _cinemaService.CreateProductionStudioFor(
@@ -340,41 +489,51 @@ namespace GatewayAPIService.Api.Controllers
         {
             var response = await _studioService.Update(id, request, ct);
 
-            UpdateProductionStudioRequest? updateRecord = new UpdateProductionStudioRequest
+            if (response.Picture != null)
             {
-                Name = response.Name,
-                Picture = response.Picture
-            };
-
-            ProductionStudioResponse? compareRecord = null;
-
-            bool? studioCommonsEquals = null;
-
-
-            if (response.Filmography != null)
-            {
-                compareRecord ??= await _cinemaService.GetProductionStudioById(response.Filmography.FirstOrDefault().Id, id, ct);
-
-                studioCommonsEquals ??= updateRecord.SameCommons(compareRecord);
-
-                foreach (FilmographyResponse filmography in response.Filmography)
-                {
-
-                    if (!studioCommonsEquals.GetValueOrDefault())
-                    {
-                        await _cinemaService.UpdateProductionStudio(
-                            filmography.Id,
-                            id,
-                            updateRecord,
-                            ct);
-                    }
-
-                    if (filmography.Picture != null)
-                    {
-                        filmography.PictureUri = await _imageService.GetImage(filmography.Picture, ImageSize.Small);
-                    }
-                }
+                response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
             }
+
+            if (response is null)
+            {
+                return NotFound();
+            }
+
+            await UpdateAdditional(response, ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update studio's main information with provided request parameters
+        /// </summary>
+        /// <param name="id">id of studio to be updated</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Studio is not found</response>
+        [HttpPut("{id}/main")]
+        [ProducesResponseType(typeof(StudioResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutMainAsync(
+            [FromRoute] string id,
+            [FromBody] UpdateStudioRequest request,
+            CancellationToken ct
+            )
+        {
+            var response = await _studioService.UpdateMain(id, request, ct);
+
+            if (response.Picture != null)
+            {
+                response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
+            }
+
+            if (response is null)
+            {
+                return NotFound();
+            }
+
+            await UpdateAdditional(response, ct);
 
             return Ok(response);
         }
@@ -397,32 +556,41 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] ReplaceImageRequest request
             )
         {
-            string? PictureId;
+            string? pictureUri;
 
-            if (request.Id is null)
-            {
-                PictureId = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size);
-            }
-            else PictureId = await _imageService.ReplaceImage(request.Id, request.NewId, request.FileBase64, request.Size);
-
-            if (PictureId == null)
-            {
-                return BadRequest(request);
-            }
-
-            UpdatePictureResponse? response = await _studioService.UpdatePhoto(studioId, new UpdatePictureRequest { Picture = PictureId }, ct);
+            var response = await _studioService.GetById(studioId, ct);
 
             if (response is null)
             {
-                return BadRequest(studioId);
+                return NotFound();
             }
 
-            if (response.Picture != null)
+            if (response.Picture is null)
             {
-                response.PictureUri = await _imageService.GetImage(PictureId, ImageSize.Big);
+                pictureUri = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size, ImageSize.Big);
+            }
+            else pictureUri = await _imageService.ReplaceImage(request.Id, request.NewId, request.FileBase64, request.Size, ImageSize.Big);
+
+            if (pictureUri == null)
+            {
+                return NotFound(request);
             }
 
-            return Ok(response);
+            UpdatePictureResponse? responsePhoto = await _studioService.UpdatePhoto(studioId, new UpdatePictureRequest { 
+                Picture = response.Picture
+            }, ct);
+            if (responsePhoto is null)
+            {
+                return NotFound(studioId);
+            }
+            if (responsePhoto.Picture != null)
+            {
+                responsePhoto.PictureUri = pictureUri;
+            }
+
+            await UpdateAdditional(response, ct);
+
+            return Ok(responsePhoto);
         }
 
         /// <summary>
@@ -444,14 +612,14 @@ namespace GatewayAPIService.Api.Controllers
 
             if (studio is null)
             {
-                return BadRequest(id);
+                return NotFound(id);
             }
 
             var deleted = await _studioService.Delete(id, ct);
 
             if (!deleted)
             {
-                return BadRequest(id);
+                return NotFound(id);
             }
 
             if (studio.Filmography != null)
@@ -464,7 +632,7 @@ namespace GatewayAPIService.Api.Controllers
                 await _imageService.DeleteImage(studio.Picture, (ImageSize)31);
             }
 
-            return Ok();
+            return Ok(id);
         }
 
         /// <summary>
@@ -489,19 +657,54 @@ namespace GatewayAPIService.Api.Controllers
 
             if (studio is null)
             {
-                return BadRequest(studioId);
+                return NotFound(studioId);
             }
 
             var deleted = await _studioService.DeleteFilmography(studio.Id, filmographyId, ct);
 
             if (!deleted)
             {
-                return BadRequest(filmographyId);
+                return NotFound(filmographyId);
             }
 
             await _cinemaService.DeleteStarring(filmographyId, studio.Id, ct);
 
-            return Ok();
+            return Ok(filmographyId);
+        }
+
+        protected async Task UpdateAdditional(StudioResponse studio, CancellationToken ct)
+        {
+
+            UpdateProductionStudioRequest? updateRecord = new UpdateProductionStudioRequest
+            {
+                Name = studio.Name,
+                Picture = studio.Picture
+            };
+
+            ProductionStudioResponse? compareRecord = null;
+
+            bool? studioCommonsEquals = null;
+
+
+            if (studio.Filmography != null)
+            {
+                compareRecord ??= await _cinemaService.GetProductionStudioById(studio.Filmography.FirstOrDefault().Id, studio.Id, ct);
+
+                studioCommonsEquals ??= updateRecord.SameCommons(compareRecord);
+
+                foreach (FilmographyResponse filmography in studio.Filmography)
+                {
+
+                    if (!studioCommonsEquals.GetValueOrDefault())
+                    {
+                        await _cinemaService.UpdateProductionStudio(
+                            filmography.Id,
+                            studio.Id,
+                            updateRecord,
+                            ct);
+                    }
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page
 @using Shared.CinemaDataService.Models.Flags;
+@using EncyclopediaService.Api.Models.Display;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreateStudioModel
 @{
 }
@@ -119,7 +120,15 @@
 										@foreach (var film in Model.Studio.Filmography)
 										{
 											<div class="col add-film">
-												<partial name="_FilmCard" model="@film" />
+												<partial name="_FilmCard" model="@(new FilmographyRecord 
+												{
+													ParentId = nameof(Model.Studio) + "." + nameof(Model.Studio.Filmography),
+													Id = film.Id,
+													Name = film.Name,
+													Year = film.Year,
+													Picture = film.Picture,
+													PictureUri = film.PictureUri
+												})" />
 											</div>
 										}
 									}

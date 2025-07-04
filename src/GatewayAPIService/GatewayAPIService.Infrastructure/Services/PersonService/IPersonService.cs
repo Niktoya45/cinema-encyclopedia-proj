@@ -10,9 +10,11 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
     {
         /* Get Requests For Person */
         Task<Page<PersonsResponse>?> Get(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<PersonsResponse>?> GetByIds(string[] ids, CancellationToken ct, SortBy? st = null);
         Task<PersonResponse?> GetById(string id, CancellationToken ct);
         Task<FilmographyResponse?> GetFilmographyById(string personId, string filmographyId, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<PersonsResponse>?> GetBySearchPage(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetByJobs(Job jobs, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
 
@@ -28,6 +30,7 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
         /* Put Requests For Person */
 
         Task<PersonResponse?> Update(string id, UpdatePersonRequest person, CancellationToken ct);
+        Task<PersonResponse?> UpdateMain(string id, UpdatePersonRequest person, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdatePhoto(string personId, UpdatePictureRequest picture, CancellationToken ct);
         Task<FilmographyResponse?> UpdateFilmography(string? personId, string filmographyId, UpdateFilmographyRequest filmography, CancellationToken ct);
 

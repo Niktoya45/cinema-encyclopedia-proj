@@ -3,6 +3,7 @@ using ImageService.Api.General;
 using System.Runtime;
 using System.Reflection;
 using ImageService.Infrastructure.Repositories;
+using ImageService.Infrastructure.Environment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAntiforgery();
+
 
 builder.Services.AddTransient<BlobContainerClient>(provider =>
 {
@@ -26,7 +28,8 @@ builder.Services.AddTransient<BlobContainerClient>(provider =>
     return container;
 });
 
-builder.Services.AddTransient<IImageRepository, ImageRepository>();
+
+builder.Services.AddTransient<IImageRepository, ServerImageRepository>();
 
 builder.Services.AddSingleton<ImageSettings>(provider =>
 {
@@ -35,6 +38,21 @@ builder.Services.AddSingleton<ImageSettings>(provider =>
     return settings;
 });
 
+builder.Services.AddSingleton<WebContentEnv>(provider =>
+{
+    WebContentEnv env = builder.Configuration.GetSection("web_env").Get<WebContentEnv>() ?? throw new Exception("Missing \'web_env\' appsettings section or some of its elements could not be mapped");
+
+    env.Root = builder.Environment.WebRootPath;
+    return env;
+});
+
+
+builder.Logging.AddConsole();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 2_147_648;
+});
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
@@ -46,8 +64,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.MapControllers();
 

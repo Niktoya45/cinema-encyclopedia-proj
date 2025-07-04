@@ -6,6 +6,7 @@ import {
     bsElementShow, 
     addShowEditorEvents, addMainPictureEditEvents,
     addShowCloseEvents,
+    getHidden,
 } from './utils.js';
 import { addFormAddSubmitStarring, addFormEditSubmitStarring } from './starring_events.js';
 import { addFormAddSubmitStudio } from './production_studio_events.js';
@@ -27,6 +28,7 @@ const formEditMainId = 'form-edit-main';
 const formEditMainSubmitId = 'submit-' + formEditMainId;
 const formAddStudioId = 'form-add-studio';
 const formAddStudioSubmitId = 'submit-' + formAddStudioId;
+const formLoginId = 'form-login';
 
 const deleteCinemaAction = window.location.pathname + "?handler=deletecinema";
 const deleteStudioAction = window.location.pathname + "?handler=deleteproductionstudio";
@@ -38,6 +40,7 @@ var formPictureSubmit = document.getElementById(formPictureSubmitId);
 var formDelete = document.getElementById(formDeleteId);
 var formEditMain = document.getElementById(formEditMainId);
 var formEditMainSubmit = document.getElementById(formEditMainSubmitId);
+var formLogin = document.getElementById(formLoginId);
 
 var carouselStarring = document.getElementById(carouselStarringId);
 var blockStudios = document.querySelector(".studios-block");
@@ -51,42 +54,46 @@ var stars = Array.from(starsClick).map(starClick => starClick.querySelector(".st
 
 var labelsClick = blockLabels.querySelectorAll("button");
 
-const UserAdmin = formEditMain ? true : false;
+const UserLoggedIn = !formLogin;
+const UserAdmin = !!formEditMain;
 
 
 //** ONLOAD ACTIONS **//
 
 // make user rating change
 
-for (let i = 0; i < stars.length; i++) {
+    for (let i = 0; i < stars.length; i++) {
 
-    starsClick.item(i).addEventListener('click', function (e) {
+        starsClick.item(i).addEventListener('click', function (e) {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        if (starsRate.classList.contains('login-proceed')) {
-            bsElementShow(starsRate);
-            return;
-        }
+            if (!UserLoggedIn || starsRate.classList.contains('login-proceed')) {
+                return;
+            }
 
-        let rating = 0;
-        if (stars[i].classList.contains('rail')) {
-            rating = this.value;
-        } else {
-            if(i != 0)
-                rating = starsClick.item(i-1).value
-        }
+            let rating = 0;
+            if (stars[i].classList.contains('rail')) {
+                rating = this.value;
+            } else {
+                if (i != 0)
+                    rating = starsClick.item(i - 1).value
+            }
 
-        fetchPostMVC(new URLSearchParams({ score: rating }), starsRate.action, "JSON")
-            .then((result) => {
+            let uScore = getHidden(starsRate, 'UserScore').value;
 
-                console.log(result);
+            fetchPostMVC(new URLSearchParams({ score: rating, userScore: uScore }), starsRate.action, "JSON")
+                .then((result) => {
 
-                fillStars(i);
-            });
-    });
-}
+                    console.log(result);
 
+                    fillStars(i);
+                });
+        });
+    }
+
+
+    // make user label change
 for (let i = 0; i < labelsClick.length; i++) {
 
     labelsClick.item(i).addEventListener('click', function (e) {
@@ -107,21 +114,24 @@ for (let i = 0; i < labelsClick.length; i++) {
         }
         console.log(labelValue);
 
-        if (blockLabels.classList.contains('login-proceed')) {
-            bsElementShow(blockLabels);
+        if (!UserLoggedIn || blockLabels.classList.contains('login-proceed')) {
             return;
         }
 
         fetchPostMVC(new URLSearchParams({ label: labelValue }), labelAction, "JSON")
             .then((result) => {
 
-                if (labelValue > 0) {
-                    this.classList.add('active');
-                } else {
-                    this.classList.remove('active')
-                }
+                labelsClick.forEach(function (click) {
+
+                    if (parseInt(click.value) & result.label) {
+                        click.classList.add('active');
+                    }
+                    else {
+                        click.classList.remove('active');
+                    }
+                });
             });
-        
+
     });
 }
 

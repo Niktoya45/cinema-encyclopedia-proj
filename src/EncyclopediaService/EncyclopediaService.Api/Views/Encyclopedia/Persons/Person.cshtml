@@ -17,7 +17,7 @@
     @if (IsAdmin)
     {
         <!-- Edit Main Information Popup -->
-        <form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+        <form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
             <div class="container-fluid">
                 <form id="form-edit-main" asp-page-handler="editPerson" class="trim-inputs" method="post">
                     <partial name="_EditMain" model="Model.EditMain" />
@@ -159,10 +159,10 @@
                 <div class="row">
 
                     <!-- Main Object Information Block -->
-                    <div class="col position-relative">
+                    <div class="col-md-6 position-relative">
 
                         <!-- Main Object Information Col-1 -->
-                        <div class="col-md-5">
+                        <div class="col-md-10">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.BirthDate.ToString("dd-MMM-yyyy"))</li>
@@ -175,13 +175,7 @@
                             </ul>
                         </div>
 
-                        <div class="col-md-1"></div>
-
-                        <!-- Main Object Information Col-2 (Optional) -->
-                        <div class="col-md-5"></div>
-
-                        <!-- Main Object Information Options -->
-                        <div class="col-md-1 position-absolute end-0 top-0">
+                        <div class="col-md-2 position-absolute end-0 top-0">
                             @if (IsAdmin)
                             {
                                 <div class="editor editor-toggle dropdown">
@@ -196,7 +190,22 @@
                             }
                         </div>
 
+                        </div>
+
                     </div>
+
+                    <!-- Main Object Information Block-2 (Optional) -->
+                    <div class="col-md-6 position-relative" >
+
+
+                        <div class="col-md-10"></div>
+
+                        <!-- Main Object Information Options -->
+                        <div class="col-md-2 position-absolute end-0 top-0">
+
+                    </div>
+
+
 
                 </div>
             </div>

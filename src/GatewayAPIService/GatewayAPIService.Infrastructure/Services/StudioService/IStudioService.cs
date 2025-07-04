@@ -11,10 +11,13 @@ namespace GatewayAPIService.Infrastructure.Services.StudioService
     {
         /* Get Requests For Studio */
         Task<Page<StudiosResponse>?> Get(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetByIds(string[] ids, CancellationToken ct, SortBy? st = null);
         Task<StudioResponse?> GetById(string id, CancellationToken ct);
         Task<FilmographyResponse?> GetFilmographyById(string studioId, string filmographyId, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetBySearchPage(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<StudiosResponse>?> GetByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<StudiosResponse>?> GetByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
 
         /******/
@@ -29,6 +32,7 @@ namespace GatewayAPIService.Infrastructure.Services.StudioService
         /* Put Requests For Studio */
 
         Task<StudioResponse?> Update(string id, UpdateStudioRequest studio, CancellationToken ct);
+        Task<StudioResponse?> UpdateMain(string id, UpdateStudioRequest studio, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdatePhoto(string studioId, UpdatePictureRequest picture, CancellationToken ct);
         Task<FilmographyResponse?> UpdateFilmography(string? studioId, string filmographyId, UpdateFilmographyRequest filmography, CancellationToken ct);
 

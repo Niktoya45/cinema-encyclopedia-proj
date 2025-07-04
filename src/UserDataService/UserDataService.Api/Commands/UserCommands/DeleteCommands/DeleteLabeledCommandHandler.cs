@@ -19,6 +19,9 @@ namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
         }
         public async Task<IEnumerable<LabeledResponse>> Handle(DeleteLabeledCommand request, CancellationToken cancellationToken)
         {
+            if (request.CinemaId == " ")
+                request.CinemaId = null;
+
             LabeledRecord labeled = _mapper.Map<DeleteLabeledCommand, LabeledRecord>(request);
             IEnumerable<LabeledRecord>? deleted = await _repository.DeleteFromCinemaList(labeled, cancellationToken);
 

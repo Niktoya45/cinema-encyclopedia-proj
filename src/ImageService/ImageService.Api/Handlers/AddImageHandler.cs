@@ -57,7 +57,7 @@ namespace ImageService.Api.Handlers
                         }
                         catch (Exception ex)
                         {
-                            throw new ImageNotAddedException($"Image {request.Id} was not added for size: {size}");
+                            throw new ImageNotAddedException($"Image {request.Id} was not added for size: {size}\nMessage: {ex.Message}");
                         }
 
                         if (uriSAS is null)

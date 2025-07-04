@@ -5,10 +5,9 @@ using EncyclopediaService.Api.Models.Test;
 using EncyclopediaService.Api.Models.TestData;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.GatewayService;
-using EncyclopediaService.Infrastructure.Services.ImageService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Shared.CinemaDataService.Models.Flags;
+using Shared.CinemaDataService.Models.PersonDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
 using Shared.ImageService.Models.Flags;
 using Shared.ImageService.Models.ImageDTO;
@@ -43,11 +42,43 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             _gatewayService = gatewayService;
             _settings = settings;
         }
-        public async Task<IActionResult> OnGet([FromRoute] string id) 
+        public async Task<IActionResult> OnGet([FromRoute] string id, CancellationToken ct) 
         {
-            // send data request instead of block below
+            if (TestEntities.Used)
+            {
+                Person = TestEntities.Person;
+            }
+            else
+            {
+                var response = await _gatewayService.GetPersonById(id, ct);
 
-            Person = TestEntities.Person;
+                if (response is null)
+                {
+                    return RedirectToPage("/Index");
+                }
+
+                Person = new Person
+                {
+                    Id = response.Id,
+                    Name = response.Name,
+                    Picture = response.Picture,
+                    PictureUri = response.PictureUri,
+                    BirthDate = response.BirthDate,
+                    Jobs = response.Jobs,
+                    Country = response.Country,
+                    Description = response.Description,
+
+                };
+
+                Person.Filmography = response.Filmography.Select(s => new FilmographyRecord
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Year = s.Year,
+                    Picture = s.Picture,
+                    PictureUri = s.PictureUri
+                }).ToArray();
+            }
 
             EditMain = new EditMainPerson { Id = Person.Id, Name = Person.Name, BirthDate = Person.BirthDate, Country = Person.Country, Jobs = Person.Jobs, Description = Person.Description };
 
@@ -59,7 +90,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             return Page();
         }
 
-        public async Task<IActionResult> OnPostEditPerson([FromRoute] string id)
+        public async Task<IActionResult> OnPostEditPerson([FromRoute] string id, CancellationToken ct)
         {
 
             if (!ModelState.IsValid)
@@ -67,24 +98,43 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 return OnPostReuseEditMain(true);
             }
 
-            if (EditMain != null)
+            if (EditMain != null && !TestEntities.Used)
             {
-                EditMain.Id = id;
-                EditMain.Jobs = EditMain.JobsBind.Aggregate((acc, j) => acc | j);
+                var response = await _gatewayService.UpdatePersonMain(id, new UpdatePersonRequest
+                {
+                    Name = EditMain.Name,
+                    BirthDate = EditMain.BirthDate,
+                    Jobs = EditMain.JobsBind.Aggregate((acc, g) => acc | g),
+                    Country = EditMain.Country.GetValueOrDefault(),
+                    Description = EditMain.Description,
+                }, ct);
             }
 
             return new OkResult();
         }
 
-        public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id)
+        public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: set ParentId and send post NewFilmography to mediatre proxy 
-
             ModelState.Remove("JobsBind");
 
             if (!ModelState.IsValid)
             {
                 return OnPostReuseAddFilmography(true);
+            }
+
+            if (!TestEntities.Used && EditFilm != null && EditFilm.Id != null)
+            {
+                var response = await _gatewayService.CreatePersonFilmographyFor(id, new Shared.CinemaDataService.Models.RecordDTO.CreateFilmographyRequest
+                {
+                    Id = EditFilm.Id,
+                    Name = EditFilm.Name,
+                    Picture = EditFilm.Picture
+                }, ct);
+
+                if (response is null)
+                {
+                    return new OkObjectResult(null);
+                }
             }
 
             return Partial("_FilmCard", new FilmographyRecord {
@@ -96,9 +146,14 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             });
         }
 
-        public async Task<IActionResult> OnPostDeleteFilmography([FromRoute] string id)
+        public async Task<IActionResult> OnPostDeleteFilmography([FromRoute] string id, CancellationToken ct)
         {
-            // Implement: send delete request specifying ParentId and Id to mediatre proxy
+            if (TestEntities.Used && RecordId != null)
+            {
+                var response = await _gatewayService.DeleteStudioFilmography(id, RecordId, ct);
+
+                if (!response) return new OkObjectResult(null);
+            }
 
             return new OkObjectResult(RecordId);
         }
@@ -150,14 +205,26 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             {
                 IEnumerable<SearchResponse> response = new List<SearchResponse>();
 
-                response = TestRecords.SearchList(search);
+                if (TestRecords.Used)
+                    response = TestRecords.SearchList(search);
+                else
+                {
+                    response = await _gatewayService.GetCinemasBySearch(search, ct, new Pagination(0, 5));
+                }
 
                 return new OkObjectResult(response);
             }
 
             else
             {
-                return new OkObjectResult(TestRecords.SearchRecord(search));
+                if(TestRecords.Used)
+                    return new OkObjectResult(TestRecords.SearchRecord(search));
+                else
+                {
+                    var response = await _gatewayService.GetCinemasByIds(new string[] { recordId }, ct, null);
+
+                    return new OkObjectResult(response);
+                }
             }
 
         }

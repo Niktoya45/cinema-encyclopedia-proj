@@ -3,7 +3,7 @@
 @model ProfileService.Api.Views.Profiles.ProfileModel
 @{
 	bool IsUser = User.IsProfileOwner(Model.Id);
-	bool IsUserAdmin = Model.Role.Contains("Administrator") && !Model.Role.Contains("Super");
+	bool IsUserAdmin =  Model.Role != null && Model.Role.Contains("Administrator") && !Model.Role.Contains("Super");
 	bool IsSuperAdmin = User.IsSuperAdmin();
 }
 
@@ -12,14 +12,14 @@
 	@if (IsUser)
 	{
 		<!-- Edit Main Information Popup -->
-		<form-popup id="modal-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
+		<form-popup id="modal-edit-main" form="form-edit-main" title="Edit main information" lock="true" save-close="false" scroll="true">
 			<div class="container-fluid">
 				<partial name="_EditMain" model="Model.EditMain" />
 			</div>
 		</form-popup>
 
 		<!-- Edit Profile Picture Popup -->
-		<form-popup id="modal-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
+		<form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose new profile picture" lock="true" save-close="true" scroll="true">
 			<div class="container-fluid">
 				<partial name="_EditPicture" model="Model.EditProfilePicture" />
 			</div>
@@ -47,8 +47,7 @@
             </div>
         </form-popup>	
 	}
-
-	@if (IsSuperAdmin)
+	else if (IsSuperAdmin)
 	{
 		<!-- Manage Profile Popup -->
         <form-popup id="modal-manage-profile" form="form-manage-profile" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
@@ -194,35 +193,44 @@
 			<div class="col-md-7">
 				<div class="row">
 
-					<!-- Main Object Information Col-1 -->
-					<div class="col-md-5">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
-							<li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Profile.Birthdate.Year == 1900 ? "-" : Model.Profile.Birthdate.ToString("dd-MM-yyyy"))</li>
-						</ul>
-					</div>
+					<!-- Main Object Information -->
+					<div class="col-md-6 position-relative">
 
-					<div class="col-md-1"></div>
+						<!-- Main Object Information Col -->
+						<div class="col-md-10">
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Birthdate</li>
+								<li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Profile.Birthdate.Year == 1 ? "-" : Model.Profile.Birthdate.ToString("dd-MM-yyyy"))</li>
+							</ul>
+						</div>
+
+						<!-- Main Object Information Options -->
+						<div class="col-md-1 position-absolute end-0 top-0">
+							@if (IsUser)
+							{
+								<div class="editor editor-toggle dropdown">
+									<button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
+										<span class="icon icon-md icon-options-dots"></span>
+									</button>
+
+									<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
+										<li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
+									</ul>
+								</div>
+							}
+
+						</div>
+
+					</div>
 
 					<!-- Main Object Information Col-2 (Optional) -->
-					<div class="col-md-5"></div>
-
-					<!-- Main Object Information Options -->
-					<div class="col-md-1">
-						@if (IsUser)
-						{
-							<div class="editor editor-toggle dropdown">
-								<button id="dropdown-edit-main" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
-									<span class="icon icon-md icon-options-dots"></span>
-								</button>
-
-								<ul class="dropdown-menu mt-2" aria-labelledby="dropdown-edit-main">
-									<li><a class="dropdown-item" data-bs-target="#modal-edit-main" data-bs-toggle="modal" href="#">Edit information</a></li>
-								</ul>
-							</div>
-						}
-
+					<div class="col-md-6 position-relative">
+							
+						<div class="col-md-5"></div>
+						
+						<div class="col-md-1"></div>
 					</div>
+
 
 				</div>
 			</div>

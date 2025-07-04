@@ -5,7 +5,7 @@ namespace EncyclopediaService.Api.Models.Test
 {
     public static class TestEntities
     {
-        public const bool Used = true;
+        public const bool Used = false;
 
         public static Cinema Cinema = new Cinema
             {

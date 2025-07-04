@@ -1,4 +1,3 @@
-using Azure.Storage.Blobs;
 using EncyclopediaService.Api.Models.Sort;
 using EncyclopediaService.Api.Models.Utils;
 using EncyclopediaService.Infrastructure.Services.GatewayService;

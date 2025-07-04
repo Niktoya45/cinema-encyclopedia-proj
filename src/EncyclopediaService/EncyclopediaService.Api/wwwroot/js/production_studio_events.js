@@ -103,6 +103,8 @@ function fetchFormAddStudio(form, doFormWrap, actionAddStudio) {
     fetchForm(
         form,
         function (placeholder) {
+            if (!placeholder) return;
+
             let div = document.createElement("div");
             let Id = '';
 

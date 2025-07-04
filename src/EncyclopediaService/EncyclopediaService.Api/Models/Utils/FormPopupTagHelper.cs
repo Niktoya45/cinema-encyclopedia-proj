@@ -10,6 +10,7 @@ namespace EncyclopediaService.Api.Models.Utils
         public string? Title { get; set; }
         public string? Size { get; set; } 
         public string? Form { get; set; }
+        public string? Style { get; set; }
         public bool Lock { get; set; }
         public bool Scroll { get; set; }
 
@@ -25,7 +26,7 @@ namespace EncyclopediaService.Api.Models.Utils
             output.PreContent.SetHtmlContent(
                 $@"<div class=""modal fade"" id=""{Id}"" {(Lock ? @"data-bs-backdrop=""static"" data-bs-keyboard=""false""" : " ")} tabindex=""-1"" aria-hidden=""true"">
                             <div class=""modal-dialog modal-dialog-centered {(Scroll ? "modal-dialog-scrollable" : "")} {(Size != null ? "modal-"+Size : "")}"">
-                                <div class=""modal-content"">
+                                <div class=""modal-content"" style=""{Style??""}"">
                                     <div class=""modal-header"">
                                     <h5 class=""modal-title"">{Title??" "}</h5>
                                     <button type=""button"" class=""btn-close cancel"" data-bs-dismiss=""modal"" data-bs-target=""#{Id}"" aria-label=""Close"">

@@ -42,6 +42,10 @@ namespace CinemaDataService.Api.Queries.PersonQueries
 
                     break;
 
+                case PersonsSearchPageQuery pspq:
+                    persons = await _repository.FindByName(pspq.Search.Split(), pspq.Pg, pspq.Sort, cancellationToken);
+                    break;
+
                 case PersonsJobsQuery pjq:
                     persons = await _repository.FindByJobs(pjq.Jobs, pjq.Pg, pjq.Sort, cancellationToken);
                     break;

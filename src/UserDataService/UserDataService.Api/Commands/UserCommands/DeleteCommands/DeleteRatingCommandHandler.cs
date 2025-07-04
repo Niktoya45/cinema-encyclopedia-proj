@@ -20,6 +20,9 @@ namespace UserDataService.Api.Commands.UserCommands.DeleteCommands
         }
         public async Task<IEnumerable<RatingResponse>> Handle(DeleteRatingCommand request, CancellationToken cancellationToken)
         {
+            if (request.CinemaId == " ")
+                request.CinemaId = null;
+
             RatingRecord rating = _mapper.Map<DeleteRatingCommand, RatingRecord>(request);
             IEnumerable<RatingRecord>? deleted = await _repository.DeleteFromRatingList(rating, cancellationToken);
 

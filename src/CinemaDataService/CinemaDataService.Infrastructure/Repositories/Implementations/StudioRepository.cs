@@ -1,11 +1,10 @@
-﻿using CinemaDataService.Infrastructure.Repositories.Abstractions;
+﻿using CinemaDataService.Domain.Aggregates.Shared;
 using CinemaDataService.Domain.Aggregates.StudioAggregate;
+using CinemaDataService.Infrastructure.Context;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using MongoDB.Driver;
 using System.Linq.Expressions;
-using CinemaDataService.Infrastructure.Context;
-using CinemaDataService.Domain.Aggregates.Shared;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
-using CinemaDataService.Domain.Aggregates.PersonAggregate;
 
 namespace CinemaDataService.Infrastructure.Repositories.Implementations
 {
@@ -28,10 +27,27 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         {
             DateOnly YearBegin = new DateOnly(year, 1, 1);
 
-            return await Find(c => c.FoundDate > YearBegin && c.FoundDate <= YearBegin.AddYears(1), pg,
+            return await Find(c => c.FoundDate >= YearBegin && c.FoundDate < YearBegin.AddYears(1), pg,
                                 st,
                                 ct
                 );
+        }
+        public async Task<List<Studio>?> FindByYearSpans(int[] yearsLower, int yearSpan, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        {
+            FilterDefinition<Studio> filter = Builders<Studio>.Filter.Not(
+                Builders<Studio>.Filter.And(
+                    yearsLower.Select(y => Builders<Studio>.Filter.Not(
+                        Builders<Studio>.Filter.Where(c => new DateOnly(y, 1, 1) <= c.FoundDate && c.FoundDate < new DateOnly(y + yearSpan, 1, 1))
+                            )
+                        )
+                    )
+                );
+
+            return await Find(filter,
+                              pg,
+                              st,
+                              ct
+                              );
         }
         public async Task<List<Studio>?> FindByCountry(Country country, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
         {

@@ -15,13 +15,13 @@ export function fetchForm(form, eventAdd, eventRefreshForm, modalForm) {
 
     fetchPostMVC(form, form.action, "TEXT")
         .then((result) => {
-            if (!result) { window.location.reload(); return; }
+            if (!result) { return; }
 
             let placeholder = document.createElement("div");
 
             placeholder.innerHTML = result;
 
-            if (getPartialType(placeholder) == "form") {
+            if (placeholder.innerHTML && getPartialType(placeholder) == "form") {
 
                 form.innerHTML = result;
                 placeholder.remove();
@@ -62,6 +62,8 @@ export function fetchPostMVC(form, action, responseType) {
         })
         .then((response) => {
 
+            if (!response) return response;
+
             if (responseType == "TEXT") {
                 return response.text();
             }
@@ -88,6 +90,8 @@ export function fetchGetMVC(action, responseType) {
             signal: signalCancel
         })
         .then((response) => {
+
+            if (!response) return response;
 
             if (responseType == "TEXT") {
                 return response.text();
@@ -142,7 +146,7 @@ export function addMainPictureEditEvents(formPicture, formPictureSubmit, imgTarg
         fetchPostMVC(formPicture, formPicture.action, "JSON")
             .then((result) => {
 
-                if (!result.picture) {
+                if (!result || !result.picture) {
                     return;
                 }
 

@@ -36,7 +36,24 @@ namespace CinemaDataService.Infrastructure.Repositories.Implementations
         {
             DateOnly YearBegin = new DateOnly(year, 1, 1);
 
-            return await Find(c => c.ReleaseDate > YearBegin && c.ReleaseDate <= YearBegin.AddYears(1),
+            return await Find(c => c.ReleaseDate >= YearBegin && c.ReleaseDate < YearBegin.AddYears(1),
+                              pg,
+                              st,
+                              ct
+                              );
+        }
+        public async Task<List<Cinema>?> FindByYearSpans(int[] yearsLower, int yearSpan, Pagination? pg = default, SortBy? st = default, CancellationToken ct = default)
+        {
+            FilterDefinition<Cinema> filter = Builders<Cinema>.Filter.Not(
+                Builders<Cinema>.Filter.And(
+                    yearsLower.Select(y => Builders<Cinema>.Filter.Not(
+                        Builders<Cinema>.Filter.Where(c => new DateOnly(y, 1, 1) <= c.ReleaseDate && c.ReleaseDate < new DateOnly(y+yearSpan, 1, 1))
+                            )
+                        )
+                    )
+                );
+
+            return await Find(filter,
                               pg,
                               st,
                               ct

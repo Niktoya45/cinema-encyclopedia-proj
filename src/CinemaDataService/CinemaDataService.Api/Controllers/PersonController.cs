@@ -61,7 +61,7 @@ namespace CinemaDataService.Api.Controllers
         /// </summary>
         /// <returns>All person list</returns>
         /// <param name="ids">indices to search by</param> 
-        /// <param name="pg">pagination parameters</param> 
+        /// <param name="st">sort parameters (optional)</param> 
         /// <response code="200">Success</response>
         /// <response code="400">No person was found</response>
         /// <response code="500">Something is wrong on a server</response>
@@ -72,10 +72,10 @@ namespace CinemaDataService.Api.Controllers
         public async Task<IActionResult> PostAsync(
             CancellationToken ct,
             [FromBody] string[] ids,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] SortBy? st = null
             )
         {
-            var response = await _mediator.Send(_wrapPersonsQuery(new PersonsIdQuery(ids, pg)), ct);
+            var response = await _mediator.Send(_wrapPersonsQuery(new PersonsIdQuery(ids, st)), ct);
 
             return Ok(response);
         }
@@ -99,6 +99,30 @@ namespace CinemaDataService.Api.Controllers
         )
         {
             var response = await _mediator.Send(new PersonsSearchQuery(search, pg), ct);
+
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Get persons by names using search string 
+        /// </summary>
+        /// <param name="search"> search string </param>
+        /// <param name="st">sort parameters (optional)</param>
+        /// <param name="pg">pagination parameters (optional)</param>
+        /// <returns></returns>
+        [HttpGet("search-page/{search}")]
+        [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchPage(
+            CancellationToken ct,
+            [FromRoute] string search,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+        )
+        {
+            var response = await _mediator.Send(_wrapPersonsQuery(new PersonsSearchPageQuery(search, st, pg)), ct);
 
             return Ok(response);
         }
@@ -268,7 +292,7 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAsync(
             CancellationToken ct,
-            [FromQuery] string id,
+            [FromRoute] string id,
             [FromBody] UpdatePersonRequest request
             )
         {
@@ -301,7 +325,7 @@ namespace CinemaDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutMainAsync(
             CancellationToken ct,
-            [FromQuery] string id,
+            [FromRoute] string id,
             [FromBody] UpdatePersonRequest request
             )
         {
@@ -399,7 +423,7 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeletePersonCommand(id), ct);
 
-            return Ok();
+            return Ok(id);
         }
 
         /// <summary>
@@ -422,7 +446,7 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeletePersonFilmographyCommand(personId, filmographyId), ct);
 
-            return Ok();
+            return Ok(filmographyId);
         }
     }
 }

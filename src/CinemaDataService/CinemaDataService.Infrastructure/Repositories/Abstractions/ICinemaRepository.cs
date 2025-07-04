@@ -10,6 +10,7 @@ namespace CinemaDataService.Infrastructure.Repositories.Abstractions
         public Task<StudioRecord?> AddProductionStudio(string cinemaId, StudioRecord studio, CancellationToken ct);
         public Task<Starring?> AddStarring(string? cinemaId, Starring starring, CancellationToken ct);
         public Task<List<Cinema>?> FindByYear(int year, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);
+        public Task<List<Cinema>?> FindByYearSpans(int[] yearsLower, int yearSpan, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);
         public Task<List<Cinema>?> FindByGenres(Genre genre, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);
         public Task<List<Cinema>?> FindByLanguage(Language language, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);
         public Task<List<Cinema>?> FindByStudioId(string studioId, Pagination? pg = default, SortBy? sort = default, CancellationToken ct = default);

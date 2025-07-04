@@ -73,7 +73,7 @@
             </div>
         </form-popup>
 
-        <form-popup id="modal-delete-element" form="form-delete-element" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
+        <form-popup id="modal-delete-element" form="form-delete-element" size="lg" lock="true" save-close="true" scroll="false" add-button="false"  style="border:#333 double 0.5rem">
             <div class="container-fluid">
                 <form id="form-delete-element" method="post">
                     <input type="hidden" asp-for="RecordId"/>
@@ -85,7 +85,7 @@
                         <p class="label-delete label-studio no-display fs-4 fw-bold">Delete studio record for this cinema page?</p>
 
                         <div class="d-flex hstack gap-4 h-25 justify-content-center">
-                            <div class="d-flex hstack gap-4 h-25" style="width:80%">
+                            <div class="d-flex hstack gap-4 h-25 w-50" style="width:80%;margin-top:6rem">
                                 <button value="delete" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Delete</button>
                                 <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
                             </div>
@@ -101,18 +101,18 @@
 
     @if(!LoggedIn)
     {
-        <form-popup id="modal-login" form="form-login" size="lg" lock="true" save-close="true" scroll="false" add-button="false">
+        <form-popup id="modal-login" form="form-login" size="lg" lock="true" save-close="true" scroll="false" add-button="false" style="border:black double 0.5rem">
             <div class="container-fluid">
 
                     <div class="d-flex vstack w-100 justify-content-center align-items-center">
 
                         <p class="fs-4 fw-bold">This action requires you to login</p>
-                        <p class="fs-4 fw-bold">Proceed to login?</p>
+                        <p class="fs-3 fw-bold mt-3">Proceed to login?</p>
 
                         <div class="d-flex hstack gap-4 h-25 justify-content-center">
-                            <div class="d-flex hstack gap-4 h-25" style="width:80%">
-                                <form id="form-login" asp-page="Index" asp-page-handler="Login" method="post">
-                                <button value="login" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Login</button>
+                            <div class="d-flex hstack gap-4 h-25" style="width:80%;margin-top:6rem">
+                                <form id="form-login" action="@(Url.PageLink("/Index", "Login", new {redirect = $"/encyclopedia/cinemas/{Model.Id}"}))" method="get" class="w-50">
+                                <button value="login" type="submit" class="btn btn-dark w-100" data-bs-dismiss="modal">Login</button>
                                 </form>
                                 <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
                             </div>
@@ -204,13 +204,14 @@
                             starSpan = 0.6f;
                         }
 
-                        <form id="rate-cinema" asp-page-handler="Rate" class="@(LoggedIn ? "" : "login-proceed")" method="post">
-                            <button data-bs-target="#modal-login" data-bs-toggle="modal" style="display:none"></button>
+                        <form id="rate-cinema" asp-page-handler="@(LoggedIn ? "Rate" : "")" class="@(LoggedIn ? "" : "login-proceed")" method="post">
+                            <input type="hidden" asp-for="UserScore" value="@(Model.UserScore)"/>
                             @for (byte i = 0; i < starCount; i++)
                             {
-                                <button class="rail" value="@(i+1)" style="background:none;border:none;padding:0;width:auto;text-decoration:none">
+                                <button class="rail" value="@(i+1)" @(LoggedIn ? "" : "data-bs-target=#modal-login data-bs-toggle=modal" )
+                                    style="background:none;border:none;padding:0;width:auto;text-decoration:none">
                                     <svg width="@((starSize+starSpan)*K)" height="@(starSize*K*1.5)" xmlns="http://www.w3.org/2000/svg">
-                                        <polygon class="star rail" points="@Star(starSize, 0)" ></polygon>
+                                        <polygon class="star @(Model.UserScore < i+1 ? "rail" : "")" points="@Star(starSize, 0)" ></polygon>
                                         <polygon class="star-empty" points="@Star(starSize, 0)"></polygon>
                                     </svg>
                                 </button>
@@ -244,10 +245,10 @@
                         }
                     </div>
                     <div class="row labels-block @(LoggedIn ? "" : "login-proceed")">
-                        <button data-bs-target="#modal-login" data-bs-toggle="modal" style="display:none"></button>
 
                         <div class="col mt-3 mb-1">
-                            <button title="favorite" class="@((Model.UserLabel & Label.Favored) == Label.None ? "" : "active") btn-refresh btn-label" value="@((byte)Label.Favored)">
+                            <button title="favorite" @(LoggedIn ? "" : "data-bs-target=#modal-login data-bs-toggle=modal" )
+                                class="@((Model.UserLabel & Label.Favored) == Label.None ? "" : "active") btn-refresh btn-label" value="@((byte)Label.Favored)">
                                 <svg id="heart" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                     <polygon points="18,12 23,7 26,7 31,12 31,17 27,24 19,30 16,30 8,24 4,17 4,12 9,7 12,7 17,12" />
                                 </svg>
@@ -274,7 +275,8 @@
                             <div id="collapse-labels-body">
                                 <div id="collapse-labels" class="collapse collapse-horizontal">
                                     <div id="labels" class="card card-body hstack">
-                                        <button title="planned" class="@((Model.UserLabel & Label.Planned) == Label.None ? "" : "active")"  value="@((byte)Label.Planned)">
+                                        <button title="planned" @(LoggedIn ? "" : "data-bs-target=#modal-login data-bs-toggle=modal" )
+                                            class="@((Model.UserLabel & Label.Planned) == Label.None ? "" : "active")"  value="@((byte)Label.Planned)">
                                             <svg id="clock" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="15,3 10,5 5,10 4,13 4,20 5,23 9,28 15,31 20,31 26,28 30,23 31,20 31,13 30,10 25,5 20,3" />
                                                 <line class="thin" x1="17" x2="17" y1="17" y2="9"></line>
@@ -282,7 +284,8 @@
                                                 <line x1="16" x2="18" y1="17" y2="17" stroke-width="3"></line>
                                             </svg>
                                         </button>
-                                        <button title="watching" class="@((Model.UserLabel & Label.Watching) == Label.None ? "" : "active")"  value="@((byte)Label.Watching)">
+                                        <button title="watching" @(LoggedIn ? "" : "data-bs-target=#modal-login data-bs-toggle=modal" )
+                                            class="@((Model.UserLabel & Label.Watching) == Label.None ? "" : "active")"  value="@((byte)Label.Watching)">
                                             <svg id="monitor" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="7,4 4,7 4,23 7,26 28,26 31,23 31,7 28,4" />
                                                 <polygon points="12,10 10,12 10,18 12,20  23,20 25,18 25,12 23,10" />
@@ -290,7 +293,8 @@
                                                 <line x1="10" x2="25" y1="30" y2="30" />
                                             </svg>
                                         </button>
-                                        <button title="seen" class="@((Model.UserLabel & Label.Seen) == Label.None ? "" : "active")"  value="@((byte)Label.Seen)">
+                                        <button title="seen" @(LoggedIn ? "" : "data-bs-target=#modal-login data-bs-toggle=modal" )
+                                            class="@((Model.UserLabel & Label.Seen) == Label.None ? "" : "active")"  value="@((byte)Label.Seen)">
                                             <svg id="eye" class="label-icons" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon class="empty" points="14,4 9,6 6,11 4,14 4,19 5,22 8,26 11,28 14,29 20,29 23,28 26,26 29,22 30,19 30,13 29,11 25,6 20,4" />
                                                 <polygon points="17,7 20,12 21,13 23,14 27,14 27,16 27,17 25,9" />

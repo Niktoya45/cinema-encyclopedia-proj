@@ -155,10 +155,10 @@
                 <div class="row">
 
                     <!-- Main Object Information Block -->
-                    <div class="col position-relative">
+                    <div class="col-md-6 position-relative">
 
-                        <!-- Main Object Information Col-1 -->
-                        <div class="col-md-5">
+                        <!-- Main Object Information -->
+                        <div class="col-md-10">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Date found</li>
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Studio.FoundDate.ToString("dd-MMM-yyyy"))</li>
@@ -171,13 +171,8 @@
                             </ul>
                         </div>
 
-                        <div class="col-md-1"></div>
-
-                        <!-- Main Object Information Col-2 (Optional) -->
-                        <div class="col-md-5"></div>
-
                         <!-- Main Object Information Options -->
-                        <div class="col-md-1 position-absolute end-0 top-0">
+                        <div class="col-md-2 position-absolute end-0 top-0">
                             @if (IsAdmin)
                             {
                                 <div class="editor editor-toggle dropdown">
@@ -194,6 +189,16 @@
 
                     </div>
 
+                    <!-- Main Object Information Block-2 (Optional) -->
+                    <div class="col-md-6 position-relative" >
+
+
+                        <div class="col-md-10"></div>
+
+                        <!-- Main Object Information Block-2 Options -->
+                        <div class="col-md-2 position-absolute end-0 top-0">
+
+                    </div>
 
 
                 </div>

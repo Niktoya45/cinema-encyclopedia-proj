@@ -19,8 +19,11 @@ namespace AccessService.Api
         {
 
             var builder = WebApplication.CreateBuilder(args);
-            var connectionString = builder.Configuration.GetConnectionString("AccessDbContextConnection")
-                ?? throw new InvalidOperationException("Connection string 'AccessDbContextConnection' not found.");
+
+            var connectionString = (builder.Configuration.GetConnectionString("AccessDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AccessDbContextConnection' not found."))
+                .Replace("(Project)", Directory.GetCurrentDirectory().Replace("Api", "Infrastructure"))
+                .Replace("(CurrentUser)", Environment.UserName); ;
+                
 
             builder.Services.AddDbContext<AccessDbContext>(options =>
                             options.UseSqlServer(connectionString)
@@ -30,6 +33,8 @@ namespace AccessService.Api
                         options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<AccessDbContext>()
                 .AddTokenProvider(nameof(AccessService), typeof(DataProtectorTokenProvider<AccessProfileUser>));
+
+
 
             builder.Services.AddJsonWebKeys("keys.jwks");
 

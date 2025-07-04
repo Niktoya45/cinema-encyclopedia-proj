@@ -40,8 +40,16 @@ namespace CinemaDataService.Api.Queries.StudioQueries
 
                     break;
 
+                case StudiosSearchPageQuery sspq:
+                    studios = await _repository.FindByName(sspq.Search.Split(), sspq.Pg, sspq.Sort, cancellationToken);
+                    break;
+
                 case StudiosYearQuery syq:
                     studios = await _repository.FindByYear(syq.Year, syq.Pg, syq.Sort, cancellationToken);
+                    break;
+
+                case StudiosYearSpansQuery sysq:
+                    studios = await _repository.FindByYearSpans(sysq.YearsLower, sysq.YearSpan, sysq.Pg, sysq.Sort, cancellationToken);
                     break;
 
                 case StudiosCountryQuery scq:

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using UserDataService.Api.Commands.UserCommands.CreateCommands;
+using UserDataService.Api.Commands.UserCommands.DeleteCommands;
 using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Models.LabeledDTO;
 
@@ -10,12 +11,16 @@ namespace UserDataService.Api.Mappings
         public LabeledMappingProfile()
         {
             CreateMap<CreateLabeledCommand, LabeledRecord>()
-                .ForMember(u => u.Id, opt => opt.Ignore())
+                .ForMember(r => r.Id, opt => opt.MapFrom(c => c.CinemaId))
+                .ForMember(r => r.CinemaId, opt => opt.MapFrom(c => c.CinemaId))
+                .ForMember(u => u.AddedAt, opt => opt.Ignore());
+            
+            CreateMap<DeleteLabeledCommand, LabeledRecord>()
+                .ForMember(r => r.Id, opt => opt.MapFrom(c => c.CinemaId))
+                .ForMember(r => r.CinemaId, opt => opt.MapFrom(c => c.CinemaId))
                 .ForMember(u => u.AddedAt, opt => opt.Ignore());
 
             CreateMap<LabeledRecord, LabeledResponse>();
-
-            CreateMap<IEnumerable<LabeledRecord>, IEnumerable<LabeledResponse>>();
         }
     }
 }

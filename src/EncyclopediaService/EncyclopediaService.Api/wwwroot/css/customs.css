@@ -17,6 +17,16 @@
     height: auto;
 }
 
+.return-to-service {
+    background-color: #66ddff;
+    border-radius: 2rem;
+}
+
+.return-to-service button {
+    background-color: #33aacc;
+    padding: 1rem 2rem;
+}
+
 .no-display {
     display:none;
 }

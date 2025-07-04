@@ -6,7 +6,7 @@ namespace EncyclopediaService.Api.Models.TestData
 {
     public static class TestRecords
     {
-        public const bool Used = true;
+        public const bool Used = false;
 
         public static IList<CinemaRecord> CinemasList = Enumerable.Range(1, 30).Select(
             x => new CinemaRecord { 
@@ -26,6 +26,8 @@ namespace EncyclopediaService.Api.Models.TestData
                 Id = "" + x, 
                 Name = $"Studio {x}" }
             ).ToList();
+
+        public static List<StudioRecord> StudiosChoice = Enumerable.Range(1, 10).Select(i => new StudioRecord { Id = "" + i, Name = "Studio Name" + i }).ToList();
 
         public static Func<string, List<SearchResponse>> SearchList = (string search) => new List<SearchResponse> {
                     new SearchResponse { Id = "12", Name = " Search Name 12"},

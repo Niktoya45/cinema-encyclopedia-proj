@@ -30,7 +30,7 @@ var formEditSubmit = document.getElementById(formEditSubmitId);
 var formDelete = document.getElementById(formDeleteId);
 
 const reuseAddAction = window.location.pathname + "?handler=reuseaddfilmography";
-const searchAddAction = window.location.pathname + "?handler=searchfilmography";
+const searchAddAction = window.location.pathname + "?handler=searchfilm";
 const reuseEditAction = window.location.pathname + "?handler=reuseeditfilmography";
 const deleteAction = window.location.pathname + "?handler=deletefilmography";
 
@@ -103,6 +103,8 @@ function fetchFormAddFilmography(form, doFormWrap, actionAddFilmography) {
     fetchForm(
         form,
         function (placeholder) {
+            if (!placeholder.innerHTML) return;
+
             let div = document.createElement("div");
             let Id = '';
 

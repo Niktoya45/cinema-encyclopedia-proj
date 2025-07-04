@@ -6,6 +6,7 @@ using Shared.CinemaDataService.Models.CinemaDTO;
 using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace GatewayAPIService.Infrastructure.Services.CinemaService
@@ -22,6 +23,11 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         public CinemaService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public void Authorize(string scheme, string? value)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, value);
         }
 
         /* Get Requests For Cinema */
@@ -49,9 +55,9 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
 
             return await response.HandleResponse<ProductionStudioResponse>(ct);
         }
-        public async Task<Page<CinemasResponse>?> GetByIds(string[] ids, CancellationToken ct, Pagination? pg = null) 
+        public async Task<Page<CinemasResponse>?> GetByIds(string[] ids, CancellationToken ct, SortBy? st = null) 
         {
-            var response = await _httpClient.PostAsJsonAsync(cinemasUri + "/indexes?" + sort_paginate(null, pg), ids, ct);
+            var response = await _httpClient.PostAsJsonAsync(cinemasUri + "/indexes?" + sort_paginate(st, null), ids, ct);
 
             return await response.HandleResponse<Page<CinemasResponse>>(ct);
         }
@@ -61,9 +67,21 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
 
             return await response.HandleResponse<IEnumerable<SearchResponse>>(ct);
         }
+        public async Task<Page<CinemasResponse>?> GetBySearchPage(string search, CancellationToken ct, Pagination? pg = null) 
+        {
+            var response = await _httpClient.GetAsync(cinemasUri + "/search-page" + $"/{search}?" + sort_paginate(null, pg), ct);
+
+            return await response.HandleResponse<Page<CinemasResponse>>(ct);
+        }
         public async Task<Page<CinemasResponse>?> GetByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
             var response = await _httpClient.GetAsync(cinemasUri + "/year" + $"/{year}?" + sort_paginate(st, pg), ct);
+
+            return await response.HandleResponse<Page<CinemasResponse>>(ct);
+        }
+        public async Task<Page<CinemasResponse>?> GetByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(cinemasUri + "/year" + $"?d={yearSpan}{yearsLower.Aggregate<int, string>("", (acc, y) => acc + $"&lys={y}")}&" + sort_paginate(st, pg), ct);
 
             return await response.HandleResponse<Page<CinemasResponse>>(ct);
         }
@@ -120,6 +138,12 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
             return await response.HandleResponse<CinemaResponse>(ct);
         }
 
+        public async Task<CinemaResponse?> UpdateMain(string id, UpdateCinemaRequest cinema, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(cinemasUri + $"/{id}/main", cinema, ct);
+
+            return await response.HandleResponse<CinemaResponse>(ct);
+        }
         public async Task<UpdatePictureResponse?> UpdatePhoto(string cinemaId, UpdatePictureRequest picture, CancellationToken ct)
         {
             var response = await _httpClient.PutAsJsonAsync(cinemasUri + $"/{cinemaId}/picture", picture, ct);
@@ -157,13 +181,13 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         }
         public async Task<bool> DeleteProductionStudio(string? cinemaId, string studioId, CancellationToken ct)
         {
-            var response = await _httpClient.DeleteAsync(cinemasUri + (cinemaId == null ? "" : $"/{cinemaId}") + $"/{studioId}", ct);
+            var response = await _httpClient.DeleteAsync(cinemasUri + (cinemaId == null ? "" : $"/{cinemaId}") + "/production-studios" + $"/{studioId}", ct);
 
             return response.IsSuccessStatusCode;
         }
         public async Task<bool> DeleteStarring(string? cinemaId, string starringId, CancellationToken ct)
         {
-            var response = await _httpClient.DeleteAsync(cinemasUri + (cinemaId == null ? "" : $"/{cinemaId}") + $"/{starringId}", ct);
+            var response = await _httpClient.DeleteAsync(cinemasUri + (cinemaId == null ? "" : $"/{cinemaId}") + "/starrings" + $"/{starringId}", ct);
 
             return response.IsSuccessStatusCode;
         }

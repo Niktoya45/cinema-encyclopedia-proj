@@ -55,7 +55,7 @@ namespace UserDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Labeled(
             [FromRoute] string id,
-            [FromRoute] Label? label,
+            [FromRoute] Label label = Label.None,
             [FromQuery] string? cinemaId = null,
             CancellationToken ct = default)
         {
@@ -224,7 +224,7 @@ namespace UserDataService.Api.Controllers
         {
             await _mediator.Send(new DeleteUserCommand(id), ct);
 
-            return Ok();
+            return Ok(id);
         }
 
         /// <summary>
@@ -241,13 +241,13 @@ namespace UserDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Labeled(
             [FromRoute] string userId,
-            [FromRoute] string cinemaId,
+            [FromRoute] string? cinemaId = null,
             CancellationToken ct = default
             )
         {
             await _mediator.Send(new DeleteLabeledCommand(userId, cinemaId), ct);
 
-            return Ok();
+            return Ok(cinemaId);
         }
 
         /// <summary>
@@ -264,13 +264,13 @@ namespace UserDataService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteRating(
             [FromRoute] string userId,
-            [FromRoute] string cinemaId,
+            [FromRoute] string? cinemaId = null,
             CancellationToken ct = default
             )
         {
             await _mediator.Send(new DeleteRatingCommand(userId, cinemaId), ct);
 
-            return Ok();
+            return Ok(cinemaId);
         }
 
     }

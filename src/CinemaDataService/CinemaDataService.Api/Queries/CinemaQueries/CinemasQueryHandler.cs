@@ -39,8 +39,16 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
 
                     break;
 
+                case CinemasSearchPageQuery cspq:
+                    cinemas = await _repository.FindByName(cspq.Search.Split(), cspq.Pg, cspq.Sort, cancellationToken);
+                    break;
+
                 case CinemasYearQuery cyq:
                     cinemas = await _repository.FindByYear(cyq.Year, cyq.Pg, cyq.Sort, cancellationToken);
+                    break;
+
+                case CinemasYearSpansQuery cysq:
+                    cinemas = await _repository.FindByYearSpans(cysq.YearsLower, cysq.YearSpan, cysq.Pg, cysq.Sort, cancellationToken);
                     break;
 
                 case CinemasGenresQuery cgq:

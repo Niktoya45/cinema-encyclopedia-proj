@@ -12,6 +12,5 @@ namespace GatewayAPIService.Infrastructure.Extensions
                   && request.Picture == response.Picture;
 
         }
-
     }
 }

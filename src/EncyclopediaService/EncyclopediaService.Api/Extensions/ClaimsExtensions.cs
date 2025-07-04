@@ -10,8 +10,8 @@ namespace EncyclopediaService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = true;
-        public static bool DisableRoles = true;
+        public static bool DisableAuthentication = false;
+        public static bool DisableRoles = false;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {
@@ -35,6 +35,11 @@ namespace EncyclopediaService.Api.Extensions
             (role != null && role.Value.Contains("dministrator"));
 
             return IsAdmin;
+        }
+
+        public static string? GetId(this ClaimsPrincipal principal)
+        {
+            return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
         }
 
         public static ClaimsPrincipal ToPrincipal(Dictionary<string, string> claimsDictionary, string authenticationType)

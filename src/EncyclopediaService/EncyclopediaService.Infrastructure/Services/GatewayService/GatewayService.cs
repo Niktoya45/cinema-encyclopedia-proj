@@ -42,6 +42,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<Page<CinemasResponse>?>();
         }
+        public async Task<Page<CinemasResponse>?> GetCinemasByIds(string[] ids, CancellationToken ct, SortBy? st = null)
+        {
+            var response = await _httpClient.PostAsJsonAsync(cinemasUri + "/indexes?" + sort_paginate(st, null), ids, ct);
+
+            return await response.HandleResponse<Page<CinemasResponse>>();
+        }
         public async Task<CinemaResponse?> GetCinemaById(string id, CancellationToken ct)
         {
             var response = await _httpClient.GetAsync(cinemasUri + $"/{id}", ct);
@@ -54,9 +60,21 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<IEnumerable<SearchResponse>>();
         }
+        public async Task<Page<CinemasResponse>?> GetCinemasBySearchPage(string search, CancellationToken ct, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(cinemasUri + $"/search-page/{search}?" + sort_paginate(null, pg), ct);
+
+            return await response.HandleResponse<Page<CinemasResponse>>();
+        }
         public async Task<Page<CinemasResponse>?> GetCinemasByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
             var response = await _httpClient.GetAsync(cinemasUri + $"/year/{year}?" + sort_paginate(st, pg), ct);
+
+            return await response.HandleResponse<Page<CinemasResponse>>();
+        }
+        public async Task<Page<CinemasResponse>?> GetCinemasByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(cinemasUri + $"/year" + $"?d={yearSpan}{yearsLower.Aggregate<int, string>("", (acc, y) => acc + $"&lys={y}")}&" + sort_paginate(st, pg), ct);
 
             return await response.HandleResponse<Page<CinemasResponse>>();
         }
@@ -109,6 +127,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         public async Task<CinemaResponse?> UpdateCinema(string id, UpdateCinemaRequest cinema, CancellationToken ct)
         {
             var response = await _httpClient.PutAsJsonAsync(cinemasUri + $"/{id}", cinema, ct);
+
+            return await response.HandleResponse<CinemaResponse>();
+        }
+        public async Task<CinemaResponse?> UpdateCinemaMain(string id, UpdateCinemaRequest cinema, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(cinemasUri + $"/{id}/main", cinema, ct);
 
             return await response.HandleResponse<CinemaResponse>();
         }
@@ -165,6 +189,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<Page<PersonsResponse>>();
         }
+        public async Task<Page<PersonsResponse>?> GetPersonsByIds(string[] ids, CancellationToken ct, SortBy? st = null)
+        {
+            var response = await _httpClient.PostAsJsonAsync(personsUri + "/indexes?" + sort_paginate(st, null), ids, ct);
+
+            return await response.HandleResponse<Page<PersonsResponse>>();
+        }
         public async Task<PersonResponse?> GetPersonById(string id, CancellationToken ct)
         {
             var response = await _httpClient.GetAsync(personsUri + $"/{id}", ct);
@@ -176,6 +206,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
             var response = await _httpClient.GetAsync(personsUri + $"/search/{search}?" + sort_paginate(null, pg), ct);
 
             return await response.HandleResponse<IEnumerable<SearchResponse>>();
+        }
+        public async Task<Page<PersonsResponse>?> GetPersonsBySearchPage(string search, CancellationToken ct, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(personsUri + $"/search-page/{search}?" + sort_paginate(null, pg), ct);
+
+            return await response.HandleResponse<Page<PersonsResponse>>();
         }
         public async Task<Page<PersonsResponse>?> GetPersonsByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
@@ -214,6 +250,13 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         public async Task<PersonResponse?> UpdatePerson(string id, UpdatePersonRequest person, CancellationToken ct)
         {
             var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}", person, ct);
+
+            return await response.HandleResponse<PersonResponse>();
+        }
+
+        public async Task<PersonResponse?> UpdatePersonMain(string id, UpdatePersonRequest person, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}/main", person, ct);
 
             return await response.HandleResponse<PersonResponse>();
         }
@@ -257,6 +300,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<Page<StudiosResponse>>();
         }
+        public async Task<Page<StudiosResponse>?> GetStudiosByIds(string[] ids, CancellationToken ct, SortBy? st = null)
+        {
+            var response = await _httpClient.PostAsJsonAsync(studiosUri +  "/indexes?" + sort_paginate(st, null), ids, ct);
+
+            return await response.HandleResponse<Page<StudiosResponse>>();
+        }
         public async Task<StudioResponse?> GetStudioById(string id, CancellationToken ct)
         {
             var response = await _httpClient.GetAsync(studiosUri + $"/{id}", ct);
@@ -269,9 +318,21 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return await response.HandleResponse<IEnumerable<SearchResponse>>();
         }
+        public async Task<Page<StudiosResponse>?> GetStudiosBySearchPage(string search, CancellationToken ct, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(studiosUri + $"/search-page/{search}?" + sort_paginate(null, pg), ct);
+
+            return await response.HandleResponse<Page<StudiosResponse>>();
+        }
         public async Task<Page<StudiosResponse>?> GetStudiosByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
             var response = await _httpClient.GetAsync(studiosUri + $"/year/{year}?" + sort_paginate(st, pg), ct);
+
+            return await response.HandleResponse<Page<StudiosResponse>>();
+        }
+        public async Task<Page<StudiosResponse>?> GetStudiosByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(studiosUri + $"/year" + $"?d={yearSpan}{yearsLower.Aggregate<int, string>("", (acc, y) => acc + $"&lys={y}")}&" + sort_paginate(st, pg), ct);
 
             return await response.HandleResponse<Page<StudiosResponse>>();
         }
@@ -306,6 +367,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         public async Task<StudioResponse?> UpdateStudio(string id, UpdateStudioRequest studio, CancellationToken ct)
         {
             var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}", studio, ct);
+
+            return await response.HandleResponse<StudioResponse>();
+        }
+        public async Task<StudioResponse?> UpdateStudioMain(string id, UpdateStudioRequest studio, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}/main", studio, ct);
 
             return await response.HandleResponse<StudioResponse>();
         }
@@ -409,11 +476,11 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
             return response.IsSuccessStatusCode;
         }
-        public async Task<bool> DeleteFromLabeledList(string userId, string? cinemaId, CancellationToken ct)
+        public async Task<LabeledResponse?> DeleteFromLabeledList(string userId, string? cinemaId, Label label, CancellationToken ct)
         {
-            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}/label/{cinemaId}", ct);
+            var response = await _httpClient.DeleteAsync(usersUri + $"/{userId}/label/{cinemaId}" + (label == Label.None ? "" : $"/{label}"), ct);
 
-            return response.IsSuccessStatusCode;
+            return await response.HandleResponse<LabeledResponse>();
         }
 
         /******/

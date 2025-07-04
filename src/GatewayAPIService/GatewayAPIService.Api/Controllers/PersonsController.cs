@@ -38,6 +38,43 @@ namespace GatewayAPIService.Api.Controllers
         }
 
         /// <summary>
+        /// Get persons by indexes and optional sort criteria
+        /// </summary>
+        /// <param name="ids">index list</param>
+        /// <param name="st">sort parameters (optional)</param>
+        /// <returns>Persons list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No person was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpPost("indexes")]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PostAsync(
+            CancellationToken ct,
+            [FromBody] string[] ids,
+            [FromQuery] SortBy? st = null
+            )
+        {
+            Page<PersonsResponse>? response = await _personService.GetByIds(ids, ct, st);
+
+            if (response is null)
+            {
+                return NotFound();
+            }
+
+            foreach (PersonsResponse person in response.Response)
+            {
+                if (person.Picture != null)
+                {
+                    person.PictureUri = await _imageService.GetImage(person.Picture, ImageSize.Medium);
+                }
+            }
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get all persons by optional sort and pagination criteria
         /// </summary>
         /// <param name="st">sort parameters</param>
@@ -60,7 +97,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (PersonsResponse person in response.Response)
@@ -74,13 +111,13 @@ namespace GatewayAPIService.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("search")]
+        [HttpGet("search/{search}")]
         [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Search(
             CancellationToken ct,
-            [FromQuery] string search,
+            [FromRoute] string search,
             [FromQuery] Pagination? pg = null
         )
         {
@@ -88,7 +125,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (SearchResponse person in response)
@@ -96,6 +133,34 @@ namespace GatewayAPIService.Api.Controllers
                 if (person.Picture != null)
                 {
                     person.PictureUri = await _imageService.GetImage(person.Picture, ImageSize.Tiny);
+                }
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("search-page/{search}")]
+        [ProducesResponseType(typeof(Page<PersonsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchPage(
+            CancellationToken ct,
+            [FromRoute] string search,
+            [FromQuery] Pagination? pg = null
+        )
+        {
+            Page<PersonsResponse>? response = await _personService.GetBySearchPage(search, ct, pg);
+
+            if (response is null)
+            {
+                return NotFound();
+            }
+
+            foreach (PersonsResponse person in response.Response)
+            {
+                if (person.Picture != null)
+                {
+                    person.PictureUri = await _imageService.GetImage(person.Picture, ImageSize.Medium);
                 }
             }
 
@@ -127,7 +192,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (PersonsResponse person in response.Response)
@@ -166,7 +231,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             foreach (PersonsResponse person in response.Response)
@@ -199,7 +264,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             if (response.Picture != null)
@@ -237,7 +302,7 @@ namespace GatewayAPIService.Api.Controllers
             PersonResponse? response = await _personService.Create(request, ct);
 
             if (response is null) { 
-                return BadRequest(request);
+                return NotFound(request);
             }
 
             return Ok(response);
@@ -264,7 +329,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (cinema is null) 
             {
-                return BadRequest(request.Id);
+                return NotFound(request.Id);
             }
 
             request.Name = cinema.Name;
@@ -275,7 +340,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (person is null)
             {
-                return BadRequest(personId);
+                return NotFound(personId);
             }
 
             FilmographyResponse? response = null;
@@ -292,7 +357,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest(request.Id);
+                return NotFound(request.Id);
             }
 
             StarringResponse? responseBack = await _cinemaService.CreateStarringFor(
@@ -337,49 +402,49 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest(id);
-            }
-
-            UpdateStarringRequest? updateRecord = new UpdateStarringRequest { 
-                Name = response.Name,
-                Picture = response.Picture
-            };
-
-            StarringResponse? compareRecord = null;
-
-            bool? starringCommonsEquals = null;
-
-            if (response.Filmography != null)
-            {
-                foreach (FilmographyResponse filmography in response.Filmography)
-                {
-                    compareRecord = await _cinemaService.GetStarringById(filmography.Id, id, ct);
-
-                    updateRecord.RolePriority = compareRecord.RolePriority.GetValueOrDefault();
-                    updateRecord.RoleName = compareRecord.RoleName;
-
-                    starringCommonsEquals = updateRecord.SameCommons(compareRecord);
-
-                    if (!starringCommonsEquals.GetValueOrDefault())
-                    {
-                        await _cinemaService.UpdateStarring(
-                            filmography.Id,
-                            id,
-                            updateRecord,
-                            ct);
-                    }
-
-                    if (filmography.Picture != null)
-                    {
-                        filmography.PictureUri = await _imageService.GetImage(filmography.Picture, ImageSize.Small);
-                    }
-                }
+                return NotFound(id);
             }
 
             if (response.Picture != null)
             {
                 response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
             }
+
+            await UpdateAdditional(response, ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Update person's main information with provided request parameters
+        /// </summary>
+        /// <param name="id">id of person to be updated</param>
+        /// <param name="request">request body</param>
+        /// <returns>Updated person instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">Person is not found</response>
+        [HttpPut("{id}/main")]
+        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutMainAsync(
+            CancellationToken ct,
+            [FromRoute] string id,
+            [FromBody] UpdatePersonRequest request
+            )
+        {
+            PersonResponse? response = await _personService.UpdateMain(id, request, ct);
+
+            if (response is null)
+            {
+                return NotFound(id);
+            }
+
+            if (response.Picture != null)
+            {
+                response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
+            }
+
+            await UpdateAdditional(response, ct);
 
             return Ok(response);
         }
@@ -401,32 +466,43 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] ReplaceImageRequest request
             )
         {
-            string? PictureId;
 
-            if (request.Id is null)
-            {
-                PictureId = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size);
-            }
-            else PictureId = await _imageService.ReplaceImage(request.Id, request.NewId, request.FileBase64, request.Size);
-
-            if (PictureId == null)
-            {
-                return BadRequest(request);
-            }
-
-            UpdatePictureResponse? response = await _personService.UpdatePhoto(personId, new UpdatePictureRequest { Picture = PictureId }, ct);
+            var response = await _personService.GetById(personId, ct);
 
             if (response is null)
             {
-                return BadRequest(personId);
+                return NotFound();
             }
 
-            if (response.Picture != null)
+            string? pictureUri;
+
+            if (response.Picture is null)
             {
-                response.PictureUri = await _imageService.GetImage(PictureId, ImageSize.Big);
+                pictureUri = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size, ImageSize.Big);
+            }
+            else pictureUri = await _imageService.ReplaceImage(response.Picture, request.NewId, request.FileBase64, request.Size, ImageSize.Big);
+
+            if (pictureUri == null)
+            {
+                return NotFound(request);
             }
 
-            return Ok(response);
+            UpdatePictureResponse? responsePhoto = await _personService.UpdatePhoto(personId, new UpdatePictureRequest { 
+                Picture = request.NewId
+            }, ct);
+
+            if (responsePhoto is null)
+            {
+                return NotFound(personId);
+            }
+            if (responsePhoto.Picture != null)
+            {
+                responsePhoto.PictureUri = pictureUri;
+            }
+
+            await UpdateAdditional(response, ct);
+
+            return Ok(responsePhoto);
         }
 
 
@@ -449,14 +525,14 @@ namespace GatewayAPIService.Api.Controllers
 
             if (person is null)
             {
-                return BadRequest(id);
+                return NotFound(id);
             }
 
             var deleted = await _personService.Delete(id, ct);
 
             if (!deleted)
             {
-                return BadRequest(id);
+                return NotFound(id);
             }
 
             if (person.Filmography != null)
@@ -494,19 +570,59 @@ namespace GatewayAPIService.Api.Controllers
 
             if (person is null)
             {
-                return BadRequest(personId);
+                return NotFound(personId);
             }
 
             var deleted = await _personService.DeleteFilmography(person.Id, filmographyId, ct);
 
             if (!deleted) 
             {
-                return BadRequest(filmographyId);
+                return NotFound(filmographyId);
             }
 
             await _cinemaService.DeleteStarring(filmographyId, person.Id, ct);
 
-            return Ok();
+            return Ok(filmographyId);
+        }
+
+        protected async Task UpdateAdditional(PersonResponse person, CancellationToken ct)
+        {
+            UpdateStarringRequest? updateRecord = new UpdateStarringRequest
+            {
+                Name = person.Name,
+                Picture = person.Picture
+            };
+
+            StarringResponse? compareRecord = null;
+
+            bool? starringCommonsEquals = null;
+
+            if (person.Filmography != null)
+            {
+                foreach (FilmographyResponse filmography in person.Filmography)
+                {
+                    compareRecord = await _cinemaService.GetStarringById(filmography.Id, person.Id, ct);
+
+                    updateRecord.RolePriority = compareRecord.RolePriority.GetValueOrDefault();
+                    updateRecord.RoleName = compareRecord.RoleName;
+
+                    starringCommonsEquals = updateRecord.SameCommons(compareRecord);
+
+                    if (!starringCommonsEquals.GetValueOrDefault())
+                    {
+                        await _cinemaService.UpdateStarring(
+                            filmography.Id,
+                            person.Id,
+                            updateRecord,
+                            ct);
+                    }
+
+                    if (filmography.Picture != null)
+                    {
+                        filmography.PictureUri = await _imageService.GetImage(filmography.Picture, ImageSize.Small);
+                    }
+                }
+            }
         }
     }
 }

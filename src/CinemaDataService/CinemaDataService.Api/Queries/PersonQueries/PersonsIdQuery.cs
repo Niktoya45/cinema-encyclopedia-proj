@@ -8,8 +8,8 @@ namespace CinemaDataService.Api.Queries.PersonQueries
     {
         public PersonsIdQuery(
             string[] ids,
-            Pagination? pagination = null
-            ):base(null, pagination)
+            SortBy? sort = null
+            ):base(sort, null)
         {
             Ids = ids;
         }

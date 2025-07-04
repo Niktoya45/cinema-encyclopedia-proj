@@ -1,9 +1,9 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using Shared.UserDataService.Models.Flags;
 
-namespace ProfileService.Api.Models
+namespace ProfileService.Api.Models.Display
 {
-    public record CinemaRecord{
+    public record Marked
+    {
         public string? ParentId { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }

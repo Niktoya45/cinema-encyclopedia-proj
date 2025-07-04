@@ -7,9 +7,9 @@ namespace ProfileService.Api.Extensions
 {
     public static class ClaimsExtensions
     {
-        public static bool DisableAuthentication = true;
+        public static bool DisableAuthentication = false;
         public static bool DisableRoles = true;
-        public static bool DisablePosession = true;
+        public static bool DisablePosession = false;
 
         public static bool IsLoggedIn(this ClaimsPrincipal principal)
         {

@@ -22,9 +22,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         /* GET Requests For Cinema */
         Task<Page<CinemasResponse>?> GetCinemas(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<CinemasResponse>?> GetCinemasByIds(string[] ids, CancellationToken ct, SortBy? st = null);
         Task<CinemaResponse?> GetCinemaById(string id, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetCinemasBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<CinemasResponse>?> GetCinemasBySearchPage(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<CinemasResponse>?> GetCinemasByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<CinemasResponse>?> GetCinemasByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<CinemasResponse>?> GetCinemasByGenre(Genre genre, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<CinemasResponse>?> GetCinemasByLanguage(Language language, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<CinemasResponse>?> GetCinemasByStudioId(string studioId, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
@@ -42,6 +45,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         /* PUT Requests For Cinema */
 
         Task<CinemaResponse?> UpdateCinema(string id, UpdateCinemaRequest cinema, CancellationToken ct);
+        Task<CinemaResponse?> UpdateCinemaMain(string id, UpdateCinemaRequest cinema, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdateCinemaPhoto(string cinemaId, ReplaceImageRequest picture, CancellationToken ct);
         Task<StarringResponse?> UpdateCinemaStarring(string? cinemaId, string starringId, UpdateStarringRequest starring, CancellationToken ct);
 
@@ -64,8 +68,10 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         /* GET Requests For Person */
         Task<Page<PersonsResponse>?> GetPersons(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<PersonsResponse>?> GetPersonsByIds(string[] ids, CancellationToken ct, SortBy? st = null);
         Task<PersonResponse?> GetPersonById(string id, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetPersonsBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<PersonsResponse>?> GetPersonsBySearchPage(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetPersonsByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<PersonsResponse>?> GetPersonsByJobs(Job jobs, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
 
@@ -81,6 +87,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         /* PUT Requests For Person */
 
         Task<PersonResponse?> UpdatePerson(string id, UpdatePersonRequest person, CancellationToken ct);
+        Task<PersonResponse?> UpdatePersonMain(string id, UpdatePersonRequest person, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdatePersonPhoto(string personId, ReplaceImageRequest picture, CancellationToken ct);
 
         /******/
@@ -101,9 +108,12 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         /* GET Requests For Studio */
         Task<Page<StudiosResponse>?> GetStudios(CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetStudiosByIds(string[] ids, CancellationToken ct, SortBy? st = null);
         Task<StudioResponse?> GetStudioById(string id, CancellationToken ct);
         Task<IEnumerable<SearchResponse>?> GetStudiosBySearch(string search, CancellationToken ct, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetStudiosBySearchPage(string search, CancellationToken ct, Pagination? pg = null);
         Task<Page<StudiosResponse>?> GetStudiosByYear(int year, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
+        Task<Page<StudiosResponse>?> GetStudiosByYearSpans(int[] yearsLower, int yearSpan, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
         Task<Page<StudiosResponse>?> GetStudiosByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null);
 
         /******/
@@ -118,6 +128,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         /* PUT Requests For Studio */
 
         Task<StudioResponse?> UpdateStudio(string id, UpdateStudioRequest studio, CancellationToken ct);
+        Task<StudioResponse?> UpdateStudioMain(string id, UpdateStudioRequest studio, CancellationToken ct);
         Task<UpdatePictureResponse?> UpdateStudioPhoto(string studioId, ReplaceImageRequest picture, CancellationToken ct);
 
         /******/
@@ -158,7 +169,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         /* User DELETE Requests */
         Task<bool> DeleteUser(string id, CancellationToken ct);
-        Task<bool> DeleteFromLabeledList(string userId, string? cinemaId, CancellationToken ct);
+        Task<LabeledResponse?> DeleteFromLabeledList(string userId, string? cinemaId, Label label, CancellationToken ct);
 
         /******/
 

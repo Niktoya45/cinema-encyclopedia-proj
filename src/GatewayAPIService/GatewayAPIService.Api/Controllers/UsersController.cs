@@ -55,7 +55,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             if (response.Picture != null)
@@ -142,7 +142,7 @@ namespace GatewayAPIService.Api.Controllers
                 UserId = userId
             };
 
-            return Ok(responseCinemas);
+            return Ok(response);
         }
 
         /// <summary>
@@ -214,6 +214,13 @@ namespace GatewayAPIService.Api.Controllers
                 }
             }
 
+            var responseCinema = await _cinemaService.GetByIds(new string[] { request.CinemaId }, ct, null);
+
+            if (responseCinema is null || !responseCinema.Response.Any())
+            {
+                return NotFound();
+            }
+
             var response = await _userService.CreateForLabeledList(userId, request, ct);
 
             return Ok(response);
@@ -255,6 +262,15 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
+            var responseOldRating = await _userService.GetRatingFor(userId, request.Id, ct);
+
+            request.OldRating = responseOldRating is null ? 0 : responseOldRating.Rating;
+
+            var responseCinemaRating = await _cinemaService.UpdateRating(request.Id, request, ct);
+
+            if (responseCinemaRating is null)
+                return NotFound();
+
             var responseUserRating = await _userService.UpdateRatingList(
                 userId, 
                 new UpdateUserRatingRequest {
@@ -263,10 +279,6 @@ namespace GatewayAPIService.Api.Controllers
                 }, 
                 ct);
 
-            if (responseUserRating is null)
-                return BadRequest();
-
-            var responseCinemaRating = await _cinemaService.UpdateRating(request.Id, request, ct);
 
             return Ok(responseUserRating);
         }
@@ -275,7 +287,7 @@ namespace GatewayAPIService.Api.Controllers
         /// Update single user with provided request parameters
         /// </summary>
         /// <param name="userId">authorized user Id</param>
-        /// <param name="requestRole">request role</param>
+        /// <param name="role">request role</param>
         /// <returns>Updated user instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
@@ -284,10 +296,10 @@ namespace GatewayAPIService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GrantRoleAsync(
             [FromRoute] string userId,
-            [FromBody] string requestRole,
+            [FromQuery] string role,
             CancellationToken ct = default)
         {
-            var response = await _accessService.GrantRole(userId, requestRole, ct);
+            var response = await _accessService.GrantRole(userId, role, ct);
 
             return Ok(response);
         }
@@ -296,7 +308,7 @@ namespace GatewayAPIService.Api.Controllers
         /// Update single user with provided request parameters
         /// </summary>
         /// <param name="userId">authorized user Id</param>
-        /// <param name="requestRole">requested role</param>
+        /// <param name="role">requested role</param>
         /// <returns>Updated user instance</returns>
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
@@ -305,10 +317,10 @@ namespace GatewayAPIService.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RevokeRoleAsync(
             [FromRoute] string userId,
-            [FromBody] string requestRole,
+            [FromQuery] string role,
             CancellationToken ct = default)
         {
-            var response = await _accessService.RevokeRole(userId, requestRole, ct);
+            var response = await _accessService.RevokeRole(userId, role, ct);
 
             return Ok(response);
         }
@@ -330,32 +342,36 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] ReplaceImageRequest request
             )
         {
-            string? PictureId;
+            string? pictureUri;
 
-            if (request.Id is null)
+            var response = await _userService.Get(userId, ct);
+
+
+            if (response.Picture is null)
             {
-                PictureId = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size);
+                pictureUri = await _imageService.AddImage(request.NewId, request.FileBase64, request.Size, ImageSize.Big);
             }
-            else PictureId = await _imageService.ReplaceImage(request.Id, request.NewId, request.FileBase64, request.Size);
+            else pictureUri = await _imageService.ReplaceImage(response.Picture, request.NewId, request.FileBase64, request.Size, ImageSize.Big);
 
-            if (PictureId == null)
+
+            if (pictureUri == null)
             {
                 return BadRequest(request);
             }
 
-            UpdatePictureResponse? response = await _userService.UpdatePhoto(userId, new UpdatePictureRequest { Picture = PictureId }, ct);
+            UpdatePictureResponse? responsePhoto = await _userService.UpdatePhoto(userId, new UpdatePictureRequest { Picture = pictureUri }, ct);
 
-            if (response is null)
+            if (responsePhoto is null)
             {
                 return BadRequest(userId);
             }
 
-            if (response.Picture != null)
+            if (responsePhoto.Picture != null)
             {
-                response.PictureUri = await _imageService.GetImage(PictureId, ImageSize.Big);
+                responsePhoto.PictureUri = pictureUri;
             }
 
-            return Ok(response);
+            return Ok(responsePhoto);
         }
 
         /// <summary>
@@ -396,22 +412,54 @@ namespace GatewayAPIService.Api.Controllers
         /// <response code="200">Success</response>
         /// <response code="400">User is not found</response>
         [HttpDelete("{userId}/label/{cinemaId}")]
+        [HttpDelete("{userId}/label/{cinemaId}/{label}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Labeled(
             [FromRoute] string userId,
             [FromRoute] string cinemaId,
+            [FromRoute] Label label = Label.None,
             CancellationToken ct = default
             )
         {
-            var response = await _userService.DeleteFromLabeledList(userId, cinemaId, ct);
+            bool response;
+
+            Label newLabel = Label.None;
+
+            if (cinemaId != null && label != Label.None)
+            {
+                var responseLabel = await _userService.GetLabelFor(userId, cinemaId, ct);
+
+                if (responseLabel == null || !responseLabel.Any())
+                {
+                    return BadRequest();
+                }
+
+                Label oldLabel = responseLabel.FirstOrDefault().Label;
+
+                if (oldLabel != label) {
+                    newLabel = oldLabel ^ label;
+
+                    response = await _userService.CreateForLabeledList(
+                        userId, 
+                        new CreateLabeledRequest {
+                            CinemaId = cinemaId,
+                            Label = newLabel
+                        }, 
+                        ct
+                        ) != null;
+
+                }
+                else response = await _userService.DeleteFromLabeledList(userId, cinemaId, ct);
+            }
+            else response = await _userService.DeleteFromLabeledList(userId, cinemaId, ct);
 
             if (!response)
             {
                 return BadRequest();
-            }    
+            }
 
-            return Ok(cinemaId);
+            return Ok(new LabeledResponse { UserId = userId, CinemaId = cinemaId, Label = newLabel });
         }
 
     }

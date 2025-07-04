@@ -9,6 +9,8 @@ namespace EncyclopediaService.Infrastructure.Extensions
         {
             if (response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    return null;
                 return await response.Content.ReadFromJsonAsync<T>();
             }
 

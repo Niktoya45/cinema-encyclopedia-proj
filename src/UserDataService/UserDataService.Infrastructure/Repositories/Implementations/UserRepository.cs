@@ -35,7 +35,10 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             }
 
             var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.Id == cinema.Id));
-            var updateLabel = Builders<LabeledRecord>.Update.Set(r => r.Label, cinema.Label);
+            var updateLabel = Builders<LabeledRecord>.Update.Combine(
+                                Builders<LabeledRecord>.Update.Set(r => r.Label, cinema.Label),
+                                Builders<LabeledRecord>.Update.Set(r => r.CinemaId, cinema.CinemaId)
+            );
 
             var res = await _db.LabeledRecords.UpdateOneAsync(findIfExists, updateLabel, new UpdateOptions { IsUpsert = true }, ct);
 
@@ -97,11 +100,11 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             return await FindCinemasList(pg, r => (r.UserId == userId), ct);
         }
 
-        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label? label, string? cinemaId = null, Pagination? pg = default, CancellationToken ct = default)
+        public async Task<List<LabeledRecord>?> FindCinemasByUserIdLabel(string userId, Label label, string? cinemaId = null, Pagination? pg = default, CancellationToken ct = default)
         {
             return await FindCinemasList(
                                         pg,
-                                    r => (r.UserId == userId) && (label == null ? true : (r.Label & label) != 0) && (cinemaId == null ? true : (r.CinemaId == cinemaId)),
+                                    r => (r.UserId == userId) && (label == Label.None ? true : (r.Label & label) != 0) && (cinemaId == null ? true : (r.CinemaId == cinemaId)),
                                         ct
                                         );
         }
@@ -119,7 +122,8 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             var update = Builders<User>.Update.Combine(
                     Set(u => u.Username, user.Username),
                     Set(u => u.Birthdate, user.Birthdate),
-                    Set(u => u.Picture, user.Picture)
+                    Set(u => u.Picture, user.Picture),
+                    Set(u => u.Description, user.Description)
                 );
 
             var find = Builders<User>.Filter.Where(u => u.Id == user.Id);
@@ -141,7 +145,8 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
 
             var update = Builders<User>.Update.Combine(
                     Set(u => u.Username, user.Username),
-                    Set(u => u.Birthdate, user.Birthdate)
+                    Set(u => u.Birthdate, user.Birthdate),
+                    Set(u => u.Description, user.Description)
                 );
 
             var find = Builders<User>.Filter.Where(u => u.Id == user.Id);
@@ -184,8 +189,19 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
                 return null;
             }
 
+            if (rating.Rating == 0)
+            { 
+                await DeleteFromRatingList(rating, ct);
+
+                return rating;
+            }
+
+
             var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.Id == rating.Id));
-            var updateRating = Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating);
+            var updateRating = Builders<RatingRecord>.Update.Combine(
+                                Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating),
+                                Builders<RatingRecord>.Update.Set(r => r.CinemaId, rating.CinemaId)
+            );
 
             var res = await _db.RatingRecords.UpdateOneAsync(findIfExists, updateRating, new UpdateOptions { IsUpsert = true }, ct);
 

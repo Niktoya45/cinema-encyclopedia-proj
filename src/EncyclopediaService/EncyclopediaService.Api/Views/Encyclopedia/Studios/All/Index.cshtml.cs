@@ -1,16 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Shared.CinemaDataService.Models.Flags;
-using EncyclopediaService.Api.Models.Utils;
-using EncyclopediaService.Api.Models.Sort;
+﻿using EncyclopediaService.Api.Models.Display;
 using EncyclopediaService.Api.Models.Filter;
-using EncyclopediaService.Api.Models.Display;
+using EncyclopediaService.Api.Models.Sort;
+using EncyclopediaService.Api.Models.Test;
 using EncyclopediaService.Api.Models.TestData;
+using EncyclopediaService.Api.Models.Utils;
+using EncyclopediaService.Infrastructure.Services.GatewayService;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Shared.CinemaDataService.Models.CinemaDTO;
+using Shared.CinemaDataService.Models.Flags;
+using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.CinemaDataService.Models.StudioDTO;
 
 namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
 {
     public class IndexModel : PageModel
     {
+        protected IGatewayService _gatewayService { get; init; }
+
         public const byte MaxPerPage = 28;
 
         [BindProperty(SupportsGet = true, Name = "pagen")]
@@ -27,65 +34,140 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios.All
 
         [BindProperty(SupportsGet = true, Name = "by")]
         public string? By { get; set; }
+
+        public const string currentPage = "/Encyclopedia/Studios/All/Index";
         public IList<StudioRecord> List { get; set; }
 
-        public IndexModel(SortStudios sortOptions)
+        public IndexModel(IGatewayService gatewayService, SortStudios sortOptions)
         {
+            _gatewayService = gatewayService;
+
             _sortOptions = sortOptions;
 
             _filterOptions = new FilterStudios();
         }
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGet(CancellationToken ct)
         {
             if (PageNum < 1) PageNum = 1;
 
-            // handle data transfer instead of below
-            List = TestRecords.StudiosList;
-
-            IsEnd = List.Count < MaxPerPage;
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnGetYears()
-        {
-            if (PageNum < 1) PageNum = 1;
-
-            // handle data transfer to Year endpoint instead
-            List = TestRecords.StudiosList;
-
-            IsEnd = List.Count < MaxPerPage;
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnGetCountry() {
-
-            if (PageNum < 1) PageNum = 1;
-
-            // handle data transfer to Country endpoint instead
-            List = TestRecords.StudiosList;
-
-            IsEnd = List.Count < MaxPerPage;
-
-            return Page();
-        }
-
-        public async Task<IActionResult> OnGetSearch()
-        {
-            if (_filterOptions.Search is null)
+            if (TestRecords.Used)
             {
-                RedirectToPage();
+                List = TestRecords.StudiosList;
+
+                IsEnd = List.Count < MaxPerPage;
+            }
+            else
+            {
+                var response = await _gatewayService.GetStudios(
+                        ct,
+                        new SortBy(Order, By),
+                        new Pagination((PageNum - 1) * MaxPerPage, MaxPerPage)
+                    );
+
+                HandleResponse(response);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetYears(CancellationToken ct)
+        {
+            if (PageNum < 1) PageNum = 1;
+
+            if (TestRecords.Used)
+            {
+                List = TestRecords.StudiosList;
+
+                IsEnd = List.Count < MaxPerPage;
+            }
+            else
+            {
+                var response = await _gatewayService.GetStudiosByYearSpans(
+                        _filterOptions.YearsBind.ToArray(),
+                        FilterStudios.YearSpan,
+                        ct,
+                        new SortBy(Order, By),
+                        new Pagination((PageNum - 1) * MaxPerPage, MaxPerPage)
+                    );
+
+                HandleResponse(response);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetCountry(CancellationToken ct) {
+
+            if (PageNum < 1) PageNum = 1;
+
+            if (TestRecords.Used)
+            {
+                List = TestRecords.StudiosList;
+
+                IsEnd = List.Count < MaxPerPage;
+            }
+            else
+            {
+                var response = await _gatewayService.GetStudiosByCountry(
+                        _filterOptions.CountryBind,
+                        ct,
+                        new SortBy(Order, By),
+                        new Pagination((PageNum - 1) * MaxPerPage, MaxPerPage)
+                    );
+
+                HandleResponse(response);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetSearch(CancellationToken ct)
+        {
+            if (_filterOptions.Search is null || _filterOptions.Search == "")
+            {
+                return RedirectToPage(currentPage);
             }
 
             if (PageNum < 1) PageNum = 1;
 
-            // handle data transfer instead of below
-            List = TestRecords.StudiosList;
+            if (TestRecords.Used)
+            {
+                List = TestRecords.StudiosList;
 
-            IsEnd = List.Count < MaxPerPage;
+                IsEnd = List.Count < MaxPerPage;
+            }
+            else
+            {
+                var response = await _gatewayService.GetStudiosBySearchPage(
+                        _filterOptions.Search,
+                        ct,
+                        new Pagination((PageNum - 1) * MaxPerPage, MaxPerPage)
+                    );
+
+                HandleResponse(response);
+            }
 
             return Page();
+        }
+
+        protected void HandleResponse(Page<StudiosResponse>? response)
+        {
+            if (response is null)
+            {
+                List = new List<StudioRecord>();
+                IsEnd = true;
+            }
+            else
+            {
+                List = response.Response.Select(c => new StudioRecord
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Picture = c.Picture,
+                    PictureUri = c.PictureUri
+                }).ToArray();
+                IsEnd = response.IsEnd;
+            }
         }
     }
 }

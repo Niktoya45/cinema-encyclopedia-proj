@@ -13,7 +13,7 @@ namespace EncyclopediaService.Api.Views
     {
         const string _baseGateway = "https://localhost:7176";
 
-        const string _defaultRedirect = "gateway/cinemas/all/index";
+        const string _defaultRedirect = "encyclopedia/cinemas/all/index";
         public string Domain(HttpRequest request) => $"{request.Scheme}://{request.Host}";
 
         HttpClient _gatewayService;

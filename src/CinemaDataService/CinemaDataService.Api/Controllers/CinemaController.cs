@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MediatR;
-using CinemaDataService.Infrastructure.Models.CinemaDTO;
-using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+﻿using CinemaDataService.Api.Commands.CinemaCommands.CreateCommands;
+using CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands;
+using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
 using CinemaDataService.Api.Queries.CinemaQueries;
 using CinemaDataService.Api.Queries.RecordQueries;
-using CinemaDataService.Api.Commands.CinemaCommands.CreateCommands;
-using CinemaDataService.Api.Commands.CinemaCommands.UpdateCommands;
-using CinemaDataService.Api.Commands.CinemaCommands.DeleteCommands;
-using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Api.Queries.StudioQueries;
+using CinemaDataService.Domain.Aggregates.CinemaAggregate;
+using CinemaDataService.Infrastructure.Models.CinemaDTO;
 using CinemaDataService.Infrastructure.Models.RecordDTO;
+using CinemaDataService.Infrastructure.Models.SharedDTO;
+using CinemaDataService.Infrastructure.Models.StudioDTO;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaDataService.Api.Controllers
 {
@@ -58,7 +61,7 @@ namespace CinemaDataService.Api.Controllers
         /// </summary>
         /// <returns>All cinema list</returns>
         /// <param name="ids">indices to search by</param> 
-        /// <param name="pg">pagination parameters</param> 
+        /// <param name="st">sort parameters (optional)</param> 
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
@@ -69,18 +72,18 @@ namespace CinemaDataService.Api.Controllers
         public async Task<IActionResult> PostAsync(
             CancellationToken ct,
             [FromBody] string[] ids, 
-            [FromQuery] Pagination? pg = null
+            [FromQuery] SortBy? st = null
             )
         {
-            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasIdQuery(ids, pg)), ct);
+            var response = await _mediator.Send(_wrapCinemasQuery (new CinemasIdQuery(ids, st)), ct);
 
             return Ok(response);
         }
 
         /// <summary>
-        /// Search by name method 
+        /// Search by name for light search queries
         /// </summary>
-        /// <returns>All cinema list</returns>
+        /// <returns>Cinema list of lightweight objects</returns>
         /// <response code="200">Success</response>
         /// <response code="400">No cinema was found</response>
         /// <response code="500">Something is wrong on a server</response>
@@ -95,6 +98,32 @@ namespace CinemaDataService.Api.Controllers
         )
         {
             var response = await _mediator.Send(new CinemasSearchQuery(search, pg), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Search by name for pages 
+        /// </summary>
+        /// <param name="search">search string</param>
+        /// <param name="st">sort parameters (optional)</param>
+        /// <param name="pg">pagination parameters (optional)</param>
+        /// <returns>Cinema list by provided search string</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No cinema was found</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("search-page/{search}")]
+        [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchPage(
+            CancellationToken ct,
+            [FromRoute] string search,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+        )
+        {
+            var response = await _mediator.Send(_wrapCinemasQuery(new CinemasSearchPageQuery(search, st, pg)), ct);
 
             return Ok(response);
         }
@@ -121,6 +150,34 @@ namespace CinemaDataService.Api.Controllers
             )
         {
             var response = await _mediator.Send(_wrapCinemasQuery (new CinemasYearQuery(year, st, pg)), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all cinemas by provided year interval boundaries with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="lys">lower year boundaries (>=)</param>
+        /// <param name="d">spans length (< lys+d)</param>
+        /// <param name="st">sort parameters</param>
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All studios list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found for this user</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("year")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> YearSpan(
+            CancellationToken ct,
+            [FromQuery] int[] lys,
+            [FromQuery] int d,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(_wrapCinemasQuery(new CinemasYearSpansQuery(lys, d, st, pg)), ct);
 
             return Ok(response);
         }

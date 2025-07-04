@@ -32,7 +32,7 @@ var buttonManageRole = document.getElementById(buttonManageRoleId);
 var imgPicture = document.querySelector('.profile-picture img');
 
 const IsUser = !!formEditMain;
-const IsSuper = !formEditMain && !!formManageUser;
+const IsSuper = !formEditMain && !!formManageUser && !IsUser;
 
 
 //** ONLOAD ACTIONS **//
@@ -40,7 +40,7 @@ const IsSuper = !formEditMain && !!formManageUser;
 if (IsUser || IsSuper)
 {
     // show confirm popup before calling an action
-    addConfirmPopupEvents(buttonDeleteProfile, deleteProfileAction, null, (t, r) => { alert('deleted ' + r); });
+    addConfirmPopupEvents(buttonDeleteProfile, deleteProfileAction, null, (t, r) => { if (r=='ok') alert('profile successfully deleted'); else alert('there was an error deleting a profile') });
 }
 
 if (IsUser)
@@ -79,14 +79,21 @@ if (IsSuper && !IsUser)
             else if (t.getAttribute('manage-role') == 'revoke') f.action = revokeRoleAction;
         },
         (t, r) => {
-            alert('Role was changed for this profile. ' + r);
+            let manage = t.getAttribute('manage-role');
 
-            if (t.getAttribute('manage-role') == 'grant') {
+            if (r == 'ok')
+                alert("Role was successfully " + (manage == 'grant' ? 'added for' : 'removed from') + " this profile.");
+            else {
+                alert('Error on changing role list for this profile');
+                return;
+            }
+
+            if (manage == 'grant') {
                 t.setAttribute('manage-role', 'revoke');
                 t.setAttribute('target-label', '#label-revoke-role');
                 t.innerText = 'Revoke Admin'
             }
-            else if (t.getAttribute('manage-role') == 'revoke') {
+            else if (manage == 'revoke') {
                 t.setAttribute('manage-role', 'grant');
                 t.setAttribute('target-label', '#label-grant-role');
                 t.innerText = 'Grant Admin'

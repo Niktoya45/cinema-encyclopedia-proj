@@ -104,6 +104,8 @@ function fetchFormAddStarring(form, doFormWrap, actionAddStarring) {
     fetchForm(
         form,
         function (placeholder) {
+            if (!placeholder.innerHTML) return;
+
             let div = document.createElement("div");
             let Id = "";
 

@@ -1,16 +1,17 @@
+using GatewayAPIService.Infrastructure.Services.AccessService;
 using GatewayAPIService.Infrastructure.Services.CinemaService;
+using GatewayAPIService.Infrastructure.Services.ImageService;
 using GatewayAPIService.Infrastructure.Services.PersonService;
 using GatewayAPIService.Infrastructure.Services.StudioService;
 using GatewayAPIService.Infrastructure.Services.UserService;
-using GatewayAPIService.Infrastructure.Services.AccessService;
-using GatewayAPIService.Infrastructure.Services.ImageService;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -153,6 +154,12 @@ namespace GatewayAPIService.Api
             });
 
             builder.Services.AddMemoryCache();
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 2_147_648;
+            });
+
 
             var app = builder.Build();
 

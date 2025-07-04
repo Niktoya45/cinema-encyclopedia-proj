@@ -7,12 +7,12 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ImageService.Infrastructure.Repositories
 {
-    public class ImageRepository:IImageRepository
+    public class AzureImageRepository:IImageRepository
     {
         BlobContainerClient _containerClient;
 
         DateTimeOffset readOffset = DateTimeOffset.UtcNow.AddHours(2);
-        public ImageRepository(BlobContainerClient containerClient) 
+        public AzureImageRepository(BlobContainerClient containerClient) 
         {
             _containerClient = containerClient;
         }

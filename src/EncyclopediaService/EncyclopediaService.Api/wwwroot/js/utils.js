@@ -15,7 +15,7 @@ export function fetchForm(form, eventAdd, eventRefreshForm, modalForm) {
 
     fetchPostMVC(form, form.action, "TEXT")
         .then((result) => {
-            if (!result) { window.location.reload(); return; }
+            if (!result) { return; }
 
             let placeholder = document.createElement("div");
 
@@ -61,6 +61,7 @@ export function fetchPostMVC(form, action, responseType) {
             signal: signalCancel
         })
         .then((response) => {
+            if (!response) return response;
 
             if (responseType == "TEXT") {
                 return response.text();
@@ -88,6 +89,7 @@ export function fetchGetMVC(action, responseType) {
             signal: signalCancel
         })
         .then((response) => {
+            if (!response) return response;
 
             if (responseType == "TEXT") {
                 return response.text();

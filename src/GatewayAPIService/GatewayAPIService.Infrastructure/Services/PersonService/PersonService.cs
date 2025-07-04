@@ -1,9 +1,10 @@
 ﻿
+using GatewayAPIService.Infrastructure.Extensions;
+using Shared.CinemaDataService.Models.CinemaDTO;
 using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.PersonDTO;
 using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
-using GatewayAPIService.Infrastructure.Extensions;
 using System.Net.Http.Json;
 
 namespace GatewayAPIService.Infrastructure.Services.PersonService
@@ -28,6 +29,12 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
 
             return await response.HandleResponse<Page<PersonsResponse>>(ct);
         }
+        public async Task<Page<PersonsResponse>?> GetByIds(string[] ids, CancellationToken ct, SortBy? st = null)
+        {
+            var response = await _httpClient.PostAsJsonAsync(personsUri + "/indexes?" + sort_paginate(st, null), ids, ct);
+
+            return await response.HandleResponse<Page<PersonsResponse>>(ct);
+        }
         public async Task<PersonResponse?> GetById(string id, CancellationToken ct) 
         {
             var response = await _httpClient.GetAsync(personsUri + $"/{id}");
@@ -36,7 +43,7 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
         }
         public async Task<FilmographyResponse?> GetFilmographyById(string personId, string filmographyId, CancellationToken ct)
         {
-            var response = await _httpClient.GetAsync(personsUri + $"{personId}/filmography/{filmographyId}", ct);
+            var response = await _httpClient.GetAsync(personsUri + $"/{personId}/filmography/{filmographyId}", ct);
 
             return await response.HandleResponse<FilmographyResponse>(ct);
         }
@@ -45,6 +52,12 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
             var response = await _httpClient.GetAsync(personsUri+$"/search/{search}?" + sort_paginate(null, pg), ct);      
             
             return await response.HandleResponse<IEnumerable<SearchResponse>>(ct);
+        }
+        public async Task<Page<PersonsResponse>?> GetBySearchPage(string search, CancellationToken ct, Pagination? pg = null)
+        {
+            var response = await _httpClient.GetAsync(personsUri+$"/search-page/{search}?" + sort_paginate(null, pg), ct);      
+            
+            return await response.HandleResponse<Page<PersonsResponse>>(ct);
         }
         public async Task<Page<PersonsResponse>?> GetByCountry(Country country, CancellationToken ct, SortBy? st = null, Pagination? pg = null)
         {
@@ -83,6 +96,12 @@ namespace GatewayAPIService.Infrastructure.Services.PersonService
         public async Task<PersonResponse?> Update(string id, UpdatePersonRequest person, CancellationToken ct)
         {
             var response = await _httpClient.PutAsJsonAsync<UpdatePersonRequest>(personsUri +$"/{id}", person, ct);
+
+            return await response.HandleResponse<PersonResponse>(ct);
+        }
+        public async Task<PersonResponse?> UpdateMain(string id, UpdatePersonRequest person, CancellationToken ct)
+        {
+            var response = await _httpClient.PutAsJsonAsync<UpdatePersonRequest>(personsUri +$"/{id}/main", person, ct);
 
             return await response.HandleResponse<PersonResponse>(ct);
         }

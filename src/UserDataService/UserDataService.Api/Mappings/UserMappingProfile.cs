@@ -16,11 +16,16 @@ namespace UserDataService.Api.Mappings
                 .ForMember(u => u.IsDeleted, opt => opt.Ignore());
 
             CreateMap<UpdateUserCommand, User>()
-                .ForMember(u => u.Id, opt => opt.Ignore())
                 .ForMember(u => u.CreatedAt, opt => opt.Ignore())
                 .ForMember(u => u.IsDeleted, opt => opt.Ignore());
 
             CreateMap<User, UserResponse>()
+                .ForMember(ur => ur.PictureUri, opt => opt.Ignore());
+
+            CreateMap<User, CreateUserResponse>()
+                .ForMember(ur => ur.PictureUri, opt => opt.Ignore());
+
+            CreateMap<User, UpdateUserResponse>()
                 .ForMember(ur => ur.PictureUri, opt => opt.Ignore());
         }
     }

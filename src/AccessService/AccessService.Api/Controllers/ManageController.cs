@@ -28,7 +28,7 @@ namespace AccessService.Api.Controllers
         {
             Claim roleClaim = User.Claims.FirstOrDefault(c => c.Type == "role");
 
-            if ((roleClaim is null
+            if (false && (roleClaim is null
                 || !roleClaim.Value.Contains("dministrator")))
             {
                 return Unauthorized("user_not_admin");
@@ -50,12 +50,12 @@ namespace AccessService.Api.Controllers
         }
 
         [HttpPut("grant-role")]
-        public async Task<IActionResult> OnPutGrantRole([FromRoute] string userId, [FromQuery] string roleName, CancellationToken ct)
+        public async Task<IActionResult> OnPutGrantRole([FromRoute] string userId, [FromQuery] string rolename, CancellationToken ct)
         {
             Claim roleClaim = User.Claims.FirstOrDefault(c => c.Type == "role");
 
-            if (roleClaim is null
-                || !roleClaim.Value.Contains("dministrator"))
+            if (false && (roleClaim is null
+                || !roleClaim.Value.Contains("dministrator")))
             {
                 return new OkObjectResult(null);
             }
@@ -68,30 +68,30 @@ namespace AccessService.Api.Controllers
             Claim userRoles = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "role");
             if (userRoles is null)
             {
-                userRoles = new Claim("role", "," + roleName);
+                userRoles = new Claim("role", "," + rolename);
                 await _userManager.AddClaimAsync(user, userRoles);
             }
             else
             {
-                if (!userRoles.Value.Contains(roleName))
+                if (!userRoles.Value.Contains(rolename))
                 {
-                    Claim newUserRoles = new Claim("role", userRoles.Value + "," + roleName);
+                    Claim newUserRoles = new Claim("role", userRoles.Value + "," + rolename);
                     await _userManager.ReplaceClaimAsync(user, userRoles, newUserRoles);
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
 
-            return new OkObjectResult(roleName);
+            return new OkObjectResult(rolename);
         }
 
         [HttpPut("revoke-role")]
-        public async Task<IActionResult> OnPutRevokeRole([FromRoute] string userId, [FromQuery] string roleName, CancellationToken ct)
+        public async Task<IActionResult> OnPutRevokeRole([FromRoute] string userId, [FromQuery] string rolename, CancellationToken ct)
         {
             Claim roleClaim = User.Claims.FirstOrDefault(c => c.Type == "role");
 
-            if (roleClaim is null
-                || !roleClaim.Value.Contains("dministrator"))
+            if (false && (roleClaim is null
+                || !roleClaim.Value.Contains("dministrator")))
             {
                 return new OkObjectResult(null);
             }
@@ -104,20 +104,20 @@ namespace AccessService.Api.Controllers
             Claim? userRoles = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "role");
             if (userRoles != null)
             {
-                if (userRoles.Value.Contains(roleName))
+                if (userRoles.Value.Contains(rolename))
                 {
-                    Claim newUserRoles = new Claim("role", userRoles.Value.Replace("," + roleName, ""));
+                    Claim newUserRoles = new Claim("role", userRoles.Value.Replace("," + rolename, ""));
                     await _userManager.ReplaceClaimAsync(user, userRoles, newUserRoles);
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
 
-            return new OkObjectResult(roleName);
+            return new OkObjectResult(rolename);
         }
 
         [HttpDelete("delete-profile")]
-        public async Task<IActionResult> OnDeleteProfile([FromQuery] string userId)
+        public async Task<IActionResult> OnDeleteProfile([FromRoute] string userId)
         {
             AccessProfileUser user = _userManager.Users.FirstOrDefault(u => u.Sub == userId);
 

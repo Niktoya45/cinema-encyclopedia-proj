@@ -8,8 +8,8 @@ namespace CinemaDataService.Api.Queries.CinemaQueries
     {
         public CinemasIdQuery(
             string[] ids,
-            Pagination? pagination = null
-            ):base(null, pagination)
+            SortBy? sort = null
+            ):base(sort, null)
         {
             Ids = ids;
         }

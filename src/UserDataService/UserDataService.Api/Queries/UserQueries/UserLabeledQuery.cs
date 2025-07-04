@@ -6,7 +6,7 @@ namespace UserDataService.Api.Queries.UserQueries
 {
     public class UserLabeledQuery : IRequest<IEnumerable<LabeledResponse>>
     {
-        public UserLabeledQuery(string id, Label? label = null, string? cinemaId = null, string? userId = null)
+        public UserLabeledQuery(string id, Label label = Label.None, string? cinemaId = null, string? userId = null)
         {
             Id = id;
             Label = label;
@@ -15,7 +15,7 @@ namespace UserDataService.Api.Queries.UserQueries
         }
 
         public string Id { get; }
-        public Label? Label { get; }
+        public Label Label { get; }
         public string? CinemaId { get; }
         public string? UserId { get; }
     }

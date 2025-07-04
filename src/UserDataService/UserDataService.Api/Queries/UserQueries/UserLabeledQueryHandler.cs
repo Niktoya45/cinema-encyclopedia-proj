@@ -9,7 +9,7 @@ using UserDataService.Infrastructure.Models.SharedDTO;
 namespace UserDataService.Api.Queries.UserQueries
 {
 
-    public class UserLabeledQueryHandler : IRequestHandler<UserLabeledQuery, IEnumerable<LabeledResponse>>
+    public class UserLabeledQueryHandler : IRequestHandler<UserLabeledQuery, IEnumerable<LabeledResponse>?>
     {
         IUserRepository _repository;
         IMapper _mapper;
@@ -18,15 +18,11 @@ namespace UserDataService.Api.Queries.UserQueries
             _repository = repository;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<LabeledResponse>> Handle(UserLabeledQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LabeledResponse>?> Handle(UserLabeledQuery request, CancellationToken cancellationToken)
         {
             IList<LabeledRecord>? labeled = await _repository.FindCinemasByUserIdLabel(request.Id, request.Label, request.CinemaId, null, cancellationToken);
 
-            if (labeled == null) {
-                throw new NotFoundException(request.Id, "Users");
-            }
-
-            return _mapper.Map<IEnumerable<LabeledRecord>, IEnumerable<LabeledResponse>>(labeled);
+            return labeled is null || !labeled.Any() ? null : _mapper.Map<IEnumerable<LabeledRecord>, IEnumerable<LabeledResponse>>(labeled);
         }
     }
 }

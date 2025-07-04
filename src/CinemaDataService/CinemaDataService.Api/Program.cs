@@ -1,9 +1,11 @@
-using System.Reflection;
-using MongoDB.Driver;
+using CinemaDataService.Api.Middlewares;
 using CinemaDataService.Infrastructure.Context;
 using CinemaDataService.Infrastructure.Repositories.Abstractions;
 using CinemaDataService.Infrastructure.Repositories.Implementations;
-using CinemaDataService.Api.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using System.Reflection;
 
 namespace CinemaDataService.Api
 {
@@ -36,6 +38,34 @@ namespace CinemaDataService.Api
             builder.Services.AddTransient<IPersonRepository, PersonRepository>();
             builder.Services.AddTransient<IStudioRepository, StudioRepository>();
 
+            builder.Services.AddAuthentication(options =>
+            {
+
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            })
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.Authority = builder.Configuration.GetValue<string>("jwt:issuer");
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        ValidateIssuerSigningKey = false,
+                        AuthenticationType = "at+jwt",
+                        SaveSigninToken = true,
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+
+                    };
+
+                    options.MapInboundClaims = false;
+                });
+
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
             builder.Services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
@@ -53,7 +83,6 @@ namespace CinemaDataService.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

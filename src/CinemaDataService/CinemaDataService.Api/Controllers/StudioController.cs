@@ -74,6 +74,29 @@ namespace CinemaDataService.Api.Controllers
         }
 
         /// <summary>
+        /// Search by studio name
+        /// </summary>
+        /// <param name="search">search string</param>
+        /// <returns>Updated task instance</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">None instance is found</response>
+        [HttpGet("search-page/{search}")]
+        [ProducesResponseType(typeof(IEnumerable<SearchResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchPage(
+            CancellationToken ct,
+            [FromRoute] string search,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+        )
+        {
+            var response = await _mediator.Send(_wrapStudiosQuery(new StudiosSearchPageQuery(search, st, pg)), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get all studios by provided year with optional sort and pagination criteria
         /// </summary>
         /// <param name="year">year of studio foundation</param>
@@ -95,6 +118,34 @@ namespace CinemaDataService.Api.Controllers
             )
         {
             var response = await _mediator.Send(_wrapStudiosQuery( new StudiosYearQuery(year, st, pg)), ct);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all studios by provided year interval boundaries with optional sort and pagination criteria
+        /// </summary>
+        /// <param name="lys">lower years boundaries (>=)</param>
+        /// <param name="d">fixed year interval length (< lys+d)</param>
+        /// <param name="st">sort parameters</param>
+        /// <param name="pg">pagination parameters</param>
+        /// <returns>All studios list</returns>
+        /// <response code="200">Success</response>
+        /// <response code="400">No studio was found for this user</response>
+        /// <response code="500">Something is wrong on a server</response>
+        [HttpGet("year")]
+        [ProducesResponseType(typeof(Page<StudiosResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> YearSpan(
+            CancellationToken ct,
+            [FromQuery] int[] lys,
+            [FromQuery] int d,
+            [FromQuery] SortBy? st = null,
+            [FromQuery] Pagination? pg = null
+            )
+        {
+            var response = await _mediator.Send(_wrapStudiosQuery( new StudiosYearSpansQuery(lys, d, st, pg)), ct);
 
             return Ok(response);
         }
@@ -154,7 +205,7 @@ namespace CinemaDataService.Api.Controllers
         /// </summary>
         /// <returns>All studio list</returns>
         /// <param name="ids">indices to search by</param> 
-        /// <param name="pg">pagination parameters</param> 
+        /// <param name="st">sort parameters (optional)</param> 
         /// <response code="200">Success</response>
         /// <response code="400">No studio was found</response>
         /// <response code="500">Something is wrong on a server</response>
@@ -165,10 +216,10 @@ namespace CinemaDataService.Api.Controllers
         public async Task<IActionResult> PostAsync(
             CancellationToken ct,
             [FromBody] string[] ids,
-            [FromQuery] Pagination? pg = null
+            [FromQuery] SortBy? st = null
             )
         {
-            var response = await _mediator.Send(_wrapStudiosQuery(new StudiosIdQuery(ids, pg)), ct);
+            var response = await _mediator.Send(_wrapStudiosQuery(new StudiosIdQuery(ids, st)), ct);
 
             return Ok(response);
         }
@@ -399,30 +450,30 @@ namespace CinemaDataService.Api.Controllers
         {
             await _mediator.Send(new DeleteStudioCommand(id), ct);
 
-            return Ok();
+            return Ok(id);
         }
 
         /// <summary>
         /// Delete single cinema from filmography by optional studio id
         /// </summary>
         /// <param name="studioId">Id of studio which filmography cinema to be deleted</param>
-        /// <param name="id">Id of filmography entrance</param>
+        /// <param name="filmographyId">Id of filmography entrance</param>
         /// <returns></returns>
         /// <response code="200">Success</response>
         /// <response code="400">Studio or cinema is not found</response>
-        [HttpDelete("filmography/{id}")]
-        [HttpDelete("{studioId}/filmography/{id}")]
+        [HttpDelete("filmography/{filmographyId}")]
+        [HttpDelete("{studioId}/filmography/{filmographyId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Filmographys(
             CancellationToken ct,
             [FromRoute] string? studioId,
-            [FromRoute] string id
+            [FromRoute] string filmographyId
             )
         {
-            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, id), ct);
+            await _mediator.Send(new DeleteStudioFilmographyCommand(studioId, filmographyId), ct);
 
-            return Ok();
+            return Ok(filmographyId);
         }
     }
 }

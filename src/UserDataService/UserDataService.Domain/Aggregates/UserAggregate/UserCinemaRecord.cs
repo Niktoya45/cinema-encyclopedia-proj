@@ -9,6 +9,8 @@ namespace UserDataService.Domain.Aggregates.UserAggregate
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
         public string? CinemaId { get; set; }
         public string UserId { get; set; }
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;

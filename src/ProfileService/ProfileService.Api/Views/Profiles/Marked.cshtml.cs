@@ -1,33 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.JsonWebTokens;
 using ProfileService.Api.Models;
+using ProfileService.Api.Models.Display;
+using ProfileService.Api.Models.TestData;
+using ProfileService.Infrastructure.Services.GatewayService;
+using Shared.UserDataService.Models.Flags;
 using System.Security.Claims;
 
 namespace ProfileService.Api.Views.Profiles
 {
     public class MarkedModel : PageModel
     {
+        IGatewayService _gatewayService;
+
         [BindProperty(SupportsGet = true)]
         public string Id { get; set; }
-        public IList<CinemaRecord> List { get; set; }
-        public async Task<IActionResult> OnGet([FromRoute] string id)
-        {
-            Label[] labels = Enum.GetValues<Label>();
+        public IList<Marked> List { get; set; }
 
-            List = Enumerable.Range(1, 55).Select(x => new CinemaRecord { 
-                            ParentId = id,
-                            Id = "" + x, 
-                            Name = "Cinema " + x, 
-                            Label = labels[x%4+1], 
-                            AddedAt = new DateTime(2020+x/10, x%12+1, x%30+1, x%12+1, x%60+1, x%60+1) , 
-                            Picture = null }).ToList();
+        public MarkedModel(IGatewayService gatewayService)
+        { 
+            _gatewayService = gatewayService;
+        }
+
+        public async Task<IActionResult> OnGet([FromRoute] string id, CancellationToken ct)
+        {
+            if (TestRecords.Used)
+                List = TestRecords.Markeds;
+
+            else {
+                var response = await _gatewayService.GetUserLabeled(id, Label.None, ct);
+
+                List = response is null || response.LabeledCinemas is null ? new List<Marked>()
+                : response.LabeledCinemas.Select(l => new Marked 
+                { 
+                    ParentId = id,
+                    Id = l.Cinema.Id,
+                    Name = l.Cinema.Name,
+                    Label = l.Label,
+                    AddedAt = l.AddedAt,
+                    Picture = l.Cinema.PictureUri,
+                    
+                }).ToArray();
+            }
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostDelete([FromRoute] string id, [FromQuery] string cinemaId)
+        public async Task<IActionResult> OnPostDelete([FromRoute] string id, [FromQuery] string cinemaId, [FromQuery] Label label, CancellationToken ct)
         {
+            if (TestRecords.Used)
+                await _gatewayService.DeleteFromLabeledList(id, cinemaId, label, ct);
+
             return new OkObjectResult("log delete");
         }
     }
