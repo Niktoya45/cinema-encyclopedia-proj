@@ -94,7 +94,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
                     }
                     Id =  response.Id;
 
-                    if (AddLogo.Image is null || AddLogo.Image.Length >= _settings.MaxFileLength)
+                    if (AddLogo.Image != null && AddLogo.Image.Length < _settings.MaxFileLength)
                     {
                         string imageName = AddLogo.Image.FileName;
                         string imageExt = Path.GetExtension(imageName);

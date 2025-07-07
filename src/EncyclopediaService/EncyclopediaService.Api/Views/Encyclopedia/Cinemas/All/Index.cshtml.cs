@@ -228,8 +228,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         {
             if (response is null)
             {
-                List = new List<CinemaRecord>();
-                IsEnd = true;
+                RedirectToPage("/Error");
             }
             else
             {

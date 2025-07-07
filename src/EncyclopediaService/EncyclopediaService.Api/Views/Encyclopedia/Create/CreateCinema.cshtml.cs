@@ -68,6 +68,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
                 foreach (var s in Cinema.Starrings)
                     ModelState.Remove($"Cinema.Starrings[{s.Id}].JobsBind");
             }
+            ModelState.Remove("Id");
             ModelState.Remove("Name");
 
             if (Cinema.GenresBind != null)
@@ -116,7 +117,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                 Id = response.Id;
 
-                if (AddPoster.Image is null || AddPoster.Image.Length >= _settings.MaxFileLength)
+                if (AddPoster.Image != null && AddPoster.Image.Length < _settings.MaxFileLength)
                 {
                     string imageName = AddPoster.Image.FileName;
                     string imageExt = Path.GetExtension(imageName);
@@ -152,7 +153,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
             return Partial("_StarringCard", new EncyclopediaService.Api.Models.Display.Starring {
                     ParentId = nameof(Cinema) + "." + nameof(Cinema.Starrings),
-                    Id = "3",
+                    Id = AddStarring.Id,
                     Name = AddStarring.Name,
                     Picture = AddStarring.Picture,
                     PictureUri = AddStarring.PictureUri,
@@ -179,7 +180,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
             return Partial("_StudioCard", new ProductionStudio
             {
                 ParentId = nameof(Cinema) + "." + nameof(Cinema.ProductionStudios),
-                Id = "7",
+                Id = AddStudio.Id,
                 Name = AddStudio.Name,
                 Picture = AddStudio.Picture,
                 PictureUri = AddStudio.PictureUri

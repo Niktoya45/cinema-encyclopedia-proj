@@ -58,10 +58,16 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
         public async Task<IActionResult> OnPostAddPerson(CancellationToken ct)
         {
+            ModelState.Remove("Id");
+            ModelState.Remove("Name");
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
+
+            if (Person.JobsBind != null)
+                Person.Jobs = Person.JobsBind.Aggregate((acc, j) => acc | j);
 
             if (Person != null)
             {
@@ -96,7 +102,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                     Id = response.Id;
 
-                    if (AddPicture.Image is null || AddPicture.Image.Length >= _settings.MaxFileLength)
+                    if (AddPicture.Image != null && AddPicture.Image.Length < _settings.MaxFileLength)
                     {
                         string imageName = AddPicture.Image.FileName;
                         string imageExt = Path.GetExtension(imageName);
@@ -133,7 +139,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
             return Partial("_FilmCard", new FilmographyRecord
             {
                 ParentId = nameof(Person) + "." + nameof(Person.Filmography),
-                Id = "3",
+                Id = AddFilm.Id,
                 Name = AddFilm.Name,
                 Year = AddFilm.Year,
                 Picture = AddFilm.Picture,

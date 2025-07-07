@@ -113,6 +113,16 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             return new OkResult();
         }
 
+        public async Task<IActionResult> OnPostDeletePerson([FromRoute] string id, CancellationToken ct)
+        {
+            if (!TestEntities.Used)
+            {
+                bool response = await _gatewayService.DeletePerson(id, ct);
+            }
+
+            return new OkObjectResult(id);
+        }
+
         public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id, CancellationToken ct)
         {
             ModelState.Remove("JobsBind");
@@ -140,7 +150,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             return Partial("_FilmCard", new FilmographyRecord {
                 Id = EditFilm.Id,
                 Name = EditFilm.Name,
-                Year = 2001,
+                Year = EditFilm.Year,
                 Picture = EditFilm.Picture,
                 PictureUri = EditFilm.PictureUri
             });

@@ -115,6 +115,16 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             return new OkResult();
         }
 
+        public async Task<IActionResult> OnPostDeleteStudio([FromRoute] string id, CancellationToken ct)
+        {
+            if (!TestEntities.Used)
+            {
+                bool response = await _gatewayService.DeleteStudio(id, ct);
+            }
+
+            return new OkObjectResult(id);
+        }
+
         public async Task<IActionResult> OnPostAddFilmography([FromRoute] string id, CancellationToken ct)
         {
             if (!ModelState.IsValid)

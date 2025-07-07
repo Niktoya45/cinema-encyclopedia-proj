@@ -1,5 +1,6 @@
 ﻿@page
 @using Shared.CinemaDataService.Models.Flags;
+@using EncyclopediaService.Api.Models.Display;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreateCinemaModel
 @{
 }
@@ -147,7 +148,14 @@
 										@foreach (var studio in Model.Cinema.ProductionStudios)
 										{
 											<div class="col add-studio">
-												<partial name="_StudioCard" model="@studio"/>
+												<partial name="_StudioCard" model="@(new ProductionStudio
+											  {
+												  ParentId = nameof(Model.Cinema) + "." + nameof(Model.Cinema.ProductionStudios),
+												  Id = studio.Id,
+												  Name = studio.Name,
+												  Picture = studio.Picture,
+												  PictureUri = studio.PictureUri
+											  })" />
 											</div>
 										}
 									}
@@ -196,7 +204,17 @@
 										@foreach (var starring in Model.Cinema.Starrings)
 										{
 											<div class="col add-starring">
-												<partial name="_StarringCard" model="@starring"/>
+												<partial name="_StarringCard" model="@(new Starring
+												{
+													ParentId = nameof(Model.Cinema) + "." + nameof(Model.Cinema.ProductionStudios),
+													Id = starring.Id,
+													Name = starring.Name,
+													Picture = starring.Picture,
+													PictureUri = starring.PictureUri,
+													Jobs = starring.JobsBind.Aggregate((acc, j) => acc | j),
+													RoleName = starring.RoleName,
+													RolePriority = starring.RolePriority
+												})" />
 											</div>
 										}
 									}

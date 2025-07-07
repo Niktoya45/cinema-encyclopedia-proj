@@ -243,8 +243,10 @@ function searchFilmographyChoice(searchInput, listItem, choice) {
         searchInput,
         listItem,
         choice,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = false;
+
+            getHidden(formAdd, "Year").value = choiceRes.year;
         }
     );
 
@@ -256,8 +258,10 @@ function searchFilmographyClose(searchInput) {
     addSearchClose(
         formAdd,
         searchInput,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = true;
+
+            getHidden(formAdd, "Year").value = null;
         }
     );
 

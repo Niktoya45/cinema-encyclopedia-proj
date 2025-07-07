@@ -1,6 +1,7 @@
 ﻿@page
 @using Shared.CinemaDataService.Models.Flags;
 @using EncyclopediaService.Api.Extensions;
+@using EncyclopediaService.Api.Models.Display;
 @model EncyclopediaService.Api.Views.Encyclopedia.Create.CreatePersonModel
 @{
 
@@ -23,7 +24,7 @@
 
 
 	<div class="container-fluid create-page">
-		<form id="form-add-person" class="trim-inputs" asp-page-handler="addPerson" method="post">
+		<form id="form-add-person" class="trim-inputs" asp-page-handler="addPerson" method="post" enctype="multipart/form-data">
 
 			<div class="row">
 
@@ -139,7 +140,15 @@
 										@foreach (var film in Model.Person.Filmography)
 										{
 											<div class="col add-film">
-												<partial name="_FilmCard" model="@film"/>
+												<partial name="_FilmCard" model="@(new FilmographyRecord
+											{
+												ParentId = nameof(Model.Person) + "." + nameof(Model.Person.Filmography),
+												Id = film.Id,
+												Name = film.Name,
+												Year = film.Year,
+												Picture = film.Picture,
+												PictureUri = film.PictureUri
+											})" />
 											</div>
 										}
 									}

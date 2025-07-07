@@ -108,6 +108,15 @@ namespace GatewayAPIService.Api.Controllers
                 return NotFound();
             }
 
+
+            foreach (CinemasResponse cinema in response.Response)
+            {
+                if (cinema.Picture != null)
+                {
+                    cinema.PictureUri = await _imageService.GetImage(cinema.Picture, ImageSize.Medium);
+                }
+            }
+
             return Ok(response);
         }
 

@@ -266,7 +266,7 @@ function searchStarringChoice(searchInput, listItem, choice) {
         searchInput,
         listItem,
         choice,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = false;
 
             var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
@@ -286,7 +286,7 @@ function searchStarringClose(searchInput) {
     addSearchClose(
         formAdd,
         searchInput,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = true;
             var inputsNameDependant = formAdd.querySelectorAll(".name-dependant");
 

@@ -243,7 +243,7 @@ function searchStudioChoice(searchInput, listItem, choice) {
         searchInput,
         listItem,
         choice,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = false;
         }
     );
@@ -256,7 +256,7 @@ function searchStudioClose(searchInput) {
     addSearchClose(
         formAdd,
         searchInput,
-        function () {
+        function (form, choiceRes) {
             formAddSubmit.disabled = true;
         }
     );

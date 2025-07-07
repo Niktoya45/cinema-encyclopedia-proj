@@ -412,7 +412,7 @@ export function addSearchChoice(formAdd, actionSearch, searchInput, listItem, ch
         searchInput.value = choiceRes.name;
 
         if (eventAfterSet) {
-            eventAfterSet();
+            eventAfterSet(formAdd, choiceRes);
         }
     });
 
