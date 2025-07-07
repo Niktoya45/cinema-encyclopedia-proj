@@ -389,6 +389,13 @@ namespace GatewayAPIService.Api.Controllers
             CancellationToken ct = default
             )
         {
+            var user = await _userService.Get(userId, ct);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
             var responseProfile = await _accessService.DeleteProfile(userId, ct);
 
             if (!responseProfile)
@@ -397,6 +404,14 @@ namespace GatewayAPIService.Api.Controllers
             }
 
             var response = await _userService.Delete(userId, ct);
+
+            if (!response)
+            {
+                return BadRequest();
+            }
+
+            if(user.Picture != null)
+                await _imageService.DeleteImage(user.Picture, (ImageSize)31);
 
             await _userService.DeleteFromLabeledList(userId, null, ct);
 

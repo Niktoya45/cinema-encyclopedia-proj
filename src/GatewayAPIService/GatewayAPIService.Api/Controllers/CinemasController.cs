@@ -448,39 +448,77 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateCinemaRequest request
             )
         {
-            //return Ok(new CinemaResponse());
+
+            Page<StudiosResponse>? studioPage;
+            StudiosResponse? studioRecord;
+
+            if (request.ProductionStudios != null && request.ProductionStudios.Any())
+            {
+                foreach (var studio in request.ProductionStudios)
+                {
+                    studioPage = await _studioService.GetByIds(new string[] { studio.Id }, ct, null);
+
+                    if (studioPage == null) continue;
+
+                    studioRecord = studioPage.Response.FirstOrDefault();
+
+                    if (studioRecord == null) continue;
+
+                    studio.Name = studioRecord.Name;
+                    studio.Picture = studioRecord.Picture;
+                }
+            }
+
+            Page<PersonsResponse>? personPage;
+            PersonsResponse? personRecord;
+
+            if (request.Starrings != null && request.Starrings.Any())
+            {
+                foreach (var person in request.Starrings)
+                {
+                    personPage = await _personService.GetByIds(new string[] { person.Id }, ct, null);
+
+                    if (personPage == null) continue;
+
+                    personRecord = personPage.Response.FirstOrDefault();
+
+                    if (personRecord == null) continue;
+
+                    person.Name = personRecord.Name;
+                    person.Picture = personRecord.Picture;
+                    person.Jobs = Job.None;
+                    person.RolePriority = RolePriority.None;
+                }
+            }
 
             CinemaResponse? response = await _cinemaService.Create(request, ct);
 
             if (response is null)
-            {
-                return NotFound(request);
-            }
+                return BadRequest();
 
-            if (response.Picture != null)
+            if (request.ProductionStudios != null && request.ProductionStudios.Any())
             {
-                response.PictureUri = await _imageService.GetImage(response.Picture, ImageSize.Big);
-            }
-
-            if (response.Starrings != null && response.Starrings.Any())
-            {
-                foreach (StarringResponse starring in response.Starrings)
+                foreach (var film in request.ProductionStudios)
                 {
-                    if (starring.Picture != null)
+                    await _studioService.CreateFilmographyFor(film.Id, new CreateFilmographyRequest
                     {
-                        starring.PictureUri = await _imageService.GetImage(starring.Picture, ImageSize.Small);
-                    }
+                        Id = response.Id,
+                        Name = response.Name,
+                        Picture = response.Picture
+                    }, ct);
                 }
             }
 
-            if (response.ProductionStudios != null && response.ProductionStudios.Any())
+            if (request.Starrings != null && request.Starrings.Any())
             {
-                foreach (ProductionStudioResponse studio in response.ProductionStudios)
+                foreach (var film in request.Starrings)
                 {
-                    if (studio.Picture != null)
+                    await _personService.CreateFilmographyFor(film.Id, new CreateFilmographyRequest
                     {
-                        studio.PictureUri = await _imageService.GetImage(studio.Picture, ImageSize.Small);
-                    }
+                        Id = response.Id,
+                        Name = response.Name,
+                        Picture = response.Picture
+                    }, ct);
                 }
             }
 
@@ -742,7 +780,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return NotFound();
+                return NotFound(cinemaId);
             }
 
             if(response.Picture is null)
@@ -760,13 +798,11 @@ namespace GatewayAPIService.Api.Controllers
                 Picture = request.NewId
             }, ct);
 
-            if (responsePhoto is null)
-            {
-                return NotFound(cinemaId);
-            }
-            if (responsePhoto.Picture != null)
+            if (responsePhoto != null && responsePhoto.Picture != null)
             {
                 responsePhoto.PictureUri = pictureUri;
+
+                response.Picture = responsePhoto.Picture;
             }
 
             await UpdateAdditional(response, ct);

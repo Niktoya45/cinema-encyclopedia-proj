@@ -223,7 +223,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             return new OkObjectResult(new { label = (byte)UserLabel });
         }
 
-        public async Task<IActionResult> OnPostEditPoster([FromRoute] string id, CancellationToken ct)
+        public async Task<IActionResult> OnPostEditPicture([FromRoute] string id, CancellationToken ct)
         {
             // Implement: after receiving image name send put request to mediatre proxy
 
@@ -244,7 +244,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
             string HashImage = EditPoster.Image.OpenReadStream().ToBase64();
 
             var response = await _gatewayService.UpdateCinemaPhoto(id, new ReplaceImageRequest { 
-                Id = EditPoster.ImageId??"0", 
+                Id = EditPoster.ImageId??"", 
                 NewId = HashName, Size = (ImageSize)31, 
                 FileBase64 = HashImage },
                 ct);

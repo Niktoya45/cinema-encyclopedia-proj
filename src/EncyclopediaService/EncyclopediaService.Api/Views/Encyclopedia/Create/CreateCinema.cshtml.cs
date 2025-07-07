@@ -114,6 +114,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
                     return Page();
                 }
 
+                Id = response.Id;
+
                 if (AddPoster.Image is null || AddPoster.Image.Length >= _settings.MaxFileLength)
                 {
                     string imageName = AddPoster.Image.FileName;
@@ -124,7 +126,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                     var responsePhoto = await _gatewayService.UpdateCinemaPhoto(response.Id, new ReplaceImageRequest
                     {
-                        Id = "",
+                        Id = "0",
                         NewId = HashName,
                         Size = (ImageSize)31,
                         FileBase64 = HashImage
@@ -205,7 +207,6 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
                 {
                     response = await _gatewayService.GetStudiosBySearch(search, ct, new Pagination(0, 5));
                 }
-
                 return new OkObjectResult(response);
             }
 
@@ -221,7 +222,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                     var response = await _gatewayService.GetStudiosByIds(new string[] { recordId }, ct, null);
 
-                    return new OkObjectResult(response);
+                    return new OkObjectResult(response is null ? null : response.Response.FirstOrDefault());
                 }
             }
 
@@ -257,7 +258,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                     var response = await _gatewayService.GetPersonsByIds(new string[] { recordId }, ct,  null);
 
-                    return new OkObjectResult(response);
+                    return new OkObjectResult(response is null ? null : response.Response.FirstOrDefault());
                 }
 
             }

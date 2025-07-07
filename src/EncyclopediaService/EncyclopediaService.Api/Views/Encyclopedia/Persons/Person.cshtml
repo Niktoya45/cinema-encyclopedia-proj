@@ -171,7 +171,7 @@
                                 <li class="list-group-item mb-4 border-bottom border-info fs-5">@string.Join(" | ", Model.Person.Jobs.BreakJobsFlag())</li>
 
                                 <li class="list-group-item list-group-item-secondary mb-4 border-bottom shadow-sm fs-5">Country of origin</li>
-                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country == 0 ? " - " : Model.Person.Country.ToString())</li>
+                                <li class="list-group-item mb-4 border-bottom border-info fs-5">@(Model.Person.Country == 0 ? " - " : Model.Person.Country.ToString().Replace('_', ' '))</li>
                             </ul>
                         </div>
 

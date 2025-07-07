@@ -1,11 +1,13 @@
-﻿using ImageService.Api.Exceptions;
+﻿using Azure.Core;
+using ImageMagick;
+using ImageService.Api.Exceptions;
 using ImageService.Api.General;
 using ImageService.Api.Requests;
 using ImageService.Infrastructure.Models.Flags;
 using ImageService.Infrastructure.Models.ImageDTO;
 using ImageService.Infrastructure.Repositories;
-using ImageMagick;
 using MediatR;
+using System.Security.Cryptography;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -28,7 +30,7 @@ namespace ImageService.Api.Handlers
 
             {
                 byte[] originalBytes = Convert.FromBase64String(request.FileBase64);
-                
+
                 string path = "";
 
                 foreach (ImageSize size in Enum.GetValues<ImageSize>())

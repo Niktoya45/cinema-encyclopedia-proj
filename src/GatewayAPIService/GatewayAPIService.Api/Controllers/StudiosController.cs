@@ -356,19 +356,19 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreateStudioRequest request
             )
         {
-            Page<CinemasResponse>? responseFilm;
+            Page<CinemasResponse>? filmPage;
             CinemasResponse? filmRecord;
 
             if (request.Filmography != null && request.Filmography.Any())
             {
                 foreach (var film in request.Filmography)
                 {
-                    responseFilm = await _cinemaService.GetByIds(new string[] { film.Id }, ct, null);
+                    filmPage = await _cinemaService.GetByIds(new string[] { film.Id }, ct, null);
 
 
-                    if (responseFilm == null) continue;
+                    if (filmPage == null) continue;
 
-                    filmRecord = responseFilm.Response.FirstOrDefault();
+                    filmRecord = filmPage.Response.FirstOrDefault();
 
                     if (filmRecord == null) continue;
 
@@ -562,7 +562,7 @@ namespace GatewayAPIService.Api.Controllers
 
             if (response is null)
             {
-                return NotFound();
+                return NotFound(studioId);
             }
 
             if (response.Picture is null)
@@ -577,15 +577,14 @@ namespace GatewayAPIService.Api.Controllers
             }
 
             UpdatePictureResponse? responsePhoto = await _studioService.UpdatePhoto(studioId, new UpdatePictureRequest { 
-                Picture = response.Picture
+                Picture = request.NewId
             }, ct);
-            if (responsePhoto is null)
-            {
-                return NotFound(studioId);
-            }
-            if (responsePhoto.Picture != null)
+
+            if (responsePhoto != null && responsePhoto.Picture != null)
             {
                 responsePhoto.PictureUri = pictureUri;
+
+                response.Picture = responsePhoto.Picture;
             }
 
             await UpdateAdditional(response, ct);

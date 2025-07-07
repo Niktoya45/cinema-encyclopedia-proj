@@ -20,7 +20,7 @@
 
         <!-- Edit Studio Picture Popup -->
         <form-popup id="modal-edit-picture" form="form-edit-picture" title="Choose studio logo" lock="true" save-close="true" scroll="true">
-            <form id="form-edit-picture" asp-page-handler="editLogo" class="trim-inputs" method="post" enctype="multipart/form-data">			
+            <form id="form-edit-picture" asp-page-handler="editPicture" class="trim-inputs" method="post" enctype="multipart/form-data">			
                 <partial name="_EditPicture" model="Model.EditLogo" />
             </form>
         </form-popup>

@@ -21,7 +21,6 @@ namespace ImageService.Api.Handlers
         }
         public async Task<ImageResponse> Handle(ReplaceImage request, CancellationToken cancellationToken)
         {
-
             Dictionary<ImageSize, string> urisSAS = new Dictionary<ImageSize, string>();
 
             string? uriSAS = null;
@@ -36,7 +35,12 @@ namespace ImageService.Api.Handlers
 
                 foreach (ImageSize size in Enum.GetValues<ImageSize>())
                 {
-                    pathOld = _settings.RootDirectory + _settings.Directory[request.Size] + request.Id;
+                    if ((request.Size & size) == 0)
+                    {
+                        continue;
+                    }
+
+                    pathOld = _settings.RootDirectory + _settings.Directory[size] + request.Id;
 
                     if ((request.Size & size) == 0)
                     {
@@ -45,7 +49,7 @@ namespace ImageService.Api.Handlers
                         continue;
                     }
 
-                    pathNew = _settings.RootDirectory + _settings.Directory[request.Size] + request.NewId;
+                    pathNew = _settings.RootDirectory + _settings.Directory[size] + request.NewId;
 
                     using (MagickImage image = new MagickImage(originalBytes))
                     {

@@ -9,6 +9,7 @@ using Shared.CinemaDataService.Models.Flags;
 using Shared.CinemaDataService.Models.PersonDTO;
 using Shared.CinemaDataService.Models.RecordDTO;
 using Shared.CinemaDataService.Models.SharedDTO;
+using Shared.CinemaDataService.Models.StudioDTO;
 using Shared.ImageService.Models.Flags;
 using Shared.ImageService.Models.ImageDTO;
 
@@ -299,10 +300,48 @@ namespace GatewayAPIService.Api.Controllers
             [FromBody] CreatePersonRequest request
             )
         {
+            Page<CinemasResponse>? filmPage;
+            CinemasResponse? filmRecord;
+
+            if (request.Filmography != null && request.Filmography.Any())
+            {
+                foreach (var film in request.Filmography)
+                {
+                    filmPage = await _cinemaService.GetByIds(new string[] { film.Id }, ct, null);
+
+
+                    if (filmPage == null) continue;
+
+                    filmRecord = filmPage.Response.FirstOrDefault();
+
+                    if (filmRecord == null) continue;
+
+                    film.Name = filmRecord.Name;
+                    film.Year = filmRecord.Year;
+                    film.Picture = filmRecord.Picture;
+                }
+            }
+
             PersonResponse? response = await _personService.Create(request, ct);
 
-            if (response is null) { 
-                return NotFound(request);
+            if (response is null)
+            {
+                return BadRequest(request);
+            }
+
+            if (request.Filmography != null && request.Filmography.Any())
+            {
+                foreach (var film in request.Filmography)
+                {
+                    await _cinemaService.CreateStarringFor(film.Id, new CreateStarringRequest
+                    {
+                        Id = response.Id,
+                        Name = response.Name,
+                        Picture = response.Picture,
+                        Jobs = Job.None,
+                        RolePriority = RolePriority.None
+                    }, ct);
+                }
             }
 
             return Ok(response);
@@ -491,13 +530,12 @@ namespace GatewayAPIService.Api.Controllers
                 Picture = request.NewId
             }, ct);
 
-            if (responsePhoto is null)
-            {
-                return NotFound(personId);
-            }
-            if (responsePhoto.Picture != null)
+
+            if(responsePhoto != null && responsePhoto.Picture != null)
             {
                 responsePhoto.PictureUri = pictureUri;
+
+                response.Picture = responsePhoto.Picture;
             }
 
             await UpdateAdditional(response, ct);

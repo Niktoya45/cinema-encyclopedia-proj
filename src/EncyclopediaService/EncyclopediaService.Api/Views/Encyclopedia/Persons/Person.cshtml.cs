@@ -178,9 +178,9 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             string HashName = imageName.SHA_1() + imageExt;
             string HashImage = EditPicture.Image.OpenReadStream().ToBase64();
 
-            var response = await _gatewayService.UpdateCinemaPhoto(id, new ReplaceImageRequest
+            var response = await _gatewayService.UpdatePersonPhoto(id, new ReplaceImageRequest
             {
-                Id = EditPicture.ImageId,
+                Id = EditPicture.ImageId??"",
                 NewId = HashName,
                 Size = (ImageSize)31,
                 FileBase64 = HashImage
@@ -223,7 +223,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 {
                     var response = await _gatewayService.GetCinemasByIds(new string[] { recordId }, ct, null);
 
-                    return new OkObjectResult(response);
+                    return new OkObjectResult(response is null ? null : response.Response.FirstOrDefault());
                 }
             }
 

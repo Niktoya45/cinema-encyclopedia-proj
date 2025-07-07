@@ -45,13 +45,13 @@ namespace GatewayAPIService.Infrastructure.Services.CinemaService
         }
         public async Task<StarringResponse?> GetStarringById(string cinemaId, string starringId, CancellationToken ct) 
         {
-            var response = await _httpClient.GetAsync(cinemasUri+$"{cinemaId}/starrings/{starringId}");
+            var response = await _httpClient.GetAsync(cinemasUri+$"/{cinemaId}/starrings/{starringId}");
 
             return await response.HandleResponse<StarringResponse>(ct);
         }
         public async Task<ProductionStudioResponse?> GetProductionStudioById(string cinemaId, string studioId, CancellationToken ct)
         {
-            var response = await _httpClient.GetAsync(cinemasUri + $"{cinemaId}/production-studios/{studioId}", ct);
+            var response = await _httpClient.GetAsync(cinemasUri + $"/{cinemaId}/production-studios/{studioId}", ct);
 
             return await response.HandleResponse<ProductionStudioResponse>(ct);
         }

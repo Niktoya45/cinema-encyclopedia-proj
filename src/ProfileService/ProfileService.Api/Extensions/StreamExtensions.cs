@@ -18,7 +18,7 @@ namespace ProfileService.Api.Extensions
                 }
                 cryptoStream.FlushFinalBlock();
 
-                return Convert.ToBase64String(memoryStream.ToArray());
+                return System.Text.Encoding.Default.GetString(memoryStream.ToArray());
             }
 
     }

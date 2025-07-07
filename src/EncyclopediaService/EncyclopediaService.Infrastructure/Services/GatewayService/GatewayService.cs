@@ -249,20 +249,20 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
 
         public async Task<PersonResponse?> UpdatePerson(string id, UpdatePersonRequest person, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}", person, ct);
+            var response = await _httpClient.PutAsJsonAsync(personsUri + $"/{id}", person, ct);
 
             return await response.HandleResponse<PersonResponse>();
         }
 
         public async Task<PersonResponse?> UpdatePersonMain(string id, UpdatePersonRequest person, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{id}/main", person, ct);
+            var response = await _httpClient.PutAsJsonAsync(personsUri + $"/{id}/main", person, ct);
 
             return await response.HandleResponse<PersonResponse>();
         }
         public async Task<UpdatePictureResponse?> UpdatePersonPhoto(string personId, ReplaceImageRequest picture, CancellationToken ct)
         {
-            var response = await _httpClient.PutAsJsonAsync(studiosUri + $"/{personId}/picture/update", picture, ct);
+            var response = await _httpClient.PutAsJsonAsync(personsUri + $"/{personId}/picture/update", picture, ct);
 
             return await response.HandleResponse<UpdatePictureResponse>();
         }
@@ -424,7 +424,7 @@ namespace EncyclopediaService.Infrastructure.Services.GatewayService
         }
         public async Task<LabeledCinemasResponse<CinemasResponse>?> GetUserLabelFor(string userId, string cinemaId, CancellationToken ct)
         {
-            var response = await _httpClient.GetAsync(usersUri + $"/label?cinemaId={cinemaId}", ct);
+            var response = await _httpClient.GetAsync(usersUri + $"/{userId}/label?cinemaId={cinemaId}", ct);
 
             return await response.HandleResponse<LabeledCinemasResponse<CinemasResponse>>();
         }

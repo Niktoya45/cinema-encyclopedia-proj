@@ -179,9 +179,9 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
             string HashName = imageName.SHA_1() + imageExt;
             string HashImage = EditLogo.Image.OpenReadStream().ToBase64();
 
-            var response = await _gatewayService.UpdateCinemaPhoto(id, new ReplaceImageRequest
+            var response = await _gatewayService.UpdateStudioPhoto(id, new ReplaceImageRequest
             {
-                Id = EditLogo.ImageId,
+                Id = EditLogo.ImageId??"",
                 NewId = HashName,
                 Size = (ImageSize)31,
                 FileBase64 = HashImage
@@ -225,7 +225,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
                 {
                     var response = await _gatewayService.GetCinemasByIds(new string[] { recordId }, ct, null);
 
-                    return new OkObjectResult(response);
+                    return new OkObjectResult(response is null ? null : response.Response.FirstOrDefault());
                 }
             }
 

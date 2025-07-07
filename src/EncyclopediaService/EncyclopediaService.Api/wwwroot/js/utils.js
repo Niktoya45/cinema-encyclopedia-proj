@@ -144,7 +144,7 @@ export function addMainPictureEditEvents(formPicture, formPictureSubmit, imgTarg
         fetchPostMVC(formPicture, formPicture.action, "JSON")
             .then((result) => {
 
-                if (!result.picture) {
+                if (!result || !result.picture) {
                     return;
                 }
 
@@ -493,7 +493,7 @@ export function addSearchEvents(searchDropdown, action, eventChoose, eventClose)
                             suggestionsList.style.visibility = "hidden";
 
                             if (eventChoose) {
-                                console.log("choice action");
+                                console.log("choice action " + choice);
                                 eventChoose(searchInput, listItem, choice);
                             }
 

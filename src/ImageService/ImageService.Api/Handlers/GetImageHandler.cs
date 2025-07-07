@@ -27,7 +27,6 @@ namespace ImageService.Api.Handlers
 
             foreach (ImageSize size in Enum.GetValues<ImageSize>())
             {
-
                 if ((request.Size & size) == 0)
                 {
                     continue;

@@ -104,7 +104,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
 
                         var responsePhoto = await _gatewayService.UpdateStudioPhoto(response.Id, new ReplaceImageRequest
                         {
-                            Id = "",
+                            Id = "0",
                             NewId = HashName,
                             Size = (ImageSize)31,
                             FileBase64 = HashImage
