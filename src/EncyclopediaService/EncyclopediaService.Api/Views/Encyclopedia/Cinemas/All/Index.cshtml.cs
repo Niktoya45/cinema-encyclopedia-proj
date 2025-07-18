@@ -75,6 +75,8 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas.All
         {
             if (PageNum < 1) PageNum = 1;
 
+            var qr = Request.Query;
+
             if (TestRecords.Used)
             {
                 List = TestRecords.CinemasList;

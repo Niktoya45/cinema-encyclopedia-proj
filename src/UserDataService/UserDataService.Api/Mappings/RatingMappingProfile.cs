@@ -11,12 +11,12 @@ namespace UserDataService.Api.Mappings
         public RatingMappingProfile()
         {
             CreateMap<UpdateRatingCommand, RatingRecord>()
-                .ForMember(r => r.Id, opt => opt.MapFrom(c => c.CinemaId))
+                .ForMember(r => r.Id, opt => opt.Ignore())
                 .ForMember(r => r.CinemaId, opt => opt.MapFrom(c => c.CinemaId))
                 .ForMember(r => r.AddedAt, opt => opt.Ignore());
             
             CreateMap<DeleteRatingCommand, RatingRecord>()
-                .ForMember(r => r.Id, opt => opt.MapFrom(c => c.CinemaId))
+                .ForMember(r => r.Id, opt => opt.Ignore())
                 .ForMember(r => r.CinemaId, opt => opt.MapFrom(c => c.CinemaId))
                 .ForMember(r => r.AddedAt, opt => opt.Ignore());
 

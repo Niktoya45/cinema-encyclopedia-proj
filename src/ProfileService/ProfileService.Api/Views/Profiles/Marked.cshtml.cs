@@ -48,7 +48,7 @@ namespace ProfileService.Api.Views.Profiles
 
         public async Task<IActionResult> OnPostDelete([FromRoute] string id, [FromQuery] string cinemaId, [FromQuery] Label label, CancellationToken ct)
         {
-            if (TestRecords.Used)
+            if (!TestRecords.Used)
                 await _gatewayService.DeleteFromLabeledList(id, cinemaId, label, ct);
 
             return new OkObjectResult("log delete");

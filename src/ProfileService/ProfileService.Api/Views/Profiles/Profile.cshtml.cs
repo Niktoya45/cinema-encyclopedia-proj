@@ -52,7 +52,9 @@ namespace ProfileService.Api.Views.Profiles
 
                 if (response is null)
                 {
-                    return RedirectToPage("/Index", "Encyclopedia");
+                    if (User.IsLoggedIn())
+                        return RedirectToPage("Profile", null, new { id = User.FindFirstValue(JwtRegisteredClaimNames.Sub)});
+                    else return RedirectToPage("/Index", "Encyclopedia");
                 }
 
                 Profile = new Profile

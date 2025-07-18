@@ -145,7 +145,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
                 {
                     Name = EditMain.Name,
                     ReleaseDate = EditMain.ReleaseDate,
-                    Genres = EditMain.GenresBind.Aggregate((acc, g) => acc | g),
+                    Genres = EditMain.GenresBind is null ? EditMain.Genres : EditMain.GenresBind.Aggregate((acc, g) => acc | g),
                     Language = EditMain.Language.GetValueOrDefault(),
                     Description = EditMain.Description,
                 }, ct); 
@@ -279,6 +279,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             return Partial("_StudioLogoCard", new ProductionStudio
             {
+                NewRecord = true,
                 ParentId = null,
                 Id = EditStudio.Id,
                 Name = EditStudio.Name,
@@ -330,6 +331,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             return Partial("_StarringCard", new EncyclopediaService.Api.Models.Display.Starring
             {
+                NewRecord = true,
                 ParentId = null,
                 Id = EditStarring.Id,
                 Name = EditStarring.Name,
@@ -366,6 +368,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Cinemas
 
             return Partial("_StarringCard", new EncyclopediaService.Api.Models.Display.Starring
             {
+                NewRecord = true,
                 ParentId = null,
                 Id = EditStarring.Id,
                 Name = EditStarring.Name,

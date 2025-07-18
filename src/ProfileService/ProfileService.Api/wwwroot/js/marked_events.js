@@ -24,7 +24,7 @@ records.forEach(function (record) {
 
         fetchPostMVC(null, action, "TEXT")
             .then((result) => {
-                record.classList.add('no-display');
+                record.remove();
             });
     })
 });

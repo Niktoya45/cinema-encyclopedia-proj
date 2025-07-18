@@ -70,11 +70,10 @@ namespace GatewayAPIService.Api.Controllers
             return Redirect(callback + $"&key={key}");
         }
 
-        [HttpGet]
-        [Route("logout")]
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
-            return RedirectToRoute("encyclopedia/index");
+            return RedirectToAction("index", "encyclopedia");
         }
     }
 }

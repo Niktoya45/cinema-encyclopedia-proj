@@ -26,7 +26,7 @@
 
 				@if (IsAdmin)
 				{
-					<div class="editor editor-toggle dropdown">
+					<div class="editor editor-toggle dropdown" style="visibility:@((!Model.NewRecord && Model.ParentId is null) ? "hidden" : "visible")">
 						<button id="dropdown-studio" type="button" style="border:none;background-color:transparent;" data-bs-toggle="dropdown" aria-expanded="false">
 							<span class="icon icon-sm icon-options-dots mt-3"></span>
 						</button>

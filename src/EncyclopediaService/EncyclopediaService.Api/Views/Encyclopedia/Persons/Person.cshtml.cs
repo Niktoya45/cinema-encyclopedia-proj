@@ -104,7 +104,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
                 {
                     Name = EditMain.Name,
                     BirthDate = EditMain.BirthDate,
-                    Jobs = EditMain.JobsBind.Aggregate((acc, g) => acc | g),
+                    Jobs = EditMain.JobsBind is null ? EditMain.Jobs : EditMain.JobsBind.Aggregate((acc, g) => acc | g),
                     Country = EditMain.Country.GetValueOrDefault(),
                     Description = EditMain.Description,
                 }, ct);
@@ -148,6 +148,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Persons
             }
 
             return Partial("_FilmCard", new FilmographyRecord {
+                NewRecord = true,
                 Id = EditFilm.Id,
                 Name = EditFilm.Name,
                 Year = EditFilm.Year,

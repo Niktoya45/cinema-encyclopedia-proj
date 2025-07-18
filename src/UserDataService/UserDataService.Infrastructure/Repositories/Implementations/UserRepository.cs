@@ -34,7 +34,7 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
                 return null;
             }
 
-            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.Id == cinema.Id));
+            var findIfExists = Builders<LabeledRecord>.Filter.Where(r => (r.UserId == cinema.UserId) && (r.CinemaId == cinema.CinemaId));
             var updateLabel = Builders<LabeledRecord>.Update.Combine(
                                 Builders<LabeledRecord>.Update.Set(r => r.Label, cinema.Label),
                                 Builders<LabeledRecord>.Update.Set(r => r.CinemaId, cinema.CinemaId)
@@ -197,7 +197,7 @@ namespace UserDataService.Infrastructure.Repositories.Implementations
             }
 
 
-            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.Id == rating.Id));
+            var findIfExists = Builders<RatingRecord>.Filter.Where(r => (r.UserId == rating.UserId) && (r.CinemaId == rating.CinemaId));
             var updateRating = Builders<RatingRecord>.Update.Combine(
                                 Builders<RatingRecord>.Update.Set(r => r.Rating, rating.Rating),
                                 Builders<RatingRecord>.Update.Set(r => r.CinemaId, rating.CinemaId)

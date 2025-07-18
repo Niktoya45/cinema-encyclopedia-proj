@@ -19,6 +19,7 @@ namespace UserDataService.Api.Commands.UserCommands.CreateCommands
         public async Task<CreateUserResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             User User = _mapper.Map<CreateUserCommand, User>(request);
+
             User added = _repository.Add(User);
 
             return _mapper.Map<User, CreateUserResponse>(added);

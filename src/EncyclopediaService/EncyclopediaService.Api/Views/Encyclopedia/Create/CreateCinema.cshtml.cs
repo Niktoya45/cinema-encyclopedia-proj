@@ -101,7 +101,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
                         Id = s.Id,
                         Name = s.Name,
                         Picture = s.Picture,
-                        Jobs = s.JobsBind.Aggregate((acc, j) => acc | j),
+                        Jobs = s.JobsBind is null ? s.Jobs : s.JobsBind.Aggregate((acc, j) => acc | j),
                         RoleName = s.RoleName,
                         RolePriority = s.RolePriority.GetValueOrDefault()
                     }).ToArray(),
@@ -178,7 +178,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
             }
 
             return Partial("_StudioCard", new ProductionStudio
-            {
+            { 
                 ParentId = nameof(Cinema) + "." + nameof(Cinema.ProductionStudios),
                 Id = AddStudio.Id,
                 Name = AddStudio.Name,

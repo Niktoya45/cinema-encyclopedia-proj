@@ -211,6 +211,10 @@ namespace GatewayAPIService.Api.Controllers
                     {
                         request.Label |= currentLabel;
                     }
+                    else if ((currentLabel & Label.Favored) != 0)
+                    {
+                        request.Label |= Label.Favored;
+                    }
                 }
             }
 

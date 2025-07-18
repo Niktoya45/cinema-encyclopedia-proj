@@ -126,7 +126,7 @@ namespace AccessService.Api.Controllers
                 return new NotFoundResult();
             }
 
-            await _userManager.DeleteAsync(user);
+            var result = await _userManager.DeleteAsync(user);
 
             return new OkObjectResult(userId);
         }

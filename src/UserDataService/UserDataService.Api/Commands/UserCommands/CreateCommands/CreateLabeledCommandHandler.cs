@@ -1,5 +1,7 @@
 using AutoMapper;
+using DnsClient;
 using MediatR;
+using MongoDB.Bson;
 using UserDataService.Api.Exceptions.UserExceptions;
 using UserDataService.Domain.Aggregates.UserAggregate;
 using UserDataService.Infrastructure.Models.LabeledDTO;
@@ -20,6 +22,8 @@ namespace UserDataService.Api.Commands.UserCommands.CreateCommands
         public async Task<LabeledResponse> Handle(CreateLabeledCommand request, CancellationToken cancellationToken)
         {
             LabeledRecord labeled = _mapper.Map<CreateLabeledCommand, LabeledRecord>(request);
+
+            labeled.Id = ObjectId.GenerateNewId(DateTime.Now).ToString();
 
             LabeledRecord? added = await _repository.AddToLabeledList(labeled, cancellationToken);
 

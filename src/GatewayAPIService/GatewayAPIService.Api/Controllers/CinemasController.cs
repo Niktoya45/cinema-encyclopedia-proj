@@ -495,8 +495,6 @@ namespace GatewayAPIService.Api.Controllers
 
                     person.Name = personRecord.Name;
                     person.Picture = personRecord.Picture;
-                    person.Jobs = Job.None;
-                    person.RolePriority = RolePriority.None;
                 }
             }
 

@@ -149,6 +149,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Studios
 
             return Partial("_FilmCard", new FilmographyRecord
             {
+                NewRecord = true,
                 Id = EditFilm.Id,
                 Name = EditFilm.Name,
                 Year = EditFilm.Year,

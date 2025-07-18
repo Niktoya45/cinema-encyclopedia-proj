@@ -127,7 +127,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
             }
 
             return Partial("_FilmCard", new FilmographyRecord
-            {
+            {   
                 ParentId = nameof(Studio) + "." + nameof(Studio.Filmography),
                 Id = AddFilm.Id,
                 Name = AddFilm.Name,

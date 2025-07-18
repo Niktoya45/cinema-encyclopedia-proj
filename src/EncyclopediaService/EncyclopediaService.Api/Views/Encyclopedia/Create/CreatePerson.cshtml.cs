@@ -67,7 +67,7 @@ namespace EncyclopediaService.Api.Views.Encyclopedia.Create
             }
 
             if (Person.JobsBind != null)
-                Person.Jobs = Person.JobsBind.Aggregate((acc, j) => acc | j);
+                Person.Jobs = Person.JobsBind is null ? Person.Jobs : Person.JobsBind.Aggregate((acc, j) => acc | j);
 
             if (Person != null)
             {

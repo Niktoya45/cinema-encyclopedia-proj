@@ -55,16 +55,16 @@ namespace EncyclopediaService.Api.Views
             return RedirectOuter(_baseGateway + $"/profile/{id}{path ?? ""}", keyAF);
         }
 
-        public async Task<IActionResult> OnGetLogin([FromQuery] string redirect)
+        public async Task<IActionResult> OnGetLogin([FromQuery] string? redirect = null)
         {
             if (!User.IsLoggedIn())
             {
-                string query = $"callback={HttpUtility.UrlEncode(Url.PageLink("/Index", "Authorize", new { redirect = redirect }))}";
+                string query = $"callback={HttpUtility.UrlEncode(Url.PageLink("/Index", "Authorize", new { redirect = redirect??_defaultRedirect }))}";
 
                 return Redirect(_baseGateway + "/gateway/login" + "?" + query );
             }
 
-            return Redirect(redirect);
+            return Redirect(redirect??_defaultRedirect);
         }
 
 

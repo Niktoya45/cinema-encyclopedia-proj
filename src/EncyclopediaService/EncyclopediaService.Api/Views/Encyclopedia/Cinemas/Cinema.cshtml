@@ -111,9 +111,11 @@
 
                         <div class="d-flex hstack gap-4 h-25 justify-content-center">
                             <div class="d-flex hstack gap-4 h-25" style="width:80%;margin-top:6rem">
-                                <form id="form-login" action="@(Url.PageLink("/Index", "Login", new {redirect = $"/encyclopedia/cinemas/{Model.Id}"}))" method="get" class="w-50">
-                                <button value="login" type="submit" class="btn btn-dark w-100" data-bs-dismiss="modal">Login</button>
-                                </form>
+                                <a class="btn btn-dark w-50"
+                                 href="@(Url.PageLink("/Index", "Login", new { redirect = Url.PageLink("/Encyclopedia/Cinemas/Cinema", null, new { id = Model.Id }) }))">
+                                   Login
+                                </a>
+
                                 <button value="cancel" type="submit" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </div>
@@ -195,7 +197,7 @@
                     }
                 </svg>
                 <button id="rating" type="button" class="fs-3 fw-bold" data-bs-toggle="dropdown" data-bs-target="#collapse-stars" aria-expanded="false">
-                    @Model.Cinema.RatingScore
+                    @(Model.Cinema.RatingScore == 0 ? 0 : Model.Cinema.RatingScore.ToString("#.#"))
                 </button>
                 <div class="dropdown-menu align-items-center" id="collapse-stars" aria-labelledby="rating">
                     <div>

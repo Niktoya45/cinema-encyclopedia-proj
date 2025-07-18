@@ -461,10 +461,14 @@
 }
 
 .empty-list-message {
-    padding: 8rem 5rem;
+    padding: 1.05rem 5rem;
     font-size: 2rem;
     color: #225555; 
     font-weight: 400;
+}
+
+.empty-list:has( + .table-list tbody tr) {
+    display: none !important;
 }
 
 #list {
@@ -475,6 +479,10 @@
    z-index:3;
    background-color: inherit;
    border: none;
+}
+
+.table-list:not(.table-list:has(.record)) {
+    display: none !important;
 }
 
 .table-list thead{
